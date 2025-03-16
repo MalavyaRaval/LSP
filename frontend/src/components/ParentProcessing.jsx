@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
+import ConnectionProcessing from "./ConnectionProcessing.jsx";
 
 const ParentProcessing = ({
   parentNodes,
@@ -13,8 +14,7 @@ const ParentProcessing = ({
   }
   const currentParent = parentNodes[currentParentIndex];
 
-  // Levels: 9 is Highest and 1 is Lowest.
-  const levels = [
+  const levelsImportance = [
     { value: 9, label: "Highest" },
     { value: 8, label: "Very high" },
     { value: 7, label: "High" },
@@ -26,25 +26,36 @@ const ParentProcessing = ({
     { value: 1, label: "Lowest" },
   ];
 
+  // Step: 1 = Ask connection; 2 = Ask importance.
+  const [step, setStep] = useState(1);
   const [values, setValues] = useState({
     importance: currentParent.attributes?.importance || "",
-    connection: currentParent.attributes?.connection || "",
+    connection: "",
   });
   const [error, setError] = useState("");
+
+  // Reset the step and connection value whenever the current parent changes.
+  useEffect(() => {
+    setStep(1);
+    setValues({
+      importance: currentParent.attributes?.importance || "",
+      connection: "",
+    });
+    setError("");
+  }, [currentParent]);
 
   const handleChange = (e) => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
 
-  const validate = () => {
+  const validateImportance = () => {
     const importance = parseInt(values.importance, 10);
-    const connection = parseInt(values.connection, 10);
-    if (isNaN(importance) || isNaN(connection)) {
-      setError("Please select valid levels for both fields.");
+    if (isNaN(importance)) {
+      setError("Please select a valid level for importance.");
       return false;
     }
-    if (importance < 1 || importance > 9 || connection < 1 || connection > 9) {
-      setError("Values must be between 1 and 9.");
+    if (importance < 1 || importance > 9) {
+      setError("Importance must be between 1 and 9.");
       return false;
     }
     setError("");
@@ -52,12 +63,10 @@ const ParentProcessing = ({
   };
 
   const handleSave = async () => {
-    if (validate()) {
+    if (validateImportance()) {
       try {
-        // Ensure the numerical values are within 1 to 9.
         const imp = Math.max(1, Math.min(9, parseInt(values.importance, 10)));
-        const con = Math.max(1, Math.min(9, parseInt(values.connection, 10)));
-        // Update the node in the backend.
+        const con = parseInt(values.connection, 10);
         await axios.put(
           `http://localhost:8000/api/projects/${projectId}/nodes/${currentParent.id}`,
           { attributes: { importance: imp, connection: con } }
@@ -76,58 +85,51 @@ const ParentProcessing = ({
         Process Parent Node:{" "}
         <span className="text-indigo-600">{currentParent.name}</span>
       </h2>
-      <div className="mb-4">
-        <label className="block text-lg font-medium text-gray-700 mb-2">
-          Importance
-        </label>
-        <select
-          name="importance"
-          value={values.importance}
-          onChange={handleChange}
-          className="w-full border rounded px-2 py-1"
-        >
-          <option value="">Select Level</option>
-          {levels.map((level) => (
-            <option key={level.value} value={level.value}>
-              {level.label}
-            </option>
-          ))}
-        </select>
-      </div>
-      <div className="mb-4">
-        <label className="block text-lg font-medium text-gray-700 mb-2">
-          Connection
-        </label>
-        <select
-          name="connection"
-          value={values.connection}
-          onChange={handleChange}
-          className="w-full border rounded px-2 py-1"
-        >
-          <option value="">Select Level</option>
-          {levels.map((level) => (
-            <option key={level.value} value={level.value}>
-              {level.label}
-            </option>
-          ))}
-        </select>
-      </div>
-      {error && <p className="text-red-500 mb-4">{error}</p>}
-      <div className="flex justify-between mt-6">
-        <button
-          className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-          onClick={onPrevParent}
-          disabled={currentParentIndex === 0}
-        >
-          Back
-        </button>
-        <button
-          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-          onClick={handleSave}
-        >
-          Save and Next
-        </button>
-      </div>
+      {step === 1 ? (
+        <ConnectionProcessing
+          onComplete={(connectionValue) => {
+            setValues({ ...values, connection: connectionValue });
+            setStep(2);
+          }}
+        />
+      ) : (
+        <>
+          <div className="mb-4">
+            <label className="block text-lg font-medium text-gray-700 mb-2">
+              Importance
+            </label>
+            <select
+              name="importance"
+              value={values.importance}
+              onChange={handleChange}
+              className="w-full border rounded px-2 py-1"
+            >
+              <option value="">Select Level</option>
+              {levelsImportance.map((level) => (
+                <option key={level.value} value={level.value}>
+                  {level.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          {error && <p className="text-red-500 mb-4">{error}</p>}
+          <div className="flex justify-between mt-6">
+            <button
+              className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+              onClick={onPrevParent}
+              disabled={currentParentIndex === 0}
+            >
+              Back
+            </button>
+            <button
+              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+              onClick={handleSave}
+            >
+              Save and Next
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 };

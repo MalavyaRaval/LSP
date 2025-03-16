@@ -168,22 +168,23 @@ const Home = () => {
     getAllEvents();
   }, []);
 
+  // Replace your return block with the following changes:
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="flex flex-col min-h-screen bg-gray-50">
       <Navbar />
-      <div className="container mx-auto px-4 py-8">
+      <div className="flex-1 container mx-auto px-4 py-8">
         {/* Create Project Button */}
-        <div className="flex justify-end mb-8">
+        <div className="relative mb-8">
           <button
             type="button"
-            className="fixed bottom-8 right-8 w-12 h-12 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 flex items-center justify-center text-2xl z-10"
+            className="absolute top-0 right-0 mt-4 mr-4 w-14 h-14 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-full shadow-lg hover:shadow-xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 transform hover:scale-110 focus:outline-none z-10 flex items-center justify-center"
             data-bs-toggle="modal"
             data-bs-target="#createEventModal"
+            aria-label="Create New Project"
           >
-            +
+            <span className="text-3xl font-bold">+</span>
           </button>
         </div>
-
         {/* Create Project Modal */}
         <div
           className="modal fade"
@@ -280,7 +281,6 @@ const Home = () => {
             </div>
           </div>
         </div>
-
         {/* Projects Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {events.map((event, index) => (
@@ -325,7 +325,6 @@ const Home = () => {
             </div>
           ))}
         </div>
-
         {/* Project Details Modal */}
         {showModal && selectedEvent && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -370,10 +369,9 @@ const Home = () => {
             </div>
           </div>
         )}
-
-        <Footer />
-        <ToastMessage {...toast} />
       </div>
+      <Footer />
+      <ToastMessage {...toast} />
     </div>
   );
 };

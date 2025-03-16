@@ -3,21 +3,21 @@ const mongoose = require("mongoose");
 const nodeAttributesSchema = new mongoose.Schema({
   importance: {
     type: Number,
-    min: [1, 'Importance must be at least 1'],
-    max: [9, 'Importance cannot exceed 9']
+    min: [1, "Importance must be at least 1"],
+    max: [9, "Importance cannot exceed 9"],
   },
   connection: {
     type: Number,
-    min: [1, 'Connection must be at least 1'],
-    max: [9, 'Connection cannot exceed 9']
+    min: [1, "Connection must be at least 1"],
+    max: [8, "Connection cannot exceed 8"],
   },
   created: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   },
   decisionProcess: String,
   objectName: String,
-  lastUpdated: Date
+  lastUpdated: Date,
 });
 
 const treeNodeSchema = new mongoose.Schema({

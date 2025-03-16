@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const Query4 = () => {
+const Query4 = ({ onSave }) => {
   const [values, setValues] = useState({ first: "", second: "" });
   const [error, setError] = useState("");
 
@@ -13,25 +13,32 @@ const Query4 = () => {
     const secondNum = parseFloat(values.second);
     if (isNaN(firstNum) || isNaN(secondNum)) {
       setError("Please enter valid numbers.");
-      return;
+      return false;
     }
     if (firstNum >= secondNum) {
       setError("First value must be less than second value.");
-      return;
+      return false;
     }
     setError("");
+    return true;
+  };
+
+  const handleSave = () => {
+    if (validate()) {
+      // (Optional) save data via API
+      onSave(); // signal LeafProcessing to move to next leaf
+    }
   };
 
   return (
-    <div className="p-4">
+    <div className="p-4 border rounded">
       <h1 className="text-2xl font-bold mb-2">
         Query 4: I prefer high values of this item
       </h1>
       <p className="mb-4">
-        Please answer the following questions. The first value must be less than
-        the second value.
+        Please answer the following. The first value must be less than the
+        second value.
       </p>
-      <p className="mb-2 font-semibold">Your Choice: [Analyzed Item]</p>
       <table className="min-w-full border-collapse border border-gray-400 mb-4">
         <thead>
           <tr className="bg-gray-200">
@@ -73,6 +80,12 @@ const Query4 = () => {
         </tbody>
       </table>
       {error && <p className="text-red-500">{error}</p>}
+      <button
+        className="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+        onClick={handleSave}
+      >
+        Save and Next
+      </button>
     </div>
   );
 };

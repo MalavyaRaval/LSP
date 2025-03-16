@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const Query7 = () => {
+const Query7 = ({ onSave }) => {
   const [rows, setRows] = useState([
     { offered: "", satisfaction: "" },
     { offered: "", satisfaction: "" },
@@ -23,27 +23,32 @@ const Query7 = () => {
       const next = parseFloat(rows[i + 1].offered);
       if (isNaN(current) || isNaN(next)) {
         setError("Please enter valid numbers for all offered values.");
-        return;
+        return false;
       }
       if (current >= next) {
         setError("Offered values must be in strictly increasing order.");
-        return;
+        return false;
       }
     }
     setError("");
+    return true;
+  };
+
+  const handleSave = () => {
+    if (validateRows()) {
+      onSave();
+    }
   };
 
   return (
-    <div className="p-4">
+    <div className="p-4 border rounded">
       <h1 className="text-2xl font-bold mb-2">
         Query 7: I will specify a table of requirements
       </h1>
       <p className="mb-4">
         Please fill 2 or more rows of the scoring table. The offered values must
-        create a strictly increasing sequence. Values outside of the border
-        values yield the same satisfaction as the border values.
+        form a strictly increasing sequence.
       </p>
-      <p className="mb-2 font-semibold">[Analyzed Item]</p>
       <table className="min-w-full border-collapse border border-gray-400 mb-4">
         <thead>
           <tr className="bg-gray-200">
@@ -88,6 +93,12 @@ const Query7 = () => {
         Add Row
       </button>
       {error && <p className="text-red-500 mt-2">{error}</p>}
+      <button
+        className="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+        onClick={handleSave}
+      >
+        Save and Next
+      </button>
     </div>
   );
 };

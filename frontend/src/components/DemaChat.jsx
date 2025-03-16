@@ -1,6 +1,17 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import axios from "axios";
+import LeafProcessing from "./LeafProcessing.jsx"; // New import
+
+// Helper: recursively extract leaf nodes (nodes with no children)
+const getLeafNodes = (node) => {
+  if (!node.children || node.children.length === 0) return [node];
+  let leaves = [];
+  node.children.forEach((child) => {
+    leaves = leaves.concat(getLeafNodes(child));
+  });
+  return leaves;
+};
 
 const DemaChat = () => {
   const { username, projectname } = useParams();
@@ -9,36 +20,31 @@ const DemaChat = () => {
   const query = new URLSearchParams(location.search);
   const parentIdQuery = query.get("parentId");
 
-  // We use projectname as the projectId.
+  // Use projectname as the projectId.
   const projectId = projectname;
   const [parentId, setParentId] = useState(parentIdQuery || null);
-  // New state: Parent's name to display
   const [parentName, setParentName] = useState("");
   const [currentStep, setCurrentStep] = useState(0);
-  // Step 0: Number of children for the current node.
   const [childrenCount, setChildrenCount] = useState("");
-  // Step 1: For each child, ask for its name and whether to decompose further.
   const [childrenDetails, setChildrenDetails] = useState([]);
   const [processing, setProcessing] = useState(false);
-  // BFS queue stores nodes (with valid IDs) that need further decomposition.
   const [bfsQueue, setBfsQueue] = useState([]);
+  // New states for leaf processing.
+  const [processingLeaves, setProcessingLeaves] = useState(false);
+  const [leafNodes, setLeafNodes] = useState([]);
+  const [currentLeafIndex, setCurrentLeafIndex] = useState(0);
+  const [leafValues, setLeafValues] = useState({});
+  const [error, setError] = useState("");
 
   const messagesEndRef = useRef(null);
 
-  // We'll use our own custom text now.
+  // Our steps for decomposition.
   const steps = [
-    {
-      id: "childrenCount",
-      // The "for" part is handled in the header.
-      question: "Enter the number of children",
-    },
-    {
-      id: "childrenDetails",
-      question: "Enter details for each child",
-    },
+    { id: "childrenCount", question: "Enter the number of children" },
+    { id: "childrenDetails", question: "Enter details for each child" },
   ];
 
-  // Helper: Recursively find a node by id in the tree.
+  // Helper: Recursively find a node by id.
   const findNodeById = (node, id) => {
     if (node.id?.toString() === id.toString()) return node;
     if (!node.children || node.children.length === 0) return null;
@@ -94,11 +100,7 @@ const DemaChat = () => {
           if (res.data) {
             const treeData = res.data;
             const node = findNodeById(treeData, parentId);
-            if (node && node.name) {
-              setParentName(node.name);
-            } else {
-              setParentName("Unknown");
-            }
+            setParentName((node && node.name) || "Unknown");
           }
         } catch (err) {
           console.error("Error fetching parent details:", err);
@@ -118,7 +120,7 @@ const DemaChat = () => {
   // Auto-scroll when step changes.
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [currentStep]);
+  }, [currentStep, processingLeaves, currentLeafIndex]);
 
   // ----- STEP 0: Handle number of children -----
   const handleCountSubmit = () => {
@@ -139,11 +141,7 @@ const DemaChat = () => {
   // ----- STEP 1: Handle child details changes -----
   const handleDetailChange = (index, field, value) => {
     const newDetails = [...childrenDetails];
-    if (field === "decompose") {
-      newDetails[index][field] = value === "true";
-    } else {
-      newDetails[index][field] = value;
-    }
+    newDetails[index][field] = field === "decompose" ? value === "true" : value;
     setChildrenDetails(newDetails);
   };
 
@@ -158,11 +156,8 @@ const DemaChat = () => {
     const childrenNodes = childrenDetails.map((child, index) => ({
       id: `${effectiveParentId}-${Date.now()}-${index}`,
       name: child.name,
-      decompose: child.decompose, // top-level flag
-      attributes: {
-        decompose: child.ddemacompose,
-        created: Date.now(),
-      },
+      decompose: child.decompose,
+      attributes: { created: Date.now() },
       children: [],
       parent: effectiveParentId,
     }));
@@ -193,12 +188,11 @@ const DemaChat = () => {
       const createdChildren = parentNode.children;
       console.log("Created children from backend:", createdChildren);
 
-      const nodesToDecompose = createdChildren.filter((child) => {
-        return (
-          (child.attributes && child.attributes.decompose === true) ||
-          child.decompose === true
-        );
-      });
+      const nodesToDecompose = createdChildren.filter(
+        (child) =>
+          child.decompose === true ||
+          (child.attributes && child.attributes.decompose === true)
+      );
       console.log("Nodes to decompose:", nodesToDecompose);
 
       const storedQueue = JSON.parse(
@@ -224,13 +218,12 @@ const DemaChat = () => {
         console.log("Processing next node in queue:", nextNode);
         sessionStorage.setItem("bfsQueue", JSON.stringify(remaining));
         setBfsQueue(remaining);
-        // Instead of navigating away, update parentId for internal redirection.
         setParentId(nextNode.id);
-        // Reset state for new input for the next node.
         setChildrenCount("");
         setChildrenDetails([]);
         setCurrentStep(0);
       } else {
+        // No nodes left to decompose: finalize the tree.
         finalizeNode();
       }
     } catch (error) {
@@ -242,33 +235,55 @@ const DemaChat = () => {
   };
 
   // ----- Finalize Node -----
-  const finalizeNode = () => {
+  const finalizeNode = async () => {
     alert("All decompositions complete for this node! Finalizing tree.");
     window.dispatchEvent(new Event("refreshProjectTree"));
-    // Reset state to start fresh.
     setParentId(null);
     setChildrenCount("");
     setChildrenDetails([]);
     setCurrentStep(0);
-  };
-
-  const handleNextStep = () => {
-    if (currentStep === 0) {
-      handleCountSubmit();
-    } else if (currentStep === 1) {
-      if (childrenDetails.some((child) => !child.name.trim())) {
-        alert("Please fill in all Component names.");
-        return;
-      }
-      handleProcessChildren();
+    try {
+      const res = await axios.get(
+        `http://localhost:8000/api/projects/${projectId}`
+      );
+      const treeData = res.data;
+      const leaves = getLeafNodes(treeData);
+      console.log("Leaf nodes found:", leaves);
+      setLeafNodes(leaves);
+      setProcessingLeaves(true);
+      setCurrentLeafIndex(0);
+    } catch (error) {
+      console.error("Error fetching tree after finalizing:", error);
     }
   };
 
-  const handleBackStep = () => {
-    if (currentStep > 0) setCurrentStep((prev) => prev - 1);
-  };
-
+  // ----- Decide which view to render -----
   const renderStep = () => {
+    if (processingLeaves) {
+      return (
+        <LeafProcessing
+          leafNodes={leafNodes}
+          currentLeafIndex={currentLeafIndex}
+          leafValues={leafValues}
+          setLeafValues={setLeafValues}
+          error={error}
+          setError={setError}
+          onNextLeaf={() => {
+            if (currentLeafIndex < leafNodes.length - 1) {
+              setCurrentLeafIndex(currentLeafIndex + 1);
+            } else {
+              alert("Finished processing all leaf nodes!");
+              setProcessingLeaves(false);
+            }
+          }}
+          onPrevLeaf={() => {
+            if (currentLeafIndex > 0) {
+              setCurrentLeafIndex(currentLeafIndex - 1);
+            }
+          }}
+        />
+      );
+    }
     if (currentStep === 0) {
       return (
         <div className="p-6 bg-white rounded-lg shadow-md mx-4">
@@ -382,15 +397,29 @@ const DemaChat = () => {
     return null;
   };
 
+  const handleNextStep = () => {
+    if (currentStep === 0) {
+      handleCountSubmit();
+    } else if (currentStep === 1) {
+      if (childrenDetails.some((child) => !child.name.trim())) {
+        alert("Please fill in all Component names.");
+        return;
+      }
+      handleProcessChildren();
+    }
+  };
+
+  const handleBackStep = () => {
+    if (currentStep > 0) setCurrentStep((prev) => prev - 1);
+  };
+
   return (
     <div className="w-full h-full p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:bg-gray-800 rounded-lg shadow-xl flex flex-col">
-      {/* Header */}
       <header className="flex items-center justify-between p-4 border-b bg-gray-200 rounded-t-lg">
         <h1 className="text-xl font-bold text-gray-800">
           DeMA Decision Assistant
         </h1>
       </header>
-      {/* Main Content */}
       <main className="flex-1 p-4 overflow-y-auto">{renderStep()}</main>
       <div ref={messagesEndRef} />
     </div>

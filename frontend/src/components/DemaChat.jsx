@@ -40,8 +40,8 @@ const DemaChat = () => {
 
   // Our steps for decomposition.
   const steps = [
-    { id: "childrenCount", question: "Enter the number of children" },
-    { id: "childrenDetails", question: "Enter details for each child" },
+    { id: "childrenCount", question: "Enter the number of Components" },
+    { id: "childrenDetails", question: "Enter details for each Components" },
   ];
 
   // Helper: Recursively find a node by id.

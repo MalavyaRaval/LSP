@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import axios from "axios";
-import LeafProcessing from "./LeafProcessing.jsx"; // New import
+import LeafProcessing from "./LeafProcessing.jsx";
+import ParentProcessing from "./ParentProcessing.jsx";
 
 // Helper: recursively extract leaf nodes (nodes with no children)
 const getLeafNodes = (node) => {
@@ -20,7 +21,6 @@ const DemaChat = () => {
   const query = new URLSearchParams(location.search);
   const parentIdQuery = query.get("parentId");
 
-  // Use projectname as the projectId.
   const projectId = projectname;
   const [parentId, setParentId] = useState(parentIdQuery || null);
   const [parentName, setParentName] = useState("");
@@ -29,19 +29,24 @@ const DemaChat = () => {
   const [childrenDetails, setChildrenDetails] = useState([]);
   const [processing, setProcessing] = useState(false);
   const [bfsQueue, setBfsQueue] = useState([]);
-  // New states for leaf processing.
+  // States for leaf processing.
   const [processingLeaves, setProcessingLeaves] = useState(false);
   const [leafNodes, setLeafNodes] = useState([]);
   const [currentLeafIndex, setCurrentLeafIndex] = useState(0);
   const [leafValues, setLeafValues] = useState({});
   const [error, setError] = useState("");
+  // States for parent processing.
+  const [processingParents, setProcessingParents] = useState(false);
+  const [parentNodes, setParentNodes] = useState([]);
+  const [currentParentIndex, setCurrentParentIndex] = useState(0);
+  // New state to track processed parent IDs.
+  const [processedParentIds, setProcessedParentIds] = useState(new Set());
 
   const messagesEndRef = useRef(null);
 
-  // Our steps for decomposition.
   const steps = [
     { id: "childrenCount", question: "Enter the number of Components" },
-    { id: "childrenDetails", question: "Enter details for each Components" },
+    { id: "childrenDetails", question: "Enter details for each Component" },
   ];
 
   // Helper: Recursively find a node by id.
@@ -55,14 +60,11 @@ const DemaChat = () => {
     return null;
   };
 
-  // Load BFS queue from sessionStorage.
   useEffect(() => {
     const storedQueue = JSON.parse(sessionStorage.getItem("bfsQueue") || "[]");
     setBfsQueue(storedQueue);
-    console.log("Initial BFS Queue:", storedQueue);
   }, []);
 
-  // If no parentId is provided, fetch the root node.
   useEffect(() => {
     const fetchRoot = async () => {
       try {
@@ -72,10 +74,6 @@ const DemaChat = () => {
           );
           if (res.data && res.data.id) {
             setParentId(res.data.id.toString());
-            console.log(
-              "Fetched root node. ParentId set to:",
-              res.data.id.toString()
-            );
           } else {
             console.warn("No root node found; check backend logic.");
           }
@@ -89,7 +87,6 @@ const DemaChat = () => {
     }
   }, [projectId, parentId]);
 
-  // When parentId changes, fetch parent's name.
   useEffect(() => {
     const fetchParentName = async () => {
       if (parentId) {
@@ -111,18 +108,21 @@ const DemaChat = () => {
     fetchParentName();
   }, [parentId, projectId]);
 
-  // Also update parentId if the URL changes.
   useEffect(() => {
     const pid = new URLSearchParams(location.search).get("parentId");
     if (pid) setParentId(pid);
   }, [location.search]);
 
-  // Auto-scroll when step changes.
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [currentStep, processingLeaves, currentLeafIndex]);
+  }, [
+    currentStep,
+    processingLeaves,
+    currentLeafIndex,
+    processingParents,
+    currentParentIndex,
+  ]);
 
-  // ----- STEP 0: Handle number of children -----
   const handleCountSubmit = () => {
     const count = parseInt(childrenCount);
     if (isNaN(count) || count < 2 || count > 5) {
@@ -138,14 +138,12 @@ const DemaChat = () => {
     setCurrentStep(1);
   };
 
-  // ----- STEP 1: Handle child details changes -----
   const handleDetailChange = (index, field, value) => {
     const newDetails = [...childrenDetails];
     newDetails[index][field] = field === "decompose" ? value === "true" : value;
     setChildrenDetails(newDetails);
   };
 
-  // ----- Save Children & Update BFS Queue -----
   const saveChildren = async () => {
     const effectiveParentId = parentId;
     if (!effectiveParentId) {
@@ -186,14 +184,12 @@ const DemaChat = () => {
         return [];
       }
       const createdChildren = parentNode.children;
-      console.log("Created children from backend:", createdChildren);
 
       const nodesToDecompose = createdChildren.filter(
         (child) =>
           child.decompose === true ||
           (child.attributes && child.attributes.decompose === true)
       );
-      console.log("Nodes to decompose:", nodesToDecompose);
 
       const storedQueue = JSON.parse(
         sessionStorage.getItem("bfsQueue") || "[]"
@@ -208,14 +204,12 @@ const DemaChat = () => {
     }
   };
 
-  // ----- Process Children -----
   const handleProcessChildren = async () => {
     try {
       setProcessing(true);
       const updatedQueue = await saveChildren();
       if (updatedQueue && updatedQueue.length > 0) {
         const [nextNode, ...remaining] = updatedQueue;
-        console.log("Processing next node in queue:", nextNode);
         sessionStorage.setItem("bfsQueue", JSON.stringify(remaining));
         setBfsQueue(remaining);
         setParentId(nextNode.id);
@@ -223,7 +217,6 @@ const DemaChat = () => {
         setChildrenDetails([]);
         setCurrentStep(0);
       } else {
-        // No nodes left to decompose: finalize the tree.
         finalizeNode();
       }
     } catch (error) {
@@ -234,7 +227,6 @@ const DemaChat = () => {
     }
   };
 
-  // ----- Finalize Node -----
   const finalizeNode = async () => {
     alert("All decompositions complete for this node! Finalizing tree.");
     window.dispatchEvent(new Event("refreshProjectTree"));
@@ -252,12 +244,85 @@ const DemaChat = () => {
       setLeafNodes(leaves);
       setProcessingLeaves(true);
       setCurrentLeafIndex(0);
+      // Reset processed parents since we are starting a new parent processing phase.
+      setProcessedParentIds(new Set());
     } catch (error) {
       console.error("Error fetching tree after finalizing:", error);
     }
   };
 
-  // ----- Decide which view to render -----
+  // ----- Start Processing Parents after Leaves -----
+  const startParentProcessing = async () => {
+    try {
+      const res = await axios.get(
+        `http://localhost:8000/api/projects/${projectId}`
+      );
+      const treeData = res.data;
+      let initialParentIds = new Set();
+      leafNodes.forEach((leaf) => {
+        if (leaf.parent && leaf.parent.toString() !== treeData.id.toString()) {
+          initialParentIds.add(leaf.parent.toString());
+        }
+      });
+      // Filter out already processed parent IDs (should be empty on first call)
+      const filteredParentIds = Array.from(initialParentIds).filter(
+        (pid) => !processedParentIds.has(pid)
+      );
+      // Mark these as processed
+      const newProcessed = new Set(processedParentIds);
+      filteredParentIds.forEach((pid) => newProcessed.add(pid));
+      setProcessedParentIds(newProcessed);
+      const parentNodesArr = filteredParentIds
+        .map((pid) => findNodeById(treeData, pid))
+        .filter(Boolean);
+      if (parentNodesArr.length > 0) {
+        setParentNodes(parentNodesArr);
+        setCurrentParentIndex(0);
+        setProcessingParents(true);
+      } else {
+        alert("No parent nodes to process. Tree finalization complete.");
+      }
+    } catch (err) {
+      console.error("Error starting parent processing:", err);
+    }
+  };
+
+  // Process parent level: after finishing current level, extract next level parents.
+  const processNextParentLevel = async () => {
+    try {
+      const res = await axios.get(
+        `http://localhost:8000/api/projects/${projectId}`
+      );
+      const treeData = res.data;
+      let nextLevelParentIds = new Set();
+      parentNodes.forEach((node) => {
+        if (node.parent && node.parent.toString() !== treeData.id.toString()) {
+          nextLevelParentIds.add(node.parent.toString());
+        }
+      });
+      // Filter out IDs that have already been processed.
+      const filteredNextIds = Array.from(nextLevelParentIds).filter(
+        (pid) => !processedParentIds.has(pid)
+      );
+      // Update the processed parent set.
+      const newProcessed = new Set(processedParentIds);
+      filteredNextIds.forEach((pid) => newProcessed.add(pid));
+      setProcessedParentIds(newProcessed);
+      const nextParentsArr = filteredNextIds
+        .map((pid) => findNodeById(treeData, pid))
+        .filter(Boolean);
+      if (nextParentsArr.length > 0) {
+        setParentNodes(nextParentsArr);
+        setCurrentParentIndex(0);
+      } else {
+        setProcessingParents(false);
+        alert("Finished processing all parent nodes. Finalization complete.");
+      }
+    } catch (err) {
+      console.error("Error processing next parent level:", err);
+    }
+  };
+
   const renderStep = () => {
     if (processingLeaves) {
       return (
@@ -272,8 +337,8 @@ const DemaChat = () => {
             if (currentLeafIndex < leafNodes.length - 1) {
               setCurrentLeafIndex(currentLeafIndex + 1);
             } else {
-              alert("Finished processing all leaf nodes!");
               setProcessingLeaves(false);
+              startParentProcessing();
             }
           }}
           onPrevLeaf={() => {
@@ -281,6 +346,27 @@ const DemaChat = () => {
               setCurrentLeafIndex(currentLeafIndex - 1);
             }
           }}
+        />
+      );
+    }
+    if (processingParents) {
+      return (
+        <ParentProcessing
+          parentNodes={parentNodes}
+          currentParentIndex={currentParentIndex}
+          onNextParent={() => {
+            if (currentParentIndex < parentNodes.length - 1) {
+              setCurrentParentIndex(currentParentIndex + 1);
+            } else {
+              processNextParentLevel();
+            }
+          }}
+          onPrevParent={() => {
+            if (currentParentIndex > 0) {
+              setCurrentParentIndex(currentParentIndex - 1);
+            }
+          }}
+          projectId={projectId}
         />
       );
     }

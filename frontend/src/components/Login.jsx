@@ -36,10 +36,6 @@ const Login = () => {
         // Ensure fullName is available in the response data
         if (response.data.fullName) {
           localStorage.setItem("fullName", response.data.fullName);
-          console.log(
-            "Full Name saved to LocalStorage:",
-            response.data.fullName
-          );
         } else {
           console.error("Full name not found in the response data.");
         }

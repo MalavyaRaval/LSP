@@ -140,5 +140,45 @@ router.post('/:projectId/nodes', async (req, res) => {
   }
 });
 
-// Export the router only once
+// Add this new route after your existing routes
+
+// PUT: Update a specific node in the project tree by nodeId
+router.put('/:projectId/nodes/:nodeId', async (req, res) => {
+  try {
+    const project = await Project.findOne({ projectId: req.params.projectId });
+    if (!project) return res.status(404).json({ message: 'Project not found' });
+    const treeData = project.treeData;
+    const { attributes } = req.body;
+
+    // Helper function: recursively update node attributes
+    const updateNodeAttributes = (node, nodeId, newAttributes) => {
+      if (node.id.toString() === nodeId.toString()) {
+        node.attributes = { 
+          ...node.attributes, 
+          ...newAttributes, 
+          lastUpdated: new Date() 
+        };
+        return true;
+      }
+      if (node.children && Array.isArray(node.children)) {
+        for (let child of node.children) {
+          if (updateNodeAttributes(child, nodeId, newAttributes)) return true;
+        }
+      }
+      return false;
+    };
+
+    const found = updateNodeAttributes(treeData, req.params.nodeId, attributes);
+    if (!found) {
+      return res.status(404).json({ message: "Node not found" });
+    }
+
+    project.markModified('treeData');
+    await project.save();
+    res.json(project.treeData);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 module.exports = router;

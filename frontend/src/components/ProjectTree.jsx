@@ -200,22 +200,33 @@ const ProjectTree = ({ projectId, username, projectname }) => {
   const [tree, setTree] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Extracted loadProject function to be usable in multiple useEffect hooks.
+  const loadProject = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        `http://localhost:8000/api/projects/${projectId}`
+      );
+      setTree(response.data);
+    } catch (error) {
+      console.error("Error loading project:", error);
+      alert("Failed to load project");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const loadProject = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:8000/api/projects/${projectId}`
-        );
-        setTree(response.data);
-      } catch (error) {
-        console.error("Error loading project:", error);
-        alert("Failed to load project");
-      } finally {
-        setLoading(false);
-      }
-    };
     loadProject();
   }, [projectId]);
+
+  // Listen for the custom "refreshProjectTree" event to reload the project.
+  useEffect(() => {
+    window.addEventListener("refreshProjectTree", loadProject);
+    return () => {
+      window.removeEventListener("refreshProjectTree", loadProject);
+    };
+  }, []);
 
   const saveProject = async (updatedTree) => {
     try {

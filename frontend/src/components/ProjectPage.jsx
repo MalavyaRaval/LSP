@@ -112,8 +112,8 @@ const ProjectPage = () => {
           {/* Project Tree Container */}
           <Resizable
             defaultSize={{
-              width: 600,
-              height: 400,
+              width: 1200,
+              height: 800,
             }}
             minWidth={300}
             minHeight={200}
@@ -175,7 +175,10 @@ const ProjectPage = () => {
           </Resizable>
 
           {/* Dema Chat Container */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4">
+          <div
+            style={{ width: "1200px", height: "700px" }}
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4"
+          >
             <DemaChat />
           </div>
         </div>

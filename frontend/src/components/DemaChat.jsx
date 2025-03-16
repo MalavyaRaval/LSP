@@ -160,7 +160,7 @@ const DemaChat = () => {
       name: child.name,
       decompose: child.decompose, // top-level flag
       attributes: {
-        decompose: child.decompose,
+        decompose: child.ddemacompose,
         created: Date.now(),
       },
       children: [],
@@ -174,7 +174,7 @@ const DemaChat = () => {
           parentId: effectiveParentId,
           children: childrenNodes,
           metadata: {
-            decisionProcess: "DEMA",
+            decisionProcess: "DeMA",
             objectName: "My Object",
           },
         }
@@ -221,22 +221,21 @@ const DemaChat = () => {
       const updatedQueue = await saveChildren();
       if (updatedQueue && updatedQueue.length > 0) {
         const [nextNode, ...remaining] = updatedQueue;
-        console.log("Navigating to next node in queue:", nextNode);
+        console.log("Processing next node in queue:", nextNode);
         sessionStorage.setItem("bfsQueue", JSON.stringify(remaining));
         setBfsQueue(remaining);
-        navigate(
-          `/user/${username}/project/${projectId}/dema-chat?parentId=${nextNode.id}`,
-          { state: { bfsQueue: remaining } }
-        );
-        setTimeout(() => {
-          window.location.reload();
-        }, 100);
+        // Instead of navigating away, update parentId for internal redirection.
+        setParentId(nextNode.id);
+        // Reset state for new input for the next node.
+        setChildrenCount("");
+        setChildrenDetails([]);
+        setCurrentStep(0);
       } else {
         finalizeNode();
       }
     } catch (error) {
-      console.error("Error processing children:", error);
-      alert("Failed to process children nodes.");
+      console.error("Error processing Components:", error);
+      alert("Failed to process Components nodes.");
     } finally {
       setProcessing(false);
     }
@@ -245,8 +244,12 @@ const DemaChat = () => {
   // ----- Finalize Node -----
   const finalizeNode = () => {
     alert("All decompositions complete for this node! Finalizing tree.");
-    navigate(`/user/${username}/project/${projectId}`);
-    setTimeout(() => window.location.reload(), 100);
+    window.dispatchEvent(new Event("refreshProjectTree"));
+    // Reset state to start fresh.
+    setParentId(null);
+    setChildrenCount("");
+    setChildrenDetails([]);
+    setCurrentStep(0);
   };
 
   const handleNextStep = () => {
@@ -254,7 +257,7 @@ const DemaChat = () => {
       handleCountSubmit();
     } else if (currentStep === 1) {
       if (childrenDetails.some((child) => !child.name.trim())) {
-        alert("Please fill in all child names.");
+        alert("Please fill in all Component names.");
         return;
       }
       handleProcessChildren();
@@ -304,7 +307,7 @@ const DemaChat = () => {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    Child Name
+                    Component Name
                   </th>
                   <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">
                     Decompose?
@@ -370,7 +373,7 @@ const DemaChat = () => {
               onClick={handleNextStep}
               disabled={processing}
             >
-              {processing ? "Processing..." : "Process Children"}
+              {processing ? "Processing..." : "Process Components"}
             </button>
           </div>
         </div>
@@ -384,7 +387,7 @@ const DemaChat = () => {
       {/* Header */}
       <header className="flex items-center justify-between p-4 border-b bg-gray-200 rounded-t-lg">
         <h1 className="text-xl font-bold text-gray-800">
-          DEMA Decision Assistant
+          DeMA Decision Assistant
         </h1>
       </header>
       {/* Main Content */}

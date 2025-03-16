@@ -6,6 +6,7 @@ import ProjectTree from "./ProjectTree";
 import DemaChat from "./DemaChat.jsx";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import axios from "axios";
+import { Resizable } from "re-resizable";
 
 const ProjectPage = () => {
   const { username, projectname } = useParams();
@@ -109,49 +110,69 @@ const ProjectPage = () => {
         {/* Main Content Area (Vertical Stack) */}
         <div className="flex flex-col gap-6">
           {/* Project Tree Container */}
-          <div
-            className="relative bg-gray-900 dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden p-4"
-            style={{
-              minHeight: "400px",
-              backgroundImage:
-                "radial-gradient(circle, #d1d5db 1px, transparent 1px)",
-              backgroundSize: "20px 20px",
+          <Resizable
+            defaultSize={{
+              width: 600,
+              height: 400,
+            }}
+            minWidth={300}
+            minHeight={200}
+            enable={{
+              top: false,
+              right: true,
+              bottom: true,
+              left: false,
+              topRight: true,
+              bottomRight: true,
+              bottomLeft: true,
+              topLeft: true,
             }}
           >
-            <TransformWrapper
-              initialScale={scale}
-              centerOnInit={true}
-              wheel={{ step: 0.2 }}
-              doubleClick={{ disabled: true }}
-              limitToBounds={false}
-              preservePosition={true}
-              minScale={0.25}
-              maxScale={1}
-              onScaleChange={({ scale }) => setScale(scale)}
+            <div
+              className="relative bg-gray-900 dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden p-4"
+              style={{
+                width: "100%",
+                height: "100%",
+                backgroundImage:
+                  "radial-gradient(circle, #d1d5db 1px, transparent 1px)",
+                backgroundSize: "20px 20px",
+              }}
             >
-              {({ resetTransform }) => (
-                <>
-                  <TransformComponent
-                    wrapperStyle={{ width: "100%", height: "100%" }}
-                  >
-                    <div className="w-full h-full flex items-center justify-center">
-                      <ProjectTree
-                        projectId={projectSlug}
-                        username={evaluatorName}
-                        projectname={projectname}
-                      />
-                    </div>
-                  </TransformComponent>
-                  <button
-                    className="absolute bottom-4 right-4 px-3 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 z-50"
-                    onClick={() => resetTransform()}
-                  >
-                    Reset View
-                  </button>
-                </>
-              )}
-            </TransformWrapper>
-          </div>
+              <TransformWrapper
+                initialScale={scale}
+                centerOnInit={true}
+                wheel={{ step: 0.2 }}
+                doubleClick={{ disabled: true }}
+                limitToBounds={false}
+                preservePosition={true}
+                minScale={0.25}
+                maxScale={1}
+                onScaleChange={({ scale }) => setScale(scale)}
+              >
+                {({ resetTransform }) => (
+                  <>
+                    <TransformComponent
+                      wrapperStyle={{ width: "100%", height: "100%" }}
+                    >
+                      <div className="w-full h-full flex items-center justify-center">
+                        <ProjectTree
+                          projectId={projectSlug}
+                          username={evaluatorName}
+                          projectname={projectname}
+                        />
+                      </div>
+                    </TransformComponent>
+                    <button
+                      className="absolute bottom-4 right-4 px-3 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 z-50"
+                      onClick={() => resetTransform()}
+                    >
+                      Reset View
+                    </button>
+                  </>
+                )}
+              </TransformWrapper>
+            </div>
+          </Resizable>
 
           {/* Dema Chat Container */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4">

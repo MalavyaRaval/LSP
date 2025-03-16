@@ -4,12 +4,12 @@ const nodeAttributesSchema = new mongoose.Schema({
   importance: {
     type: Number,
     min: [1, 'Importance must be at least 1'],
-    max: [5, 'Importance cannot exceed 5']
+    max: [9, 'Importance cannot exceed 9']
   },
   connection: {
     type: Number,
     min: [1, 'Connection must be at least 1'],
-    max: [5, 'Connection cannot exceed 5']
+    max: [9, 'Connection cannot exceed 9']
   },
   created: {
     type: Date,

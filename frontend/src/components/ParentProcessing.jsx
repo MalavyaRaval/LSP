@@ -1,17 +1,31 @@
 import React, { useState } from "react";
-import axios from "axios"; // New import
+import axios from "axios";
 
 const ParentProcessing = ({
   parentNodes,
   currentParentIndex,
   onNextParent,
   onPrevParent,
-  projectId, // New prop for backend call
+  projectId,
 }) => {
   if (!parentNodes || parentNodes.length === 0) {
     return <div>No parent nodes to process.</div>;
   }
   const currentParent = parentNodes[currentParentIndex];
+
+  // Levels: 9 is Highest and 1 is Lowest.
+  const levels = [
+    { value: 9, label: "Highest" },
+    { value: 8, label: "Very high" },
+    { value: 7, label: "High" },
+    { value: 6, label: "Medium-high" },
+    { value: 5, label: "Medium" },
+    { value: 4, label: "Medium-low" },
+    { value: 3, label: "Low" },
+    { value: 2, label: "Very low" },
+    { value: 1, label: "Lowest" },
+  ];
+
   const [values, setValues] = useState({
     importance: currentParent.attributes?.importance || "",
     connection: currentParent.attributes?.connection || "",
@@ -23,14 +37,14 @@ const ParentProcessing = ({
   };
 
   const validate = () => {
-    const importance = parseFloat(values.importance);
-    const connection = parseFloat(values.connection);
+    const importance = parseInt(values.importance, 10);
+    const connection = parseInt(values.connection, 10);
     if (isNaN(importance) || isNaN(connection)) {
-      setError("Please enter valid numbers for both fields.");
+      setError("Please select valid levels for both fields.");
       return false;
     }
-    if (importance < 1 || importance > 5 || connection < 1 || connection > 5) {
-      setError("Values must be between 1 and 5.");
+    if (importance < 1 || importance > 9 || connection < 1 || connection > 9) {
+      setError("Values must be between 1 and 9.");
       return false;
     }
     setError("");
@@ -40,9 +54,9 @@ const ParentProcessing = ({
   const handleSave = async () => {
     if (validate()) {
       try {
-        // Clamp the values between 1 and 5.
-        const imp = Math.max(1, Math.min(5, parseFloat(values.importance)));
-        const con = Math.max(1, Math.min(5, parseFloat(values.connection)));
+        // Ensure the numerical values are within 1 to 9.
+        const imp = Math.max(1, Math.min(9, parseInt(values.importance, 10)));
+        const con = Math.max(1, Math.min(9, parseInt(values.connection, 10)));
         // Update the node in the backend.
         await axios.put(
           `http://localhost:8000/api/projects/${projectId}/nodes/${currentParent.id}`,
@@ -66,33 +80,37 @@ const ParentProcessing = ({
         <label className="block text-lg font-medium text-gray-700 mb-2">
           Importance
         </label>
-        <input
-          type="number"
+        <select
           name="importance"
           value={values.importance}
           onChange={handleChange}
-          onBlur={validate}
           className="w-full border rounded px-2 py-1"
-          min="2"
-          max="5"
-          placeholder="2 - 5"
-        />
+        >
+          <option value="">Select Level</option>
+          {levels.map((level) => (
+            <option key={level.value} value={level.value}>
+              {level.label}
+            </option>
+          ))}
+        </select>
       </div>
       <div className="mb-4">
         <label className="block text-lg font-medium text-gray-700 mb-2">
           Connection
         </label>
-        <input
-          type="number"
+        <select
           name="connection"
           value={values.connection}
           onChange={handleChange}
-          onBlur={validate}
           className="w-full border rounded px-2 py-1"
-          min="2"
-          max="5"
-          placeholder="2 - 5"
-        />
+        >
+          <option value="">Select Level</option>
+          {levels.map((level) => (
+            <option key={level.value} value={level.value}>
+              {level.label}
+            </option>
+          ))}
+        </select>
       </div>
       {error && <p className="text-red-500 mb-4">{error}</p>}
       <div className="flex justify-between mt-6">

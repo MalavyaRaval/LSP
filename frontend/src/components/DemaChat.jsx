@@ -252,10 +252,8 @@ const DemaChat = () => {
       setProcessedParentIds(new Set());
       // --- New check for parent nodes ---
       // If none of the leaves have a parent different from the root, then finalization is complete.
-      const hasParentNodes = leaves.some(
-        (leaf) =>
-          leaf.parent && leaf.parent.toString() !== treeData.id.toString()
-      );
+      // New check for parent nodes:
+      const hasParentNodes = treeData.children && treeData.children.length > 0;
       if (!hasParentNodes) {
         alert("No parent nodes to process. Tree finalization complete.");
         setEvaluationStarted(true);

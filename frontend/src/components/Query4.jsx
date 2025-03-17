@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-const Query4 = ({ onSave, nodeId, projectId }) => {
+const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
   const [values, setValues] = useState({ first: "", second: "" });
   const [error, setError] = useState("");
 
@@ -25,19 +25,21 @@ const Query4 = ({ onSave, nodeId, projectId }) => {
   };
 
   const handleSaveQuery = async () => {
-    if (validate()) {
-      try {
-        await axios.post("http://localhost:8000/api/query-results", {
-          nodeId,
-          queryType: "q4",
-          values,
-          projectId,
-        });
-        onSave();
-      } catch (err) {
-        setError("Failed to save query result.");
-        console.error(err);
-      }
+    if (!validate()) return;
+    try {
+      // Build payload including nodeName
+      const payload = {
+        nodeId,
+        nodeName, // include nodeName here
+        queryType: "q4",
+        values,
+        projectId,
+      };
+      await axios.post("http://localhost:8000/api/query-results", payload);
+      onSave();
+    } catch (err) {
+      console.error("Error saving Query4", err);
+      setError("Failed to save query.");
     }
   };
 
@@ -48,7 +50,7 @@ const Query4 = ({ onSave, nodeId, projectId }) => {
       </h1>
       <p className="mb-4">
         Please answer the following. The first value must be less than the
-        second value.
+        second.
       </p>
       <table className="min-w-full border-collapse border border-gray-400 mb-4">
         <thead>

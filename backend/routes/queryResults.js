@@ -5,11 +5,18 @@ const QueryResult = require("../models/QueryResult");
 // POST: Save a new query result
 router.post("/", async (req, res) => {
   try {
-    const { nodeId, queryType, values, projectId } = req.body;
-    if (!nodeId || !queryType || !values || !projectId) {
+    // Make sure the frontend sends nodeName along with nodeId, queryType, values and projectId
+    const { nodeId, nodeName, queryType, values, projectId } = req.body;
+    if (!nodeId || !nodeName || !queryType || !values || !projectId) {
       return res.status(400).json({ message: "Missing required fields" });
     }
-    const newResult = new QueryResult({ nodeId, queryType, values, projectId });
+    const newResult = new QueryResult({
+      nodeId,
+      nodeName,
+      queryType,
+      values,
+      projectId,
+    });
     await newResult.save();
     res.status(201).json({ message: "Query result saved", result: newResult });
   } catch (err) {

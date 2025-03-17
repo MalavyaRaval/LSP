@@ -152,8 +152,9 @@ const DemaChat = () => {
     }
 
     const childrenNodes = childrenDetails.map((child, index) => ({
-      id: `${effectiveParentId}-${Date.now()}-${index}`,
-      name: child.name,
+      id: `${effectiveParentId}-${Date.now()}-${index}`, // generated id
+      // Use the user-provided name trimmed; if empty, assign a default name
+      name: child.name.trim() || `Child ${index + 1}`,
       decompose: child.decompose,
       attributes: { created: Date.now() },
       children: [],
@@ -167,7 +168,7 @@ const DemaChat = () => {
           parentId: effectiveParentId,
           children: childrenNodes,
           metadata: {
-            decisionProcess: "DeMA",
+            decisionProcess: "DEMA",
             objectName: "My Object",
           },
         }

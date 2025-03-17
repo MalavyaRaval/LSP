@@ -47,7 +47,7 @@ const QueryResultsDisplay = () => {
               {results.map((result) => (
                 <tr key={result._id} className="hover:bg-gray-100">
                   <td className="border border-gray-300 p-2">
-                    {result.nodeId}
+                    {result.nodeName}
                   </td>
                   <td className="border border-gray-300 p-2">
                     {result.queryType.toUpperCase()}

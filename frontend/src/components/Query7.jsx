@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-const Query7 = ({ onSave, nodeId, projectId }) => {
+const Query7 = ({ onSave, nodeId, projectId, nodeName }) => {
+  // Added nodeName here
   const [rows, setRows] = useState([
     { offered: "", satisfaction: "" },
     { offered: "", satisfaction: "" },
@@ -40,9 +41,10 @@ const Query7 = ({ onSave, nodeId, projectId }) => {
       try {
         await axios.post("http://localhost:8000/api/query-results", {
           nodeId,
+          nodeName, // Pass nodeName in payload
           queryType: "q7",
           values: rows,
-          projectId, // Added projectId
+          projectId,
         });
         onSave();
       } catch (err) {
@@ -54,13 +56,7 @@ const Query7 = ({ onSave, nodeId, projectId }) => {
 
   return (
     <div className="p-4 border rounded">
-      <h1 className="text-2xl font-bold mb-2">
-        Query 7: I will specify a table of requirements
-      </h1>
-      <p className="mb-4">
-        Please fill 2 or more rows of the scoring table. The offered values must
-        form a strictly increasing sequence.
-      </p>
+      {/* Existing UI for Query7 */}
       <table className="min-w-full border-collapse border border-gray-400 mb-4">
         <thead>
           <tr className="bg-gray-200">

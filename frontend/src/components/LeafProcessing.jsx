@@ -70,6 +70,7 @@ const LeafProcessing = ({
               onSave={handleSaveAndNext}
               nodeId={currentLeaf.id}
               projectId={projectname}
+              nodeName={currentLeaf.name}
             />
           )}
           {composition === "q5" && (
@@ -77,6 +78,7 @@ const LeafProcessing = ({
               onSave={handleSaveAndNext}
               nodeId={currentLeaf.id}
               projectId={projectname}
+              nodeName={currentLeaf.name}
             />
           )}
           {composition === "q6" && (
@@ -84,6 +86,7 @@ const LeafProcessing = ({
               onSave={handleSaveAndNext}
               nodeId={currentLeaf.id}
               projectId={projectname}
+              nodeName={currentLeaf.name}
             />
           )}
           {composition === "q7" && (
@@ -91,6 +94,7 @@ const LeafProcessing = ({
               onSave={handleSaveAndNext}
               nodeId={currentLeaf.id}
               projectId={projectname}
+              nodeName={currentLeaf.name}
             />
           )}
         </>

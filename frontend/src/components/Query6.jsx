@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-const Query6 = ({ onSave, nodeId, projectId }) => {
+const Query6 = ({ onSave, nodeId, projectId, nodeName }) => {
+  // Added nodeName here
   const [values, setValues] = useState({ lower: "", middle: "", upper: "" });
   const [error, setError] = useState("");
 
@@ -30,9 +31,10 @@ const Query6 = ({ onSave, nodeId, projectId }) => {
       try {
         await axios.post("http://localhost:8000/api/query-results", {
           nodeId,
+          nodeName, // Pass nodeName in payload
           queryType: "q6",
           values,
-          projectId, // Added projectId
+          projectId,
         });
         onSave();
       } catch (err) {
@@ -44,13 +46,7 @@ const Query6 = ({ onSave, nodeId, projectId }) => {
 
   return (
     <div className="p-4 border rounded">
-      <h1 className="text-2xl font-bold mb-2">
-        Query 6: I prefer a specific range of values
-      </h1>
-      <p className="mb-4">
-        Please answer the following. Your values must create a strictly
-        increasing sequence.
-      </p>
+      {/* Existing UI for Query6 */}
       <table className="min-w-full border-collapse border border-gray-400 mb-4">
         <thead>
           <tr className="bg-gray-200">

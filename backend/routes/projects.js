@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Project = require('../models/Project');
+const Evaluation = require('../models/Evaluation');
 
 // GET: Retrieve the project tree by projectId (create it if not exists)
 router.get('/:projectId', async (req, res) => {
@@ -181,14 +182,16 @@ router.put('/:projectId/nodes/:nodeId', async (req, res) => {
   }
 });
 
+// DELETE a node and its associated query results, then update evaluations.
 router.delete('/node/:nodeId', async (req, res) => {
+  const { nodeId } = req.params;
+  const projectId = req.query.projectId; // Expect projectId as a query parameter
+  if (!projectId) {
+    return res.status(400).json({ message: "Project ID is required." });
+  }
+  
   try {
-    const { nodeId } = req.params;
-    const projectId = req.query.projectId; // Expect projectId as a query parameter
-    if (!projectId) {
-      return res.status(400).json({ message: "Project ID is required." });
-    }
-    
+    // Delete node logic: remove the node from treeData.
     const project = await Project.findOne({ projectId });
     if (!project) {
       return res.status(404).json({ message: "Project not found." });
@@ -200,7 +203,6 @@ router.delete('/node/:nodeId', async (req, res) => {
         return null; // Remove this node
       }
       if (node.children && node.children.length > 0) {
-        // Recursively attempt deletion for each child and filter out nulls.
         node.children = node.children
           .map(child => removeNode(child, nodeId))
           .filter(child => child !== null);
@@ -216,10 +218,18 @@ router.delete('/node/:nodeId', async (req, res) => {
     const QueryResult = require('../models/QueryResult');
     await QueryResult.deleteMany({ nodeId });
     
-    res.json({ message: "Node and its query results have been deleted.", treeData: project.treeData });
+    // Remove the key for the deleted node from all evaluations.
+    await Evaluation.updateMany(
+      { projectId },
+      { $unset: { [`alternativeValues.${nodeId}`]: "" } }
+    );
+    
+    res.json({ message: "Node, its query results, and evaluation entries updated.", treeData: project.treeData });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
+
+module.exports = router;
 
 module.exports = router;

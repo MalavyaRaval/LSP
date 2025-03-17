@@ -15,6 +15,7 @@ const User = require("./models/user.model");
 const Event = require("./models/event.model");
 const Project = require("./models/Project");
 const queryResultsRouter = require("./routes/queryResults");
+const evaluationsRouter = require("./routes/evaluations");
 
 
 
@@ -28,6 +29,9 @@ app.use(express.json());
 app.use(cors({ origin: "*" }));
 app.use('/uploads', express.static('uploads'));
 app.use("/api/query-results", queryResultsRouter);
+app.use("/api/evaluations", evaluationsRouter);
+
+
 
 // Set up multer for file uploads
 const storage = multer.diskStorage({

@@ -17,6 +17,7 @@ import Query5 from "./components/Query5.jsx";
 import Query6 from "./components/Query6.jsx";
 import Query7 from "./components/Query7.jsx";
 import QueryResultsDisplay from "./components/QueryResultsDisplay";
+import DisplayEvaluations from "./components/DisplayEvaluations";
 
 const App = () => {
   return (
@@ -51,6 +52,10 @@ const App = () => {
           path="/user/:username/project/:projectname/Queryresults"
           element={<QueryResultsDisplay />}
         />{" "}
+        <Route
+          path="/user/:username/project/:projectname/evaluate"
+          element={<DisplayEvaluations />}
+        />
       </Routes>
     </Router>
   );

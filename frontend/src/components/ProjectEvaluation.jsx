@@ -22,7 +22,7 @@ const ProjectEvaluation = () => {
   const [alternativeValues, setAlternativeValues] = useState({});
   const [queryResults, setQueryResults] = useState([]); // new state for query results
 
-  // In step 2, fetch the project tree and extract leaf nodes.
+  // In step 2, fetch the project tree and query results.
   useEffect(() => {
     if (evaluationStep === 2) {
       const fetchLeafNodes = async () => {
@@ -84,13 +84,24 @@ const ProjectEvaluation = () => {
   };
 
   const handleSubmitEvaluation = async () => {
-    // Combine alternative details and alternativeValues to send to backend.
-    console.log({
-      alternativeName,
-      alternativeCost,
-      alternativeValues,
-    });
-    alert("Evaluation submitted (not implemented yet).");
+    try {
+      const payload = {
+        projectId: projectname, // using projectname as project id
+        user: "currentUser", // replace with current user's identifier if available
+        alternativeName,
+        alternativeCost: parseFloat(alternativeCost),
+        alternativeValues, // this is expected to be an object mapping each leaf id to a number
+      };
+      const res = await axios.post(
+        "http://localhost:8000/api/evaluations",
+        payload
+      );
+      console.log("Evaluation saved:", res.data);
+      alert("Evaluation submitted successfully!");
+    } catch (err) {
+      console.error("Error submitting evaluation:", err);
+      setError("Failed to submit evaluation.");
+    }
   };
 
   if (evaluationStep === 1) {
@@ -147,6 +158,7 @@ const ProjectEvaluation = () => {
             <thead className="bg-gray-200">
               <tr>
                 <th className="border border-gray-300 p-2">Component Name</th>
+                <th className="border border-gray-300 p-2">Query Type</th>
                 <th className="border border-gray-300 p-2">Criteria Values</th>
                 <th className="border border-gray-300 p-2">
                   Values for {alternativeName}
@@ -162,9 +174,11 @@ const ProjectEvaluation = () => {
                 const existingValue = result
                   ? JSON.stringify(result.values)
                   : "-";
+                const queryType = result ? result.queryType.toUpperCase() : "-";
                 return (
                   <tr key={leaf.id} className="hover:bg-gray-100">
                     <td className="border border-gray-300 p-2">{leaf.name}</td>
+                    <td className="border border-gray-300 p-2">{queryType}</td>
                     <td className="border border-gray-300 p-2">
                       {existingValue}
                     </td>

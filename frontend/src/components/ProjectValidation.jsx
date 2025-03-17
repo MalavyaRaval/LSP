@@ -6,7 +6,8 @@ import axios from "axios";
 // Helper function to flatten the tree into an array (excluding the root)
 const flattenTree = (node) => {
   let nodes = [];
-  if (node.parent !== null) {
+  // Only include nodes that have a parent and at least one child
+  if (node.parent !== null && node.children && node.children.length > 0) {
     nodes.push(node);
   }
   if (node.children && node.children.length > 0) {
@@ -18,9 +19,7 @@ const flattenTree = (node) => {
 };
 
 const Validation = () => {
-  // Extract username and projectname from URL parameters
   const { username, projectname } = useParams();
-  // Compute projectId (same as in your ProjectPage)
   const projectId = projectname
     ? projectname
         .toLowerCase()

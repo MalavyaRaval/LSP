@@ -53,6 +53,8 @@ const ProjectPage = () => {
       navigate("/home");
     } else if (action === "validation") {
       navigate(`/user/${evaluatorName}/project/${projectname}/validation`);
+    } else if (action === "queryResults") {
+      navigate(`/user/${evaluatorName}/project/${projectSlug}/Queryresults`);
     } else if (action === "exit") {
       navigate("/");
     } else {
@@ -85,6 +87,13 @@ const ProjectPage = () => {
               onClick={() => handleNav("validation")}
             >
               Validation
+            </button>
+            {/* New Query Results Button */}
+            <button
+              className="px-4 py-2 bg-purple-500 text-black rounded hover:bg-purple-600"
+              onClick={() => handleNav("queryResults")}
+            >
+              Query Results
             </button>
             <button
               className="px-4 py-2 bg-red-500 text-black rounded hover:bg-red-600"

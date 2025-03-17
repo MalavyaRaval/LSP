@@ -24,7 +24,7 @@ const LeafProcessing = ({
 
   // Called when the query component signals that saving is complete.
   const handleSaveAndNext = () => {
-    // (Optional) Save the query results via an API call here.
+    // (Optional) Save the query results via an API call here if not already done inside each query component.
     setComposition("");
     onNextLeaf();
   };
@@ -68,10 +68,18 @@ const LeafProcessing = ({
         </>
       ) : (
         <>
-          {composition === "q4" && <Query4 onSave={handleSaveAndNext} />}
-          {composition === "q5" && <Query5 onSave={handleSaveAndNext} />}
-          {composition === "q6" && <Query6 onSave={handleSaveAndNext} />}
-          {composition === "q7" && <Query7 onSave={handleSaveAndNext} />}
+          {composition === "q4" && (
+            <Query4 onSave={handleSaveAndNext} nodeId={currentLeaf.id} />
+          )}
+          {composition === "q5" && (
+            <Query5 onSave={handleSaveAndNext} nodeId={currentLeaf.id} />
+          )}
+          {composition === "q6" && (
+            <Query6 onSave={handleSaveAndNext} nodeId={currentLeaf.id} />
+          )}
+          {composition === "q7" && (
+            <Query7 onSave={handleSaveAndNext} nodeId={currentLeaf.id} />
+          )}
         </>
       )}
       <div className="flex justify-start mt-6">

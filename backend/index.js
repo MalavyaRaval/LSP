@@ -14,6 +14,9 @@ mongoose.connect(config.connectionString || process.env.MONGODB_URI, {});
 const User = require("./models/user.model");
 const Event = require("./models/event.model");
 const Project = require("./models/Project");
+const queryResultsRouter = require("./routes/queryResults");
+
+
 
 // Import your authentication utility
 const { authenticationToken } = require("./utilities");
@@ -24,6 +27,7 @@ const app = express();
 app.use(express.json());
 app.use(cors({ origin: "*" }));
 app.use('/uploads', express.static('uploads'));
+app.use("/api/query-results", queryResultsRouter);
 
 // Set up multer for file uploads
 const storage = multer.diskStorage({

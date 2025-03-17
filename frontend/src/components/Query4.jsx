@@ -1,6 +1,7 @@
 import React, { useState } from "react";
+import axios from "axios";
 
-const Query4 = ({ onSave }) => {
+const Query4 = ({ onSave, nodeId }) => {
   const [values, setValues] = useState({ first: "", second: "" });
   const [error, setError] = useState("");
 
@@ -23,10 +24,20 @@ const Query4 = ({ onSave }) => {
     return true;
   };
 
-  const handleSave = () => {
+  const handleSaveQuery = async () => {
     if (validate()) {
-      // (Optional) save data via API
-      onSave(); // signal LeafProcessing to move to next leaf
+      try {
+        // POST the query result along with nodeId and query type "q4"
+        await axios.post("http://localhost:8000/api/query-results", {
+          nodeId,
+          queryType: "q4",
+          values, // this will store the values object
+        });
+        onSave(); // Signal LeafProcessing to move on after saving
+      } catch (err) {
+        setError("Failed to save query result.");
+        console.error(err);
+      }
     }
   };
 
@@ -82,7 +93,7 @@ const Query4 = ({ onSave }) => {
       {error && <p className="text-red-500">{error}</p>}
       <button
         className="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-        onClick={handleSave}
+        onClick={handleSaveQuery}
       >
         Save and Next
       </button>

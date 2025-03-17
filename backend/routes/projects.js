@@ -52,8 +52,8 @@ router.post('/', async (req, res) => {
     }
     
     const projectId = projectName.toLowerCase()
-      .replace(/\s+/g, '-')
-      .replace(/[^\w-]+/g, '');
+    .replace(/\s+/g, '-')
+    .replace(/[^\w-]+/g, '');
       
     const exists = await Project.findOne({ projectId });
     if (exists) {

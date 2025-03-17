@@ -13,12 +13,7 @@ const ProjectPage = () => {
   const navigate = useNavigate();
 
   // Convert projectname to a slug for use as projectId.
-  const projectSlug = projectname
-    ? projectname
-        .toLowerCase()
-        .replace(/\s+/g, "-")
-        .replace(/[^\w-]+/g, "")
-    : null;
+  const projectSlug = projectname;
 
   const storedFullName = localStorage.getItem("fullName")?.trim();
   const evaluatorName = storedFullName || username || "defaultUser";
@@ -34,7 +29,6 @@ const ProjectPage = () => {
       axios
         .get(`http://localhost:8000/api/projects/${projectSlug}`)
         .then((res) => {
-          // Assume the returned tree's root node's name is the project display name.
           if (res.data && res.data.name) {
             setProjectDisplayName(res.data.name);
           } else {
@@ -52,7 +46,7 @@ const ProjectPage = () => {
     if (action === "projects") {
       navigate("/home");
     } else if (action === "validation") {
-      navigate(`/user/${evaluatorName}/project/${projectname}/validation`);
+      navigate(`/user/${evaluatorName}/project/${projectSlug}/validation`);
     } else if (action === "queryResults") {
       navigate(`/user/${evaluatorName}/project/${projectSlug}/Queryresults`);
     } else if (action === "exit") {

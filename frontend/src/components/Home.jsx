@@ -31,16 +31,17 @@ const Home = () => {
   };
 
   const handleStartProject = (project) => {
-    const projectId = project._id;
+    // Use project.projectId (the slug) instead of project._id
+    const projectSlug = project.projectId;
     const storedFullName = localStorage.getItem("fullName")?.trim();
 
-    if (storedFullName && projectId) {
+    if (storedFullName && projectSlug) {
       const formattedFullName = storedFullName
         .replace(/\s+/g, "-")
         .toLowerCase();
-      navigate(`/user/${formattedFullName}/project/${projectId}`);
+      navigate(`/user/${formattedFullName}/project/${projectSlug}`);
     } else {
-      showToast("Full name or project ID is missing", "error");
+      showToast("Full name or project identifier is missing", "error");
     }
   };
 
@@ -172,19 +173,17 @@ const Home = () => {
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       <Navbar />
+      {/* Fixed Create Project Button */}
+      <button
+        type="button"
+        className="fixed top-22 right-4 w-14 h-14 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-full shadow-lg hover:shadow-xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 transform hover:scale-110 focus:outline-none z-50 flex items-center justify-center"
+        data-bs-toggle="modal"
+        data-bs-target="#createEventModal"
+        aria-label="Create New Project"
+      >
+        <span className="text-3xl font-bold">+</span>
+      </button>
       <div className="flex-1 container mx-auto px-4 py-8">
-        {/* Create Project Button */}
-        <div className="relative mb-8">
-          <button
-            type="button"
-            className="absolute top-0 right-0 mt-4 mr-4 w-14 h-14 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-full shadow-lg hover:shadow-xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 transform hover:scale-110 focus:outline-none z-10 flex items-center justify-center"
-            data-bs-toggle="modal"
-            data-bs-target="#createEventModal"
-            aria-label="Create New Project"
-          >
-            <span className="text-3xl font-bold">+</span>
-          </button>
-        </div>
         {/* Create Project Modal */}
         <div
           className="modal fade"

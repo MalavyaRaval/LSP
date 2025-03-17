@@ -277,7 +277,9 @@ const ProjectTree = ({ projectId, username, projectname }) => {
     setTree(updatedTree);
     await saveProject(updatedTree);
     // Also call the backend to delete query results for this node:
-    await axios.delete(`http://localhost:8000/api/projects/node/${nodeId}`);
+    await axios.delete(
+      `http://localhost:8000/api/projects/node/${nodeId}?projectId=${projectId}`
+    );
   };
 
   const editNode = async (nodeId, newName) => {

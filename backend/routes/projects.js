@@ -181,4 +181,45 @@ router.put('/:projectId/nodes/:nodeId', async (req, res) => {
   }
 });
 
+router.delete('/node/:nodeId', async (req, res) => {
+  try {
+    const { nodeId } = req.params;
+    const projectId = req.query.projectId; // Expect projectId as a query parameter
+    if (!projectId) {
+      return res.status(400).json({ message: "Project ID is required." });
+    }
+    
+    const project = await Project.findOne({ projectId });
+    if (!project) {
+      return res.status(404).json({ message: "Project not found." });
+    }
+    
+    // Recursive function to remove the node from the tree.
+    function removeNode(node, nodeId) {
+      if (node.id.toString() === nodeId.toString()) {
+        return null; // Remove this node
+      }
+      if (node.children && node.children.length > 0) {
+        // Recursively attempt deletion for each child and filter out nulls.
+        node.children = node.children
+          .map(child => removeNode(child, nodeId))
+          .filter(child => child !== null);
+      }
+      return node;
+    }
+    
+    project.treeData = removeNode(project.treeData, nodeId);
+    project.markModified("treeData");
+    await project.save();
+    
+    // Delete associated query results.
+    const QueryResult = require('../models/QueryResult');
+    await QueryResult.deleteMany({ nodeId });
+    
+    res.json({ message: "Node and its query results have been deleted.", treeData: project.treeData });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 module.exports = router;

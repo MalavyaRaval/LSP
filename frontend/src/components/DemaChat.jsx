@@ -3,6 +3,7 @@ import { useNavigate, useLocation, useParams } from "react-router-dom";
 import axios from "axios";
 import LeafProcessing from "./LeafProcessing.jsx";
 import ParentProcessing from "./ParentProcessing.jsx";
+import ProjectEvaluation from "./ProjectEvaluation.jsx";
 
 // Helper: recursively extract leaf nodes (nodes with no children)
 const getLeafNodes = (node) => {
@@ -41,6 +42,7 @@ const DemaChat = () => {
   const [currentParentIndex, setCurrentParentIndex] = useState(0);
   // New state to track processed parent IDs.
   const [processedParentIds, setProcessedParentIds] = useState(new Set());
+  const [evaluationStarted, setEvaluationStarted] = useState(false);
 
   const messagesEndRef = useRef(null);
 
@@ -228,6 +230,7 @@ const DemaChat = () => {
     }
   };
 
+  // Inside DemaChat.jsx, modify finalizeNode:
   const finalizeNode = async () => {
     alert("All decompositions complete for this node! Finalizing tree.");
     window.dispatchEvent(new Event("refreshProjectTree"));
@@ -247,6 +250,16 @@ const DemaChat = () => {
       setCurrentLeafIndex(0);
       // Reset processed parents since we are starting a new parent processing phase.
       setProcessedParentIds(new Set());
+      // --- New check for parent nodes ---
+      // If none of the leaves have a parent different from the root, then finalization is complete.
+      const hasParentNodes = leaves.some(
+        (leaf) =>
+          leaf.parent && leaf.parent.toString() !== treeData.id.toString()
+      );
+      if (!hasParentNodes) {
+        alert("No parent nodes to process. Tree finalization complete.");
+        setEvaluationStarted(true);
+      }
     } catch (error) {
       console.error("Error fetching tree after finalizing:", error);
     }
@@ -282,13 +295,13 @@ const DemaChat = () => {
         setProcessingParents(true);
       } else {
         alert("No parent nodes to process. Tree finalization complete.");
+        setEvaluationStarted(true);
       }
     } catch (err) {
       console.error("Error starting parent processing:", err);
     }
   };
 
-  // Process parent level: after finishing current level, extract next level parents.
   const processNextParentLevel = async () => {
     try {
       const res = await axios.get(
@@ -317,7 +330,8 @@ const DemaChat = () => {
         setCurrentParentIndex(0);
       } else {
         setProcessingParents(false);
-        alert("Finished processing all parent nodes. Finalization complete.");
+        // Start evaluation phase instead of alert:
+        setEvaluationStarted(true);
       }
     } catch (err) {
       console.error("Error processing next parent level:", err);
@@ -325,6 +339,9 @@ const DemaChat = () => {
   };
 
   const renderStep = () => {
+    if (evaluationStarted) {
+      return <ProjectEvaluation />;
+    }
     if (processingLeaves) {
       return (
         <LeafProcessing

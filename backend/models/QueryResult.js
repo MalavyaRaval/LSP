@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const queryResultSchema = new mongoose.Schema({
   nodeId: {
-    type: String,  // Change from Number to String
+    type: String, 
     required: true,
   },
   queryType: {

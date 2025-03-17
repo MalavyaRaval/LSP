@@ -3,7 +3,7 @@ import { useLocation, Link } from "react-router-dom";
 
 const ValuesPage = () => {
   const location = useLocation();
-  const search = location.search; // preserves query parameters
+  const search = location.search;
   const queryParams = new URLSearchParams(search);
   const parentId = queryParams.get("parentId");
   const username = queryParams.get("username");

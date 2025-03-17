@@ -1,6 +1,7 @@
 import React, { useState } from "react";
+import axios from "axios";
 
-const Query7 = ({ onSave }) => {
+const Query7 = ({ onSave, nodeId }) => {
   const [rows, setRows] = useState([
     { offered: "", satisfaction: "" },
     { offered: "", satisfaction: "" },
@@ -34,9 +35,19 @@ const Query7 = ({ onSave }) => {
     return true;
   };
 
-  const handleSave = () => {
+  const handleSaveQuery = async () => {
     if (validateRows()) {
-      onSave();
+      try {
+        await axios.post("http://localhost:8000/api/query-results", {
+          nodeId,
+          queryType: "q7",
+          values: rows,
+        });
+        onSave();
+      } catch (err) {
+        setError("Failed to save query result.");
+        console.error(err);
+      }
     }
   };
 
@@ -95,7 +106,7 @@ const Query7 = ({ onSave }) => {
       {error && <p className="text-red-500 mt-2">{error}</p>}
       <button
         className="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-        onClick={handleSave}
+        onClick={handleSaveQuery}
       >
         Save and Next
       </button>

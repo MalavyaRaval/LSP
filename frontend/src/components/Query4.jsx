@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-const Query4 = ({ onSave, nodeId }) => {
+const Query4 = ({ onSave, nodeId, projectId }) => {
   const [values, setValues] = useState({ first: "", second: "" });
   const [error, setError] = useState("");
 
@@ -27,13 +27,13 @@ const Query4 = ({ onSave, nodeId }) => {
   const handleSaveQuery = async () => {
     if (validate()) {
       try {
-        // POST the query result along with nodeId and query type "q4"
         await axios.post("http://localhost:8000/api/query-results", {
           nodeId,
           queryType: "q4",
-          values, // this will store the values object
+          values,
+          projectId,
         });
-        onSave(); // Signal LeafProcessing to move on after saving
+        onSave();
       } catch (err) {
         setError("Failed to save query result.");
         console.error(err);

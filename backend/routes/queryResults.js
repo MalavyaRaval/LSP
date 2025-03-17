@@ -5,11 +5,11 @@ const QueryResult = require("../models/QueryResult");
 // POST: Save a new query result
 router.post("/", async (req, res) => {
   try {
-    const { nodeId, queryType, values } = req.body;
-    if (!nodeId || !queryType || !values) {
+    const { nodeId, queryType, values, projectId } = req.body;
+    if (!nodeId || !queryType || !values || !projectId) {
       return res.status(400).json({ message: "Missing required fields" });
     }
-    const newResult = new QueryResult({ nodeId, queryType, values });
+    const newResult = new QueryResult({ nodeId, queryType, values, projectId });
     await newResult.save();
     res.status(201).json({ message: "Query result saved", result: newResult });
   } catch (err) {
@@ -17,10 +17,12 @@ router.post("/", async (req, res) => {
   }
 });
 
-// GET: Retrieve query results
+// GET: Retrieve query results, optionally filtering by projectId
 router.get("/", async (req, res) => {
   try {
-    const results = await QueryResult.find().sort({ createdAt: -1 });
+    const { project } = req.query;
+    const filter = project ? { projectId: project } : {};
+    const results = await QueryResult.find(filter).sort({ createdAt: -1 });
     res.json(results);
   } catch (err) {
     res.status(500).json({ message: err.message });

@@ -17,14 +17,11 @@ const LeafProcessing = ({
   if (!leafNodes || leafNodes.length === 0) return null;
   const currentLeaf = leafNodes[currentLeafIndex];
 
-  // When the user selects a composition, switch into query mode.
   const handleSelectComposition = (comp) => {
     setComposition(comp);
   };
 
-  // Called when the query component signals that saving is complete.
   const handleSaveAndNext = () => {
-    // (Optional) Save the query results via an API call here if not already done inside each query component.
     setComposition("");
     onNextLeaf();
   };
@@ -69,16 +66,32 @@ const LeafProcessing = ({
       ) : (
         <>
           {composition === "q4" && (
-            <Query4 onSave={handleSaveAndNext} nodeId={currentLeaf.id} />
+            <Query4
+              onSave={handleSaveAndNext}
+              nodeId={currentLeaf.id}
+              projectId={projectname}
+            />
           )}
           {composition === "q5" && (
-            <Query5 onSave={handleSaveAndNext} nodeId={currentLeaf.id} />
+            <Query5
+              onSave={handleSaveAndNext}
+              nodeId={currentLeaf.id}
+              projectId={projectname}
+            />
           )}
           {composition === "q6" && (
-            <Query6 onSave={handleSaveAndNext} nodeId={currentLeaf.id} />
+            <Query6
+              onSave={handleSaveAndNext}
+              nodeId={currentLeaf.id}
+              projectId={projectname}
+            />
           )}
           {composition === "q7" && (
-            <Query7 onSave={handleSaveAndNext} nodeId={currentLeaf.id} />
+            <Query7
+              onSave={handleSaveAndNext}
+              nodeId={currentLeaf.id}
+              projectId={projectname}
+            />
           )}
         </>
       )}

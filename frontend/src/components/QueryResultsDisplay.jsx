@@ -1,15 +1,19 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useParams } from "react-router-dom";
 import Navbar from "./Nav/Navbar";
 import Footer from "./Footer";
 
 const QueryResultsDisplay = () => {
   const [results, setResults] = useState([]);
   const [error, setError] = useState("");
+  const { projectname } = useParams();
 
   const fetchResults = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/api/query-results");
+      const res = await axios.get(
+        `http://localhost:8000/api/query-results?project=${projectname}`
+      );
       setResults(res.data);
     } catch (err) {
       setError("Failed to fetch query results.");
@@ -19,7 +23,7 @@ const QueryResultsDisplay = () => {
 
   useEffect(() => {
     fetchResults();
-  }, []);
+  }, [projectname]);
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-const Query7 = ({ onSave, nodeId }) => {
+const Query7 = ({ onSave, nodeId, projectId }) => {
   const [rows, setRows] = useState([
     { offered: "", satisfaction: "" },
     { offered: "", satisfaction: "" },
@@ -42,6 +42,7 @@ const Query7 = ({ onSave, nodeId }) => {
           nodeId,
           queryType: "q7",
           values: rows,
+          projectId, // Added projectId
         });
         onSave();
       } catch (err) {

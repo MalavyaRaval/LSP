@@ -15,10 +15,11 @@ const getLeafNodes = (node) => {
 const DisplayEvaluations = () => {
   const { projectname } = useParams(); // using projectname as project ID
   const [evaluations, setEvaluations] = useState([]);
-  const [leafMapping, setLeafMapping] = useState({}); // map leafId -> leafName
+  const [leafMapping, setLeafMapping] = useState({}); // map from project tree: leafId -> leafName
+  const [queryMapping, setQueryMapping] = useState({}); // fallback mapping from query results: nodeId -> nodeName
   const [error, setError] = useState("");
 
-  // Fetch evaluations as before.
+  // Fetch evaluations.
   useEffect(() => {
     const fetchEvaluations = async () => {
       try {
@@ -31,7 +32,6 @@ const DisplayEvaluations = () => {
         setError("Failed to fetch evaluations.");
       }
     };
-
     fetchEvaluations();
   }, [projectname]);
 
@@ -46,18 +46,37 @@ const DisplayEvaluations = () => {
         const leaves = getLeafNodes(treeData);
         const mapping = {};
         leaves.forEach((leaf) => {
-          mapping[leaf.id] = leaf.name;
+          // Use string conversion for consistent lookup.
+          mapping[leaf.id.toString()] = leaf.name;
         });
         setLeafMapping(mapping);
       } catch (err) {
         console.error("Error fetching project tree:", err);
       }
     };
-
     fetchProjectTree();
   }, [projectname]);
 
-  // Determine union of all keys in alternativeValues from evaluations.
+  // Fetch query results to build fallback mapping from nodeId to nodeName.
+  useEffect(() => {
+    const fetchQueryResultsMapping = async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:8000/api/queryResults?project=${projectname}`
+        );
+        const mapping = {};
+        res.data.forEach((result) => {
+          mapping[result.nodeId.toString()] = result.nodeName;
+        });
+        setQueryMapping(mapping);
+      } catch (err) {
+        console.error("Error fetching query results for mapping:", err);
+      }
+    };
+    fetchQueryResultsMapping();
+  }, [projectname]);
+
+  // Compute union of all keys in alternativeValues from evaluations.
   const allLeafKeys = evaluations.reduce((acc, evalItem) => {
     const keys = Object.keys(evalItem.alternativeValues || {});
     keys.forEach((key) => {
@@ -100,10 +119,11 @@ const DisplayEvaluations = () => {
               </tr>
               {/* Row for each leaf key */}
               {allLeafKeys.map((key) => {
-                // Use the mapping to show proper leaf name if available.
-                const leafLabel = leafMapping[key]
-                  ? leafMapping[key]
-                  : `Leaf ${key}`;
+                // Use project tree mapping first, then fallback to query mapping.
+                const leafLabel =
+                  leafMapping[key.toString()] ||
+                  queryMapping[key.toString()] ||
+                  `Leaf ${key}`;
                 return (
                   <tr key={key} className="hover:bg-gray-100">
                     <td className="border border-gray-300 p-2 font-medium">

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "./Nav/Navbar";
 import Footer from "./Footer";
-import defaultImage from "../images/symbol.jpg";
 import axiosInstance from "./utils/axiosInstance";
 import ToastMessage from "./ToastMessage";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -10,10 +9,10 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 const Home = () => {
   const [events, setEvents] = useState([]);
+  // Remove the image field completely since it's not used anymore.
   const [eventDetails, setEventDetails] = useState({
     name: "",
     description: "",
-    image: null,
   });
 
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -31,7 +30,6 @@ const Home = () => {
   };
 
   const handleStartProject = (project) => {
-    // Use project.projectId (the slug) instead of project._id
     const projectSlug = project.projectId;
     const storedFullName = localStorage.getItem("fullName")?.trim();
 
@@ -45,38 +43,27 @@ const Home = () => {
     }
   };
 
-  const handleImageChange = (e) => {
-    setEventDetails({
-      ...eventDetails,
-      image: e.target.files[0],
-    });
-  };
-
+  // Update handleSubmit to use the new endpoints.
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Create project first
+      // Create project first using the projects route
       const projectResponse = await axiosInstance.post("/api/projects", {
         projectName: eventDetails.name.trim(),
       });
 
-      // Create event with FormData
-      const formData = new FormData();
-      formData.append("name", eventDetails.name);
-      formData.append("description", eventDetails.description);
-      formData.append("projectId", projectResponse.data.projectId); // Use projectId instead of _id
+      // Then set the event info via the new /api/projects/event endpoint.
+      const eventPayload = {
+        projectId: projectResponse.data.projectId,
+        name: eventDetails.name,
+        description: eventDetails.description,
+      };
+      const eventResponse = await axiosInstance.post(
+        "/api/projects/event",
+        eventPayload
+      );
 
-      if (eventDetails.image) {
-        formData.append("image", eventDetails.image);
-      }
-
-      const eventResponse = await axiosInstance.post("/add-event", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
-      // Update state with the new event
+      // Update state with the new event info.
       setEvents([
         ...events,
         {
@@ -85,8 +72,8 @@ const Home = () => {
         },
       ]);
 
-      // Reset form
-      setEventDetails({ name: "", description: "", image: null });
+      // Reset form.
+      setEventDetails({ name: "", description: "" });
       showToast("Project added successfully!", "success");
       document.querySelector('[data-bs-dismiss="modal"]').click();
     } catch (error) {
@@ -136,9 +123,10 @@ const Home = () => {
     setShowModal(false);
   };
 
+  // Update getAllEvents to call the new endpoint that fetches event info from projects.
   const getAllEvents = async () => {
     try {
-      const response = await axiosInstance.get("/get-all-events");
+      const response = await axiosInstance.get("/api/projects/events");
       if (response.data && response.data.events) {
         setEvents(response.data.events);
       }
@@ -173,7 +161,6 @@ const Home = () => {
     getAllEvents();
   }, []);
 
-  // Replace your return block with the following changes:
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       <Navbar />
@@ -210,14 +197,12 @@ const Home = () => {
                   ✕
                 </button>
               </div>
-
               <div className="modal-body">
                 {successMessage && (
                   <div className="p-3 mb-4 bg-green-100 text-green-700 rounded-lg">
                     {successMessage}
                   </div>
                 )}
-
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="space-y-4">
                     <div>
@@ -234,7 +219,6 @@ const Home = () => {
                         required
                       />
                     </div>
-
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Description
@@ -247,23 +231,7 @@ const Home = () => {
                         required
                       ></textarea>
                     </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Project Image
-                      </label>
-                      <div className="flex items-center justify-center w-full border-2 border-dashed border-gray-300 rounded-lg p-6">
-                        <input
-                          type="file"
-                          name="image"
-                          className="w-full"
-                          onChange={handleImageChange}
-                          accept="image/*"
-                        />
-                      </div>
-                    </div>
                   </div>
-
                   <div className="flex justify-end gap-4 mt-8">
                     <button
                       type="button"
@@ -291,19 +259,12 @@ const Home = () => {
               key={index}
               className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow overflow-hidden"
             >
-              <div className="aspect-square bg-gray-100">
-                <img
-                  src={event.image || defaultImage}
-                  alt="Project"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-
-              <div className="p-4">
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">
+              <div className="w-full h-64 flex items-center justify-center bg-gray-100">
+                <h2 className="text-2xl font-bold text-gray-700">
                   {event.name}
-                </h3>
-
+                </h2>
+              </div>
+              <div className="p-4">
                 <div className="flex flex-wrap gap-2 mt-4">
                   <button
                     onClick={() => showDetails(event)}
@@ -341,26 +302,11 @@ const Home = () => {
                   ✕
                 </button>
               </div>
-
               <div className="p-6">
                 <p className="text-gray-600 mb-4">
                   {selectedEvent.description}
                 </p>
-                <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
-                  <img
-                    src={
-                      selectedEvent.image
-                        ? typeof selectedEvent.image === "string"
-                          ? selectedEvent.image
-                          : URL.createObjectURL(selectedEvent.image)
-                        : defaultImage
-                    }
-                    alt="Project"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
               </div>
-
               <div className="flex justify-end p-6 border-t">
                 <button
                   onClick={closeModal}

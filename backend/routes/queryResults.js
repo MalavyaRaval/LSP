@@ -26,14 +26,17 @@ router.post("/", async (req, res) => {
 
 // GET: Retrieve query results, optionally filtering by projectId
 router.get("/", async (req, res) => {
-  try {
-    const { project } = req.query;
-    const filter = project ? { projectId: project } : {};
-    const results = await QueryResult.find(filter).sort({ createdAt: -1 });
-    res.json(results);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
+    try {
+      const { project } = req.query;
+      if (!project) {
+        return res.status(400).json({ message: "Project parameter is required" });
+      }
+      // Find query results for the given project
+      const results = await QueryResult.find({ projectId: project });
+      res.json(results);
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  });
 
 module.exports = router;

@@ -31,6 +31,8 @@ app.use('/uploads', express.static('uploads'));
 app.use("/api/query-results", queryResultsRouter);
 app.use("/api/evaluations", evaluationsRouter);
 
+app.use("/api/queryResults", require("./routes/queryResults"));
+app.use("/api/evaluations", require("./routes/evaluations"));
 
 
 // Set up multer for file uploads

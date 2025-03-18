@@ -3,10 +3,30 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const Project = require('../models/Project');
 const Evaluation = require('../models/Evaluation');
-const Event = require('../models/event.model'); // Require the Event model
-// (Assuming your Event model is defined in models/event.model.js)
+const { authenticationToken } = require("../utilities");
+
+// Remove Event model entirely – all event routes are now part of projects router
+
+// --- Existing Routes for Project Tree ---
 
 // GET: Retrieve the project tree by projectId (create it if not exists)
+
+router.get('/events', async (req, res) => {
+  try {
+    const projects = await Project.find({});
+    const events = projects.map(p => ({
+      projectId: p.projectId,
+      name: p.eventInfo?.name || p.treeData.name,
+      description: p.eventInfo?.description || "",
+      createdAt: p.eventInfo?.createdAt || p.createdAt
+    }));
+    res.json({ events });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+
 router.get('/:projectId', async (req, res) => {
   try {
     let project = await Project.findOne({ projectId: req.params.projectId });
@@ -47,7 +67,7 @@ router.put('/:projectId', async (req, res) => {
   }
 });
 
-// POST: Create a new project
+// POST: Create a new project (basic info)
 router.post('/', async (req, res) => {
   try {
     const { projectName } = req.body;
@@ -76,7 +96,9 @@ router.post('/', async (req, res) => {
           connection: null,
           created: new Date()
         }
-      }
+      },
+      // Initialize eventInfo as empty.
+      eventInfo: {}
     });
 
     await newProject.save();
@@ -103,13 +125,11 @@ router.post('/:projectId/nodes', async (req, res) => {
     
     const addChildrenToParent = (node) => {
       if (node.id == parentId) { // Loose equality for type flexibility
-        // Add DEMA metadata to parent node
         node.attributes = node.attributes || {};
         node.attributes.decisionProcess = metadata?.decisionProcess || 'DEMA';
         node.attributes.objectName = metadata?.objectName || 'Untitled Object';
         node.attributes.lastUpdated = new Date();
 
-        // Add children with attributes
         node.children.push(...children.map(child => ({
           ...child,
           attributes: {
@@ -120,7 +140,6 @@ router.post('/:projectId/nodes', async (req, res) => {
           parent: node.id,
           children: []
         })));
-
         return true;
       }
       return node.children?.some(addChildrenToParent);
@@ -152,7 +171,6 @@ router.put('/:projectId/nodes/:nodeId', async (req, res) => {
     const treeData = project.treeData;
     const { attributes } = req.body;
 
-    // Helper function: recursively update node attributes
     const updateNodeAttributes = (node, nodeId, newAttributes) => {
       if (node.id.toString() === nodeId.toString()) {
         node.attributes = { 
@@ -192,16 +210,14 @@ router.delete('/node/:nodeId', async (req, res) => {
   }
   
   try {
-    // Delete node logic: remove the node from treeData.
     const project = await Project.findOne({ projectId });
     if (!project) {
       return res.status(404).json({ message: "Project not found." });
     }
     
-    // Recursive function to remove the node from the tree.
     function removeNode(node, nodeId) {
       if (node.id.toString() === nodeId.toString()) {
-        return null; // Remove this node
+        return null;
       }
       if (node.children && node.children.length > 0) {
         node.children = node.children
@@ -215,11 +231,9 @@ router.delete('/node/:nodeId', async (req, res) => {
     project.markModified("treeData");
     await project.save();
     
-    // Delete associated query results.
     const QueryResult = require('../models/QueryResult');
     await QueryResult.deleteMany({ nodeId });
     
-    // Remove the key for the deleted node from all evaluations.
     await Evaluation.updateMany(
       { projectId },
       { $unset: { [`alternativeValues.${nodeId}`]: "" } }
@@ -232,40 +246,65 @@ router.delete('/node/:nodeId', async (req, res) => {
 });
 
 // DELETE a project and all its related data.
-router.delete('/:projectId', async (req, res) => {
+router.delete('/:projectId', authenticationToken, async (req, res) => {
   try {
     const { projectId } = req.params;
-    // Build filter: use custom projectId; if valid ObjectId, include _id as well.
     const filter = mongoose.Types.ObjectId.isValid(projectId)
-      ? { $or: [{ projectId: projectId }, { _id: projectId }] }
-      : { projectId: projectId };
-
-    // Try finding the project
+      ? { $or: [{ projectId }, { _id: projectId }] }
+      : { projectId };
+  
     const project = await Project.findOne(filter);
     if (!project) {
       return res.status(200).json({ message: "Project not found. Nothing to delete." });
     }
-
-    // Delete the project document.
+  
+    // Check authorization: only the creator (stored in eventInfo.createdBy) can delete.
+    if (!project.eventInfo || !project.eventInfo.createdBy ||
+        project.eventInfo.createdBy.toString() !== req.user.userId.toString()) {
+      return res.status(403).json({ message: "Not authorized to delete this project." });
+    }
+  
     await Project.findOneAndDelete(filter);
-
-    // Use the project's custom projectId for associated data removal.
+  
     const customId = project.projectId;
-
-    // Delete associated query results.
     const QueryResult = require('../models/QueryResult');
     await QueryResult.deleteMany({ projectId: customId });
-
-    // Delete associated evaluations.
     await Evaluation.deleteMany({ projectId: customId });
-
-    // DELETE any events associated with this project so they no longer show on Home page.
-    await Event.deleteMany({ projectId: customId });
-
+  
     res.json({ message: "Project and all its related data have been deleted successfully." });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Error deleting project: " + err.message });
+  }
+});
+
+
+// --- New Event Routes using the Project Model ---
+//
+// POST /api/projects/event
+// This route updates the project document adding/updating its eventInfo field.
+router.post('/event', authenticationToken, async (req, res) => {
+  try {
+    // Expect projectId, name and description in the request body.
+    const { projectId, name, description } = req.body;
+    if (!projectId || !name || !description) {
+      return res.status(400).json({ message: "projectId, name and description are required." });
+    }
+    const project = await Project.findOne({ projectId });
+    if (!project) {
+      return res.status(404).json({ message: "Project not found." });
+    }
+    // Set the eventInfo field with the authenticated user's id.
+    project.eventInfo = {
+      name,
+      description,
+      createdBy: req.user.userId,
+      createdAt: new Date()
+    };
+    await project.save();
+    res.json({ event: project.eventInfo, projectId: project.projectId });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 });
 

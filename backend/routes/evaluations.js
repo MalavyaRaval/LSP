@@ -25,16 +25,16 @@ router.post("/", async (req, res) => {
 
 // GET: Retrieve evaluations for a project
 router.get("/", async (req, res) => {
-    try {
-      const projectId = req.query.project;
-      if (!projectId) {
-        return res.status(400).json({ message: "Project ID is required." });
-      }
-      const evaluations = await Evaluation.find({ projectId });
-      res.json(evaluations);
-    } catch (err) {
-      res.status(500).json({ message: err.message });
+  try {
+    const projectId = req.query.project;
+    if (!projectId) {
+      return res.status(400).json({ message: "Project ID is required." });
     }
-  });
+    const evaluations = await Evaluation.find({ projectId });
+    res.json(evaluations);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
 
 module.exports = router;

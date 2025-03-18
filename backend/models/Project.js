@@ -1,52 +1,25 @@
 const mongoose = require("mongoose");
 
 const nodeAttributesSchema = new mongoose.Schema({
-  importance: {
-    type: Number,
-    min: [1, "Importance must be at least 1"],
-    max: [9, "Importance cannot exceed 9"],
-  },
-  connection: {
-    type: Number,
-    min: [1, "Connection must be at least 1"],
-    max: [8, "Connection cannot exceed 8"],
-  },
-  created: {
-    type: Date,
-    default: Date.now,
-  },
+  importance: { type: Number, min: [1, "Minimum is 1"], max: [9, "Maximum is 9"] },
+  connection: { type: Number, min: [1, "Minimum is 1"], max: [8, "Maximum is 8"] },
+  created: { type: Date, default: Date.now },
   decisionProcess: String,
   objectName: String,
   lastUpdated: Date,
 });
 
 const treeNodeSchema = new mongoose.Schema({
-  id: {
-    type: Number,
-    required: true
-  },
-  name: {
-    type: String,
-    required: true
-  },
+  id: { type: Number, required: true },
+  name: { type: String, required: true },
   attributes: nodeAttributesSchema,
-  children: {
-    type: [mongoose.Schema.Types.Mixed],
-    default: []
-  },
-  parent: {
-    type: Number,
-    default: null
-  }
+  children: { type: [mongoose.Schema.Types.Mixed], default: [] },
+  parent: { type: Number, default: null }
 });
 
 const projectSchema = new mongoose.Schema({
   projectId: { 
-    type: String, 
-    required: true, 
-    unique: true,
-    trim: true,
-    lowercase: true
+    type: String, required: true, unique: true, trim: true, lowercase: true
   },
   treeData: {
     type: treeNodeSchema,
@@ -54,26 +27,22 @@ const projectSchema = new mongoose.Schema({
     default: () => ({
       id: Date.now(),
       name: "Root",
-      attributes: {
-        importance: null,
-        connection: null,
-        created: Date.now()
-      },
+      attributes: { importance: null, connection: null, created: Date.now() },
       children: [],
       parent: null
     })
   },
-  createdAt: {
-    type: Date,
-    default: Date.now
+  // New eventInfo field to store event details from /event route.
+  eventInfo: {
+    name: String,
+    description: String,
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    createdAt: Date
   },
-  updatedAt: {
-    type: Date,
-    default: Date.now
-  }
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
 });
 
-// Add pre-save hook for updatedAt
 projectSchema.pre('save', function(next) {
   this.updatedAt = Date.now();
   next();

@@ -43,11 +43,9 @@ const Home = () => {
     }
   };
 
-  // Update handleSubmit to use the new endpoints.
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Create project first using the projects route
       const projectResponse = await axiosInstance.post("/api/projects", {
         projectName: eventDetails.name.trim(),
       });

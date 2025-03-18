@@ -1,10 +1,8 @@
 require("dotenv").config();
-const path = require("path");
 const config = require("./config.json");
 const mongoose = require("mongoose");
 const express = require("express");
 const cors = require("cors");
-const multer = require("multer");
 const jwt = require("jsonwebtoken");
 
 // Connect to MongoDB
@@ -12,8 +10,6 @@ mongoose.connect(config.connectionString || process.env.MONGODB_URI, {});
 
 // Import models
 const User = require("./models/user.model");
-const Event = require("./models/event.model");
-const Project = require("./models/Project");
 const queryResultsRouter = require("./routes/queryResults");
 const evaluationsRouter = require("./routes/evaluations");
 
@@ -27,7 +23,6 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(cors({ origin: "*" }));
-app.use('/uploads', express.static('uploads'));
 app.use("/api/query-results", queryResultsRouter);
 app.use("/api/evaluations", evaluationsRouter);
 
@@ -36,37 +31,11 @@ app.use("/api/evaluations", require("./routes/evaluations"));
 
 
 // Set up multer for file uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/");
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
-  }
-});
-const upload = multer({
-  storage: storage,
-  limits: { fileSize: 10 * 1024 * 1024 },
-  fileFilter: (req, file, cb) => {
-    const allowedTypes = /jpeg|jpg|png|gif/;
-    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = allowedTypes.test(file.mimetype);
-    if (extname && mimetype) {
-      return cb(null, true);
-    } else {
-      return cb(new Error("Only image files are allowed"), false);
-    }
-  }
-}).single("image");
+
+
 
 // Example authentication middleware (adjust as needed)
-const isAuthenticated = (req, res, next) => {
-  if (req.isAuthenticated && req.isAuthenticated()) {
-    return next();
-  } else {
-    return res.status(401).json({ error: true, message: "Unauthorized" });
-  }
-};
+
 
 // Routes
 
@@ -90,7 +59,7 @@ app.post("/create-account", async (req, res) => {
   const user = new User({
     fullName,
     email,
-    password, // Plain text storage
+    password,
     address,
     city,
     state,
@@ -146,41 +115,8 @@ app.get("/get-user", authenticationToken, async (req, res) => {
   }
 });
 
-// Add Event (using default image if none provided)
-app.post("/add-event", authenticationToken, (req, res) => {
-  upload(req, res, async (err) => {
-    if (err) {
-      return res.status(400).json({
-        error: true,
-        message: err.message,
-      });
-    }
-    const { name, description, projectId } = req.body;
-    const image = req.file ? `/uploads/${req.file.filename}` : "/uploads/default.jpg";
-    const userId = req.user.userId;
-    try {
-      const event = new Event({
-        name,
-        description,
-        image,
-        projectId,
-        createdBy: userId,
-      });
-      await event.save();
-      return res.json({
-        error: false,
-        event,
-        message: "Event added successfully",
-      });
-    } catch (error) {
-      console.error("Error adding Event:", error);
-      return res.status(500).json({
-        error: true,
-        message: "Internal Server Error",
-      });
-    }
-  });
-});
+// Add Event
+
 
 // Edit Account
 app.put("/edit-account", authenticationToken, async (req, res) => {
@@ -216,48 +152,10 @@ app.put("/edit-account", authenticationToken, async (req, res) => {
 });
 
 // Get all Events
-app.get("/get-all-events", async (req, res) => {
-  try {
-    const events = await Event.find().sort({ date: -1 });
-    return res.json({
-      error: false,
-      events,
-      message: "All events retrieved successfully",
-    });
-  } catch (error) {
-    return res.status(500).json({
-      error: true,
-      message: "Internal Server Error",
-    });
-  }
-});
+
 
 // Delete Event
-app.delete("/delete-event/:eventId", authenticationToken, async (req, res) => {
-  const eventId = req.params.eventId;
-  try {
-    const event = await Event.findOne({ _id: eventId });
-    if (!event) {
-      return res.status(404).json({ error: true, message: "Project not found" });
-    }
-    if (event.createdBy.toString() !== req.user.userId.toString()) {
-      return res.status(403).json({
-        error: true,
-        message: "You do not have permission to delete this Project"
-      });
-    }
-    await Event.deleteOne({ _id: eventId });
-    return res.json({
-      error: false,
-      message: "Project deleted successfully",
-    });
-  } catch (error) {
-    return res.status(500).json({
-      error: true,
-      message: "Internal Server Error",
-    });
-  }
-});
+
 
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {

@@ -98,28 +98,32 @@ const Home = () => {
     }
   };
 
-  const handleDelete = async (eventId) => {
-    if (window.confirm("Are you sure you want to delete this Project?")) {
-      axiosInstance
-        .delete(`/delete-event/${eventId}`)
-        .then((response) => {
-          if (response.data && !response.data.error) {
-            showToast("Project deleted successfully!", "success");
-            getAllEvents();
-          } else {
-            showToast("Failed to delete Project", "error");
-          }
-        })
-        .catch((error) => {
-          if (error.response && error.response.status === 403) {
-            showToast(
-              "You do not have permission to delete this Project",
-              "error"
-            );
-          } else {
-            showToast("Error deleting Project: " + error.message, "error");
-          }
-        });
+  const handleDelete = async (projectId) => {
+    if (
+      window.confirm(
+        "Are you sure you want to delete this entire project? This will delete the project tree and all related data."
+      )
+    ) {
+      try {
+        const response = await axiosInstance.delete(
+          `/api/projects/${projectId}`
+        );
+        if (response.data && !response.data.error) {
+          showToast("Project deleted successfully!", "success");
+          getAllEvents();
+        } else {
+          showToast("Failed to delete Project", "error");
+        }
+      } catch (error) {
+        if (error.response && error.response.status === 403) {
+          showToast(
+            "You do not have permission to delete this Project",
+            "error"
+          );
+        } else {
+          showToast("Error deleting Project: " + error.message, "error");
+        }
+      }
     }
   };
 
@@ -308,7 +312,7 @@ const Home = () => {
                     View Details
                   </button>
                   <button
-                    onClick={() => handleDelete(event._id)}
+                    onClick={() => handleDelete(event.projectId)}
                     className="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors text-sm"
                   >
                     Delete

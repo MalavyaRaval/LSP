@@ -255,7 +255,9 @@ const DemaChat = () => {
       // New check for parent nodes:
       const hasParentNodes = treeData.children && treeData.children.length > 0;
       if (!hasParentNodes) {
-        alert("No parent nodes to process. Tree finalization complete.");
+        alert(
+          "All parent nodes completed process. Tree finalization complete."
+        );
         setEvaluationStarted(true);
       }
     } catch (error) {
@@ -292,7 +294,9 @@ const DemaChat = () => {
         setCurrentParentIndex(0);
         setProcessingParents(true);
       } else {
-        alert("No parent nodes to process. Tree finalization complete.");
+        alert(
+          "All parent nodes completed process. Tree finalization complete."
+        );
         setEvaluationStarted(true);
       }
     } catch (err) {

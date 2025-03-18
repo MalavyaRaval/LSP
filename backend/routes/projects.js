@@ -1,7 +1,10 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require("mongoose");
 const Project = require('../models/Project');
 const Evaluation = require('../models/Evaluation');
+const Event = require('../models/event.model'); // Require the Event model
+// (Assuming your Event model is defined in models/event.model.js)
 
 // GET: Retrieve the project tree by projectId (create it if not exists)
 router.get('/:projectId', async (req, res) => {
@@ -53,8 +56,8 @@ router.post('/', async (req, res) => {
     }
     
     const projectId = projectName.toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(/[^\w-]+/g, '');
+      .replace(/\s+/g, '-')
+      .replace(/[^\w-]+/g, '');
       
     const exists = await Project.findOne({ projectId });
     if (exists) {
@@ -106,7 +109,7 @@ router.post('/:projectId/nodes', async (req, res) => {
         node.attributes.objectName = metadata?.objectName || 'Untitled Object';
         node.attributes.lastUpdated = new Date();
 
-        // Add children with attributes (read from child.attributes)
+        // Add children with attributes
         node.children.push(...children.map(child => ({
           ...child,
           attributes: {
@@ -140,8 +143,6 @@ router.post('/:projectId/nodes', async (req, res) => {
     });
   }
 });
-
-// Add this new route after your existing routes
 
 // PUT: Update a specific node in the project tree by nodeId
 router.put('/:projectId/nodes/:nodeId', async (req, res) => {
@@ -230,6 +231,42 @@ router.delete('/node/:nodeId', async (req, res) => {
   }
 });
 
-module.exports = router;
+// DELETE a project and all its related data.
+router.delete('/:projectId', async (req, res) => {
+  try {
+    const { projectId } = req.params;
+    // Build filter: use custom projectId; if valid ObjectId, include _id as well.
+    const filter = mongoose.Types.ObjectId.isValid(projectId)
+      ? { $or: [{ projectId: projectId }, { _id: projectId }] }
+      : { projectId: projectId };
+
+    // Try finding the project
+    const project = await Project.findOne(filter);
+    if (!project) {
+      return res.status(200).json({ message: "Project not found. Nothing to delete." });
+    }
+
+    // Delete the project document.
+    await Project.findOneAndDelete(filter);
+
+    // Use the project's custom projectId for associated data removal.
+    const customId = project.projectId;
+
+    // Delete associated query results.
+    const QueryResult = require('../models/QueryResult');
+    await QueryResult.deleteMany({ projectId: customId });
+
+    // Delete associated evaluations.
+    await Evaluation.deleteMany({ projectId: customId });
+
+    // DELETE any events associated with this project so they no longer show on Home page.
+    await Event.deleteMany({ projectId: customId });
+
+    res.json({ message: "Project and all its related data have been deleted successfully." });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error deleting project: " + err.message });
+  }
+});
 
 module.exports = router;

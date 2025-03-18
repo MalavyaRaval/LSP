@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
-
+import { useParams, useNavigate } from "react-router-dom";
 // Helper: recursively extract leaf nodes (nodes with no children)
 const getLeafNodes = (node) => {
   if (!node.children || node.children.length === 0) return [node];
@@ -13,14 +12,15 @@ const getLeafNodes = (node) => {
 };
 
 const ProjectEvaluation = () => {
-  const { projectname } = useParams(); // using projectname as projectId
+  const { projectname } = useParams(); // using projectname as project ID
+  const navigate = useNavigate();
   const [evaluationStep, setEvaluationStep] = useState(1);
   const [alternativeName, setAlternativeName] = useState("");
   const [alternativeCost, setAlternativeCost] = useState("");
   const [error, setError] = useState("");
   const [leafNodes, setLeafNodes] = useState([]);
   const [alternativeValues, setAlternativeValues] = useState({});
-  const [queryResults, setQueryResults] = useState([]); // new state for query results
+  const [queryResults, setQueryResults] = useState([]);
 
   // In step 2, fetch the project tree and query results.
   useEffect(() => {
@@ -90,7 +90,7 @@ const ProjectEvaluation = () => {
         user: "currentUser", // replace with current user's identifier if available
         alternativeName,
         alternativeCost: parseFloat(alternativeCost),
-        alternativeValues, // this is expected to be an object mapping each leaf id to a number
+        alternativeValues, // object mapping each leaf id to a number
       };
       const res = await axios.post(
         "http://localhost:8000/api/evaluations",
@@ -98,6 +98,21 @@ const ProjectEvaluation = () => {
       );
       console.log("Evaluation saved:", res.data);
       alert("Evaluation submitted successfully!");
+
+      // Ask the user if they have more alternatives to evaluate.
+      const more = window.confirm(
+        "Are there any more alternatives to evaluate?"
+      );
+      if (more) {
+        // Reset the form for new alternative entry.
+        setAlternativeName("");
+        setAlternativeCost("");
+        setAlternativeValues({});
+        setEvaluationStep(1);
+      } else {
+        // Redirect to the DisplayEvaluations page.
+        navigate(`/user/currentUser/project/${projectname}/evaluate`);
+      }
     } catch (err) {
       console.error("Error submitting evaluation:", err);
       setError("Failed to submit evaluation.");

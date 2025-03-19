@@ -45,24 +45,22 @@ const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
 
   return (
     <div className="p-4 border rounded">
-      <h1 className="text-2xl font-bold mb-2">
-        Query 4: I prefer high values of this item
-      </h1>
-      <p className="mb-4">
-        Please answer the following. The first value must be less than the
-        second.
-      </p>
+      <h4 className="text-2xl font-bold mb-2">
+        You’ve mentioned that you prefer Higher values. Let’s clarify your
+        preferences. Please answer the following, keeping in mind that the first
+        value should always be less than the second.
+      </h4>
       <table className="min-w-full border-collapse border border-gray-400 mb-4">
         <thead>
           <tr className="bg-gray-200">
             <th className="border border-gray-400 p-2">Description</th>
-            <th className="border border-gray-400 p-2">Value</th>
+            <th className="border border-gray-400 p-2">Provide values</th>
           </tr>
         </thead>
         <tbody>
           <tr className="hover:bg-gray-100">
             <td className="border border-gray-400 p-2">
-              It is unacceptable if the value is less than
+              What’s the minimum acceptable value?
             </td>
             <td className="border border-gray-400 p-2">
               <input
@@ -77,7 +75,7 @@ const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
           </tr>
           <tr className="hover:bg-gray-100">
             <td className="border border-gray-400 p-2">
-              I am fully satisfied if the value is greater than
+              What value would make you fully satisfied?
             </td>
             <td className="border border-gray-400 p-2">
               <input

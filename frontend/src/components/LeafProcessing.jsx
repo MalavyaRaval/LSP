@@ -29,37 +29,38 @@ const LeafProcessing = ({
   return (
     <div className="p-6 bg-white rounded-lg shadow-md mx-4">
       <h2 className="text-xl font-semibold mb-4">
-        For leaf: <span className="text-indigo-600">{currentLeaf.name}</span>
+        For this item{" "}
+        <span className="text-indigo-600">{currentLeaf.name}</span>
       </h2>
       {!composition ? (
         <>
           <p className="mb-4">
-            Which composition do you want to perform for this leaf?
+            How would you like to approach the composition?
           </p>
           <div className="flex flex-col gap-3">
             <button
               className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
               onClick={() => handleSelectComposition("q4")}
             >
-              Q4: I prefer high values
+              I prefer high values
             </button>
             <button
               className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
               onClick={() => handleSelectComposition("q5")}
             >
-              Q5: I prefer low values
+              I prefer low values
             </button>
             <button
               className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
               onClick={() => handleSelectComposition("q6")}
             >
-              Q6: I prefer a specific range
+              I prefer a specific range
             </button>
             <button
               className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
               onClick={() => handleSelectComposition("q7")}
             >
-              Q7: I will specify a table of requirements
+              I will specify a table of requirements
             </button>
           </div>
         </>

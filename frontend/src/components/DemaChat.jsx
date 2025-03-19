@@ -15,6 +15,12 @@ const getLeafNodes = (node) => {
   return leaves;
 };
 
+// Constant for initial children details (2 rows)
+const INITIAL_CHILDREN = [
+  { id: 0, name: "", decompose: null },
+  { id: 1, name: "", decompose: null },
+];
+
 const DemaChat = () => {
   const { username, projectname } = useParams();
   const location = useLocation();
@@ -25,9 +31,9 @@ const DemaChat = () => {
   const projectId = projectname;
   const [parentId, setParentId] = useState(parentIdQuery || null);
   const [parentName, setParentName] = useState("");
+  // Remove childrenCount and use initial children details directly
+  const [childrenDetails, setChildrenDetails] = useState(INITIAL_CHILDREN);
   const [currentStep, setCurrentStep] = useState(0);
-  const [childrenCount, setChildrenCount] = useState("");
-  const [childrenDetails, setChildrenDetails] = useState([]);
   const [processing, setProcessing] = useState(false);
   const [bfsQueue, setBfsQueue] = useState([]);
   // States for leaf processing.
@@ -46,9 +52,12 @@ const DemaChat = () => {
 
   const messagesEndRef = useRef(null);
 
+  // Single step: Enter details for each Component.
   const steps = [
-    { id: "childrenCount", question: "Enter the number of Components" },
-    { id: "childrenDetails", question: "Enter details for each Component" },
+    {
+      id: "childrenDetails",
+      question: "Please provide the details for each component of ",
+    },
   ];
 
   // Helper: Recursively find a node by id.
@@ -125,21 +134,6 @@ const DemaChat = () => {
     currentParentIndex,
   ]);
 
-  const handleCountSubmit = () => {
-    const count = parseInt(childrenCount);
-    if (isNaN(count) || count < 2 || count > 5) {
-      alert("Please enter a number between 2 and 5.");
-      return;
-    }
-    const details = Array.from({ length: count }, (_, i) => ({
-      id: i,
-      name: "",
-      decompose: false,
-    }));
-    setChildrenDetails(details);
-    setCurrentStep(1);
-  };
-
   const handleDetailChange = (index, field, value) => {
     const newDetails = [...childrenDetails];
     newDetails[index][field] = field === "decompose" ? value === "true" : value;
@@ -154,8 +148,7 @@ const DemaChat = () => {
     }
 
     const childrenNodes = childrenDetails.map((child, index) => ({
-      id: `${effectiveParentId}-${Date.now()}-${index}`, // generated id
-      // Use the user-provided name trimmed; if empty, assign a default name
+      id: `${effectiveParentId}-${Date.now()}-${index}`,
       name: child.name.trim() || `Child ${index + 1}`,
       decompose: child.decompose,
       attributes: { created: Date.now() },
@@ -187,7 +180,6 @@ const DemaChat = () => {
         return [];
       }
       const createdChildren = parentNode.children;
-
       const nodesToDecompose = createdChildren.filter(
         (child) =>
           child.decompose === true ||
@@ -210,15 +202,26 @@ const DemaChat = () => {
   const handleProcessChildren = async () => {
     try {
       setProcessing(true);
+      // Ensure that all component names are non-empty.
+      if (childrenDetails.some((child) => !child.name.trim())) {
+        alert("Please fill in all Component names.");
+        setProcessing(false);
+        return;
+      }
+      // Ensure that each component has a selection for yes/no.
+      if (childrenDetails.some((child) => child.decompose === null)) {
+        alert("Please select Yes or No for all components.");
+        setProcessing(false);
+        return;
+      }
       const updatedQueue = await saveChildren();
       if (updatedQueue && updatedQueue.length > 0) {
         const [nextNode, ...remaining] = updatedQueue;
         sessionStorage.setItem("bfsQueue", JSON.stringify(remaining));
         setBfsQueue(remaining);
         setParentId(nextNode.id);
-        setChildrenCount("");
-        setChildrenDetails([]);
-        setCurrentStep(0);
+        // Reset children details to initial two rows after processing.
+        setChildrenDetails(INITIAL_CHILDREN);
       } else {
         finalizeNode();
       }
@@ -230,14 +233,12 @@ const DemaChat = () => {
     }
   };
 
-  // Inside DemaChat.jsx, modify finalizeNode:
   const finalizeNode = async () => {
     alert("All decompositions complete for this node! Finalizing tree.");
     window.dispatchEvent(new Event("refreshProjectTree"));
     setParentId(null);
-    setChildrenCount("");
-    setChildrenDetails([]);
-    setCurrentStep(0);
+    // Reset children details to initial two rows.
+    setChildrenDetails(INITIAL_CHILDREN);
     try {
       const res = await axios.get(
         `http://localhost:8000/api/projects/${projectId}`
@@ -248,11 +249,7 @@ const DemaChat = () => {
       setLeafNodes(leaves);
       setProcessingLeaves(true);
       setCurrentLeafIndex(0);
-      // Reset processed parents since we are starting a new parent processing phase.
       setProcessedParentIds(new Set());
-      // --- New check for parent nodes ---
-      // If none of the leaves have a parent different from the root, then finalization is complete.
-      // New check for parent nodes:
       const hasParentNodes = treeData.children && treeData.children.length > 0;
       if (!hasParentNodes) {
         alert(
@@ -265,7 +262,7 @@ const DemaChat = () => {
     }
   };
 
-  // ----- Start Processing Parents after Leaves -----
+  // Parent processing functions remain unchanged...
   const startParentProcessing = async () => {
     try {
       const res = await axios.get(
@@ -278,11 +275,9 @@ const DemaChat = () => {
           initialParentIds.add(leaf.parent.toString());
         }
       });
-      // Filter out already processed parent IDs (should be empty on first call)
       const filteredParentIds = Array.from(initialParentIds).filter(
         (pid) => !processedParentIds.has(pid)
       );
-      // Mark these as processed
       const newProcessed = new Set(processedParentIds);
       filteredParentIds.forEach((pid) => newProcessed.add(pid));
       setProcessedParentIds(newProcessed);
@@ -316,11 +311,9 @@ const DemaChat = () => {
           nextLevelParentIds.add(node.parent.toString());
         }
       });
-      // Filter out IDs that have already been processed.
       const filteredNextIds = Array.from(nextLevelParentIds).filter(
         (pid) => !processedParentIds.has(pid)
       );
-      // Update the processed parent set.
       const newProcessed = new Set(processedParentIds);
       filteredNextIds.forEach((pid) => newProcessed.add(pid));
       setProcessedParentIds(newProcessed);
@@ -332,7 +325,6 @@ const DemaChat = () => {
         setCurrentParentIndex(0);
       } else {
         setProcessingParents(false);
-        // Start evaluation phase instead of alert:
         setEvaluationStarted(true);
       }
     } catch (err) {
@@ -390,133 +382,100 @@ const DemaChat = () => {
         />
       );
     }
-    if (currentStep === 0) {
-      return (
-        <div className="p-6 bg-white rounded-lg shadow-md mx-4">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">
-            {steps[0].question} for{" "}
-            <span className="text-indigo-600">{parentName}</span>
-          </h2>
-          <div className="flex items-center">
-            <input
-              type="number"
-              value={childrenCount}
-              onChange={(e) => setChildrenCount(e.target.value)}
-              className="border border-gray-300 rounded-lg p-2 w-1/4"
-              min="2"
-              max="5"
-              placeholder="2 - 5"
-            />
-            <button
-              className="ml-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-              onClick={handleNextStep}
-            >
-              Continue
-            </button>
-          </div>
-        </div>
-      );
-    } else if (currentStep === 1) {
-      return (
-        <div className="p-6 bg-white rounded-lg shadow-md mx-4">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">
-            {steps[1].question} for{" "}
-            <span className="text-indigo-600">{parentName}</span>
-          </h2>
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    Component Name
-                  </th>
-                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">
-                    Decompose?
-                  </th>
+    // Single step to enter component details (no count asked)
+    return (
+      <div className="p-6 bg-white rounded-lg shadow-md mx-4">
+        <h2 className="text-xl font-semibold text-gray-800 mb-4">
+          {steps[0].question}{" "}
+          <span className="text-indigo-600">{parentName}</span>
+        </h2>
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  Component Name
+                </th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">
+                  Do you want to break this down?{" "}
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {childrenDetails.map((child, index) => (
+                <tr key={index}>
+                  <td className="px-6 py-4">
+                    <input
+                      type="text"
+                      placeholder={`Component ${index + 1} name`}
+                      value={child.name}
+                      onChange={(e) =>
+                        handleDetailChange(index, "name", e.target.value)
+                      }
+                      className="border border-gray-300 rounded-lg p-2 w-full"
+                    />
+                  </td>
+                  <td className="px-6 py-4 text-center">
+                    <select
+                      value={
+                        child.decompose === null
+                          ? ""
+                          : child.decompose
+                          ? "true"
+                          : "false"
+                      }
+                      onChange={(e) =>
+                        handleDetailChange(index, "decompose", e.target.value)
+                      }
+                      className="border border-gray-300 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="">Please select</option>
+                      <option value="true">Yes</option>
+                      <option value="false">No</option>
+                    </select>
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {childrenDetails.map((child, index) => (
-                  <tr key={index}>
-                    <td className="px-6 py-4">
-                      <input
-                        type="text"
-                        placeholder={`Child ${index + 1} name`}
-                        value={child.name}
-                        onChange={(e) =>
-                          handleDetailChange(index, "name", e.target.value)
-                        }
-                        className="border border-gray-300 rounded-lg p-2 w-full"
-                      />
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <div className="inline-flex rounded-md shadow-sm">
-                        <button
-                          onClick={() =>
-                            handleDetailChange(index, "decompose", "true")
-                          }
-                          className={`px-4 py-2 border border-gray-300 text-sm font-medium ${
-                            child.decompose
-                              ? "bg-green-500 text-white"
-                              : "bg-white text-gray-700 hover:bg-green-100"
-                          } rounded-l-md`}
-                        >
-                          Yes
-                        </button>
-                        <button
-                          onClick={() =>
-                            handleDetailChange(index, "decompose", "false")
-                          }
-                          className={`px-4 py-2 border border-gray-300 text-sm font-medium ${
-                            !child.decompose
-                              ? "bg-red-500 text-white"
-                              : "bg-white text-gray-700 hover:bg-red-100"
-                          } rounded-r-md`}
-                        >
-                          No
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <div className="flex justify-between mt-6">
-            <button
-              className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
-              onClick={handleBackStep}
-            >
-              Back
-            </button>
-            <button
-              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
-              onClick={handleNextStep}
-              disabled={processing}
-            >
-              {processing ? "Processing..." : "Process Components"}
-            </button>
-          </div>
+              ))}
+            </tbody>
+          </table>
         </div>
-      );
-    }
-    return null;
+        <div className="flex justify-between items-center mt-6">
+          {childrenDetails.length < 5 && (
+            <button
+              onClick={() =>
+                setChildrenDetails([
+                  ...childrenDetails,
+                  { id: childrenDetails.length, name: "", decompose: null },
+                ])
+              }
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all duration-200 text-xl"
+            >
+              Add Row
+            </button>
+          )}
+          <button
+            onClick={handleNextStep}
+            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all duration-200 text-xl"
+            disabled={processing}
+          >
+            {processing ? "Processing..." : "Process Components"}
+          </button>
+        </div>
+      </div>
+    );
   };
 
   const handleNextStep = () => {
-    if (currentStep === 0) {
-      handleCountSubmit();
-    } else if (currentStep === 1) {
-      if (childrenDetails.some((child) => !child.name.trim())) {
-        alert("Please fill in all Component names.");
-        return;
-      }
-      handleProcessChildren();
+    // In our single-step form, just validate before processing.
+    if (childrenDetails.some((child) => !child.name.trim())) {
+      alert("Please fill in all Component names.");
+      return;
     }
+    handleProcessChildren();
   };
 
   const handleBackStep = () => {
-    if (currentStep > 0) setCurrentStep((prev) => prev - 1);
+    // Not required for the single-step form.
   };
 
   return (

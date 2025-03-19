@@ -45,12 +45,16 @@ const Query5 = ({ onSave, nodeId, projectId, nodeName }) => {
 
   return (
     <div className="p-4 border rounded">
-      {/* UI remains unchanged */}
+      <h4 className="text-2xl font-bold mb-2">
+        You’ve mentioned that you prefer Lower values. Let’s clarify your
+        preferences. Please answer the following, keeping in mind that the first
+        value should always be less than the second.
+      </h4>{" "}
       <table className="min-w-full border-collapse border border-gray-400 mb-4">
         <thead>
           <tr className="bg-gray-200">
             <th className="border border-gray-400 p-2">Description</th>
-            <th className="border border-gray-400 p-2">Value</th>
+            <th className="border border-gray-400 p-2">Provide values</th>
           </tr>
         </thead>
         <tbody>

@@ -72,7 +72,7 @@ const TreeNode = ({
   return (
     <div className={`relative my-8`} style={{ marginLeft: `${level * 80}px` }}>
       {node.parent && (
-        <div className="absolute top-[-24px] left-[-48px] h-[calc(100%+24px)] w-12 border-l-2 border-b-2 border-gray-300 rounded-bl-lg" />
+        <div className="absolute top-[-24px] left-[-48px] h-[calc(100%+24px)] w-12 border-l-2 border-b-2 border-gray-100 rounded-bl-lg" />
       )}
 
       {/* Node Content Container */}

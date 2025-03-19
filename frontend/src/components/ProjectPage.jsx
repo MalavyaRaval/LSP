@@ -14,15 +14,17 @@ const ProjectPage = () => {
 
   // Convert projectname to a slug for use as projectId.
   const projectSlug = projectname;
-
   const storedFullName = localStorage.getItem("fullName")?.trim();
   const evaluatorName = storedFullName || username || "defaultUser";
 
   // State for project display name (from the project tree root's "name")
   const [projectDisplayName, setProjectDisplayName] = useState("");
-
   // State for scale (for zoom/drag features)
   const [scale, setScale] = useState(1);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   useEffect(() => {
     if (projectSlug) {
@@ -119,6 +121,14 @@ const ProjectPage = () => {
 
         {/* Main Content Area (Vertical Stack) */}
         <div className="flex flex-col gap-6">
+          {/* Dema Chat Container - Now placed above the Project Tree */}
+          <div
+            style={{ width: "1200px", height: "700px" }}
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mx-auto"
+          >
+            <DemaChat />
+          </div>
+
           {/* Project Tree Container */}
           <Resizable
             defaultSize={{
@@ -183,14 +193,6 @@ const ProjectPage = () => {
               </TransformWrapper>
             </div>
           </Resizable>
-
-          {/* Dema Chat Container */}
-          <div
-            style={{ width: "1200px", height: "700px" }}
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4"
-          >
-            <DemaChat />
-          </div>
         </div>
       </div>
 

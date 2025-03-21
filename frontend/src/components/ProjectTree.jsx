@@ -27,7 +27,6 @@ const TreeNode = ({
     "bg-yellow-100 border-yellow-300",
     "bg-pink-100 border-pink-300",
   ];
-
   const currentColor = colors[level % colors.length];
 
   useEffect(() => {
@@ -72,13 +71,13 @@ const TreeNode = ({
   return (
     <div className={`relative my-8`} style={{ marginLeft: `${level * 80}px` }}>
       {node.parent && (
-        <div className="absolute top-[-24px] left-[-48px] h-[calc(100%+24px)] w-12 border-l-2 border-b-2 border-gray-100 rounded-bl-lg" />
+        <div className="absolute top-[-24px] left-[-48px] h-[calc(100%+24px)] w-12 border-l-2 border-dashed border-gray-100 rounded-bl-lg" />
       )}
 
       {/* Node Content Container */}
       <div className="relative" ref={nodeRef}>
         <div
-          className={`p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer group border-2 mb-4 ${currentColor}`}
+          className={`p-4 rounded-lg shadow-lg hover:shadow-2xl transition-shadow cursor-pointer group border-2 mb-4 ${currentColor}`}
           onClick={() => setShowOptions(!showOptions)}
         >
           {editing ? (
@@ -91,24 +90,9 @@ const TreeNode = ({
             />
           ) : (
             <div className="space-y-2">
-              <span className="block text-lg font-medium text-gray-800">
+              <span className="block text-2xl font-bold text-gray-900">
                 {node.name}
               </span>
-              {node.attributes && (
-                <div className="flex flex-wrap gap-2 text-sm">
-                  <div className="flex items-center bg-gray-100 px-2 py-1 rounded">
-                    <span className="text-gray-600 mr-1">⚖️</span>
-                    {node.attributes.importance}
-                  </div>
-                  <div className="flex items-center bg-gray-100 px-2 py-1 rounded">
-                    <span className="text-gray-600 mr-1">🔗</span>
-                    {node.attributes.connection}
-                  </div>
-                  <div className="text-gray-500 text-xs">
-                    {new Date(node.attributes.created).toLocaleDateString()}
-                  </div>
-                </div>
-              )}
             </div>
           )}
         </div>
@@ -120,19 +104,19 @@ const TreeNode = ({
             className="absolute left-full ml-4 top-0 flex flex-col gap-2 z-10"
           >
             <button
-              className="px-4 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition-colors whitespace-nowrap"
+              className="px-4 py-2 bg-red-600 text-white rounded-lg shadow hover:bg-red-700 transition-colors whitespace-nowrap"
               onClick={() => handleOptionClick(() => deleteNode(node.id))}
             >
               Delete
             </button>
             <button
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow-lg hover:bg-blue-600 transition-colors whitespace-nowrap"
+              className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition-colors whitespace-nowrap"
               onClick={() => handleOptionClick(() => setEditing(true))}
             >
               Edit
             </button>
             <button
-              className="px-4 py-2 bg-purple-500 text-white rounded-lg shadow-lg hover:bg-purple-600 transition-colors whitespace-nowrap"
+              className="px-4 py-2 bg-purple-500 text-white rounded-lg shadow hover:bg-purple-600 transition-colors whitespace-nowrap"
               onClick={() => handleOptionClick(handleAddWithDEMA)}
               disabled={node.children.length >= 5}
               title={
@@ -142,7 +126,7 @@ const TreeNode = ({
               Add with DEMA
             </button>
             <button
-              className={`px-4 py-2 bg-green-500 text-white rounded-lg shadow-lg hover:bg-green-600 transition-colors whitespace-nowrap ${
+              className={`px-4 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition-colors whitespace-nowrap ${
                 node.children && node.children.length === 0 ? "" : "hidden"
               }`}
               onClick={() => handleOptionClick(handleAddLeafValues)}
@@ -155,7 +139,7 @@ const TreeNode = ({
 
         {/* Add Child Input */}
         {showAddChildInput && (
-          <div className="absolute left-full ml-4 top-0 flex items-center bg-white p-2 rounded shadow-lg z-10">
+          <div className="absolute left-full ml-4 top-0 flex items-center bg-white p-2 rounded shadow z-10">
             <input
               type="text"
               value={childName}
@@ -246,7 +230,6 @@ const ProjectTree = ({ projectId, username, projectname }) => {
       name: childName,
       children: [],
       parent: parentId,
-      attributes: { importance: 0, connection: 0, created: Date.now() },
     };
 
     const updateTree = (node) => {

@@ -90,7 +90,7 @@ const TreeNode = ({
             />
           ) : (
             <div className="space-y-2">
-              <span className="block text-2xl font-bold text-gray-900">
+              <span className="block text-3xl font-bold text-gray-900">
                 {node.name}
               </span>
             </div>

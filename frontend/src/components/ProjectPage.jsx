@@ -120,15 +120,20 @@ const ProjectPage = () => {
         </div>
 
         {/* Main Content Area (Vertical Stack) */}
-        <div className="flex flex-col gap-6">
-          {/* Dema Chat Container - Now placed above the Project Tree */}
+        <div className="flex flex-col gap-6 items-center">
+          {" "}
+          {/* Added items-center to center horizontally */}
+          {/* Dema Chat Container */}
           <div
-            style={{ width: "1200px", height: "700px" }}
+            style={{
+              width: "1200px",
+              minHeight: "700px", // Set a minimum height to ensure it doesn't shrink too small
+              height: "auto", // Allow the height to auto-adjust based on content
+            }}
             className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mx-auto"
           >
             <DemaChat />
           </div>
-
           {/* Project Tree Container */}
           <Resizable
             defaultSize={{
@@ -194,9 +199,8 @@ const ProjectPage = () => {
             </div>
           </Resizable>
         </div>
+        <Footer />
       </div>
-
-      <Footer />
     </div>
   );
 };

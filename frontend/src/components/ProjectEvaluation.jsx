@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
+
 // Helper: recursively extract leaf nodes (nodes with no children)
 const getLeafNodes = (node) => {
   if (!node.children || node.children.length === 0) return [node];
@@ -21,6 +22,8 @@ const ProjectEvaluation = () => {
   const [leafNodes, setLeafNodes] = useState([]);
   const [alternativeValues, setAlternativeValues] = useState({});
   const [queryResults, setQueryResults] = useState([]);
+  // New state to show inline confirmation UI
+  const [showAlternativeConfirm, setShowAlternativeConfirm] = useState(false);
 
   // In step 2, fetch the project tree and query results.
   useEffect(() => {
@@ -92,31 +95,28 @@ const ProjectEvaluation = () => {
         alternativeCost: parseFloat(alternativeCost),
         alternativeValues, // object mapping each leaf id to a number
       };
-      const res = await axios.post(
-        "http://localhost:8000/api/evaluations",
-        payload
-      );
-      console.log("Evaluation saved:", res.data);
-      alert("Evaluation submitted successfully!");
-
-      // Ask the user if they have more alternatives to evaluate.
-      const more = window.confirm(
-        "Are there any more alternatives to evaluate?"
-      );
-      if (more) {
-        // Reset the form for new alternative entry.
-        setAlternativeName("");
-        setAlternativeCost("");
-        setAlternativeValues({});
-        setEvaluationStep(1);
-      } else {
-        // Redirect to the DisplayEvaluations page.
-        navigate(`/user/currentUser/project/${projectname}/evaluate`);
-      }
+      await axios.post("http://localhost:8000/api/evaluations", payload);
+      // Instead of window.confirm, show an inline confirmation UI.
+      setShowAlternativeConfirm(true);
     } catch (err) {
       console.error("Error submitting evaluation:", err);
       setError("Failed to submit evaluation.");
     }
+  };
+
+  // Handlers for inline confirmation
+  const handleConfirmYes = () => {
+    // Reset the form for a new alternative entry.
+    setAlternativeName("");
+    setAlternativeCost("");
+    setAlternativeValues({});
+    setEvaluationStep(1);
+    setShowAlternativeConfirm(false);
+  };
+
+  const handleConfirmNo = () => {
+    // Navigate to the summary page or re-evaluation page.
+    navigate(`/user/currentUser/project/${projectname}/evaluate`);
   };
 
   if (evaluationStep === 1) {
@@ -214,12 +214,35 @@ const ProjectEvaluation = () => {
             </tbody>
           </table>
         </div>
-        <button
-          onClick={handleSubmitEvaluation}
-          className="mt-4 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
-        >
-          Submit Evaluation
-        </button>
+        {showAlternativeConfirm ? (
+          <div className="mt-6 p-4 border border-gray-300 rounded bg-gray-50">
+            <p className="mb-4">
+              Evaluation submitted successfully! Do you have more alternatives
+              to evaluate?
+            </p>
+            <div className="flex gap-4">
+              <button
+                onClick={handleConfirmYes}
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+              >
+                Yes
+              </button>
+              <button
+                onClick={handleConfirmNo}
+                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+              >
+                No
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button
+            onClick={handleSubmitEvaluation}
+            className="mt-4 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+          >
+            Submit Evaluation
+          </button>
+        )}
       </div>
     );
   }

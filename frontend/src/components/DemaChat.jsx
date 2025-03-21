@@ -52,6 +52,11 @@ const DemaChat = () => {
 
   const messagesEndRef = useRef(null);
 
+  const getInitialChildren = () => [
+    { id: 0, name: "", decompose: null },
+    { id: 1, name: "", decompose: null },
+  ];
+
   // Single step: Enter details for each Component.
   const steps = [
     {
@@ -211,7 +216,7 @@ const DemaChat = () => {
         setBfsQueue(remaining);
         setParentId(nextNode.id);
         // Reset children details to initial two rows after processing.
-        setChildrenDetails(INITIAL_CHILDREN);
+        setChildrenDetails(getInitialChildren());
       } else {
         finalizeNode();
       }
@@ -228,7 +233,7 @@ const DemaChat = () => {
     window.dispatchEvent(new Event("refreshProjectTree"));
     setParentId(null);
     // Reset children details to initial two rows.
-    setChildrenDetails(INITIAL_CHILDREN);
+    setChildrenDetails(getInitialChildren());
     try {
       const res = await axios.get(
         `http://localhost:8000/api/projects/${projectId}`

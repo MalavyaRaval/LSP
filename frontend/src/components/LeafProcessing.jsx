@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import Query4 from "./Query4.jsx";
-import Query5 from "./Query5.jsx";
-import Query6 from "./Query6.jsx";
-import Query7 from "./Query7.jsx";
+import Query4 from "./Query/Query4.jsx";
+import Query5 from "./Query/Query5.jsx";
+import Query6 from "./Query/Query6.jsx";
+import Query7 from "./Query/Query7.jsx";
 
 const LeafProcessing = ({
   leafNodes,

@@ -82,7 +82,7 @@ const ParentProcessing = ({
   return (
     <div className="p-6 bg-white rounded-lg shadow-md mx-4">
       <h2 className="text-xl font-semibold mb-4">
-        Process Parent Node:{" "}
+        Process the components of :{" "}
         <span className="text-indigo-600">{currentParent.name}</span>
       </h2>
       {step === 1 ? (

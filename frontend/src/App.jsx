@@ -12,10 +12,10 @@ import ProjectTree from "./components/ProjectTree.jsx";
 import Projectvalidation from "./components/ProjectValidation.jsx";
 import DemaChat from "./components/DemaChat";
 import ValuesPage from "./components/ValuesPage.jsx";
-import Query4 from "./components/Query4.jsx";
-import Query5 from "./components/Query5.jsx";
-import Query6 from "./components/Query6.jsx";
-import Query7 from "./components/Query7.jsx";
+import Query4 from "./components/Query/Query4.jsx";
+import Query5 from "./components/Query/Query5.jsx";
+import Query6 from "./components/Query/Query6.jsx";
+import Query7 from "./components/Query/Query7.jsx";
 import QueryResultsDisplay from "./components/QueryResultsDisplay";
 import DisplayEvaluations from "./components/DisplayEvaluations";
 

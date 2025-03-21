@@ -15,8 +15,7 @@ const connectionLogicOptions = [
   },
   {
     value: "opt3",
-    label:
-      "Nice to have a good satisfaction of most component requirements. (Auto-set connection = 4)",
+    label: "Nice to have a good satisfaction of most component requirements.",
     autoConnection: 4,
   },
   {
@@ -69,13 +68,10 @@ const ConnectionProcessing = ({ onComplete }) => {
     <div className="p-6 bg-white rounded-lg shadow-md mx-4">
       {step === 1 && (
         <div>
-          <h2 className="text-xl font-semibold mb-4">
-            Components of{" "}
-            <span className="text-indigo-600">{`<analyzed item>`}</span>
-          </h2>
-          <p className="mb-4">
+          {/* Removed the header "Components of <analyzed item>" */}
+          <p className="mb-2">
             Select the most appropriate logic requirement that should be
-            satisfied by the listed components. Your choice:
+            satisfied by the listed components.
           </p>
           <ul className="space-y-4">
             {connectionLogicOptions.map((option) => (

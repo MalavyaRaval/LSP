@@ -124,16 +124,6 @@ const DemaChat = () => {
     if (pid) setParentId(pid);
   }, [location.search]);
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [
-    currentStep,
-    processingLeaves,
-    currentLeafIndex,
-    processingParents,
-    currentParentIndex,
-  ]);
-
   const handleDetailChange = (index, field, value) => {
     const newDetails = [...childrenDetails];
     newDetails[index][field] = field === "decompose" ? value === "true" : value;

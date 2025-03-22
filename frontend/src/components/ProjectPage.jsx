@@ -61,7 +61,7 @@ const ProjectPage = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
+    <div className="flex flex-col min-h-screen bg-white">
       <Navbar />
 
       {/* Main Content Wrapper */}
@@ -70,7 +70,7 @@ const ProjectPage = () => {
         <div className="flex items-center justify-between bg-white dark:bg-gray-800 shadow-md p-3 rounded mb-4">
           <div className="flex items-center gap-2">
             <span className="text-lg font-semibold text-gray-900 dark:text-gray-900">
-              LSP Rec Project with DEMA
+              LSP Rec Project
             </span>
           </div>
           <div className="flex items-center gap-4">
@@ -109,10 +109,10 @@ const ProjectPage = () => {
 
         {/* Project and Evaluator Information */}
         <div className="mb-4">
-          <p className="text-lg text-gray-700 dark:text-gray-300">
+          <p className="text-lg text-gray-700 dark:text-gray-900">
             <strong>User:</strong> {evaluatorName}
           </p>
-          <p className="text-lg text-gray-700 dark:text-gray-300">
+          <p className="text-lg text-gray-700 dark:text-gray-900">
             <strong>Project:</strong>{" "}
             {projectDisplayName ||
               (projectname ? projectname.toUpperCase() : "N/A")}
@@ -122,8 +122,6 @@ const ProjectPage = () => {
         {/* Main Content Area (Vertical Stack) */}
         <div className="flex flex-col gap-6 items-center">
           {" "}
-          {/* Added items-center to center horizontally */}
-          {/* Dema Chat Container */}
           <div
             style={{
               width: "1200px",
@@ -154,12 +152,12 @@ const ProjectPage = () => {
             }}
           >
             <div
-              className="relative bg-gray-900 dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden p-4"
+              className="relative bg-white rounded-lg shadow-lg overflow-hidden p-4"
               style={{
                 width: "100%",
                 height: "100%",
                 backgroundImage:
-                  "radial-gradient(circle, #d1d5db 1px, transparent 1px)",
+                  "radial-gradient(circle, #e5e7eb 1px, transparent 1px)",
                 backgroundSize: "20px 20px",
               }}
             >
@@ -188,7 +186,7 @@ const ProjectPage = () => {
                       </div>
                     </TransformComponent>
                     <button
-                      className="absolute bottom-4 right-4 px-3 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 z-50"
+                      className="absolute bottom-4 right-4 px-3 py-2 bg-blue-500 text-black rounded-lg shadow-md hover:bg-blue-600 z-50"
                       onClick={() => resetTransform()}
                     >
                       Reset View

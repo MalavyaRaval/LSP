@@ -18,7 +18,7 @@ const Dema = () => {
   const [componentDetails, setComponentDetails] = useState([]);
 
   const introMessage =
-    "I am DEMA, your decision-making assistant. I can help you systematically evaluate alternatives and create structured project components.";
+    "I am LSP Rec, your decision-making assistant. I can help you systematically evaluate alternatives and create structured project components.";
   const exitMessage =
     "Your components have been created successfully! Redirecting back to project...";
 

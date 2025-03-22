@@ -37,27 +37,27 @@ const LeafProcessing = ({
           <p className="mb-4">
             How would you like to approach the composition?
           </p>
-          <div className="flex flex-col gap-3">
+          <div className="text-xl flex flex-col gap-4">
             <button
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              className="bg-gray-200 text-black px-8 py-4 rounded-lg shadow-sm hover:bg-gray-300 hover:shadow-md transition-all"
               onClick={() => handleSelectComposition("q4")}
             >
               I prefer high values
             </button>
             <button
-              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+              className="bg-gray-200 text-black px-8 py-4 rounded-lg shadow-sm hover:bg-gray-300 hover:shadow-md transition-all"
               onClick={() => handleSelectComposition("q5")}
             >
               I prefer low values
             </button>
             <button
-              className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
+              className="bg-gray-200 text-black px-8 py-4 rounded-lg shadow-sm hover:bg-gray-300 hover:shadow-md transition-all"
               onClick={() => handleSelectComposition("q6")}
             >
               I prefer a specific range
             </button>
             <button
-              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+              className="bg-gray-200 text-black px-8 py-4 rounded-lg shadow-sm hover:bg-gray-300 hover:shadow-md transition-all"
               onClick={() => handleSelectComposition("q7")}
             >
               I will specify a table of requirements
@@ -102,7 +102,7 @@ const LeafProcessing = ({
       )}
       <div className="flex justify-start mt-6">
         <button
-          className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+          className="bg-gray-200 text-black px-8 py-4 rounded-lg shadow-sm hover:bg-gray-300 hover:shadow-md transition-all"
           onClick={onPrevLeaf}
         >
           Back

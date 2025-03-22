@@ -158,7 +158,7 @@ const DemaChat = () => {
           parentId: effectiveParentId,
           children: childrenNodes,
           metadata: {
-            decisionProcess: "DEMA",
+            decisionProcess: "LSP Rec",
             objectName: "My Object",
           },
         }
@@ -477,7 +477,7 @@ const DemaChat = () => {
     <div className="w-full h-full p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:bg-gray-800 rounded-lg shadow-xl flex flex-col">
       <header className="flex items-center justify-between p-4 border-b bg-gray-200 rounded-t-lg">
         <h1 className="text-xl font-bold text-gray-800">
-          DeMA Decision Assistant
+          LSP Rec Decision Assistant
         </h1>
       </header>
       <main className="flex-1 p-4 overflow-y-auto">{renderStep()}</main>

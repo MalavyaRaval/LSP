@@ -20,14 +20,10 @@ const TreeNode = ({
   const optionsRef = useRef(null);
   const nodeRef = useRef(null);
 
-  const colors = [
-    "bg-blue-100 border-blue-300",
-    "bg-green-100 border-green-300",
-    "bg-purple-100 border-purple-300",
-    "bg-yellow-100 border-yellow-300",
-    "bg-pink-100 border-pink-300",
-  ];
-  const currentColor = colors[level % colors.length];
+  const currentColor =
+    node.children && node.children.length === 0
+      ? "bg-blue-300 border-blue-300"
+      : "bg-gray-300 border-gray-300";
 
   useEffect(() => {
     const handleClickOutside = (event) => {

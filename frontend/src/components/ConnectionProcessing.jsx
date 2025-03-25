@@ -68,16 +68,15 @@ const ConnectionProcessing = ({ onComplete }) => {
     <div className="p-6 bg-white rounded-lg shadow-md mx-4">
       {step === 1 && (
         <div>
-          {/* Removed the header "Components of <analyzed item>" */}
-          <p className="mb-2">
+          <p className="text-xl mb-4">
             Select the most appropriate logic requirement that should be
             satisfied by the listed components.
           </p>
-          <ul className="space-y-4">
+          <ul className="text-xl space-y-4">
             {connectionLogicOptions.map((option) => (
               <li key={option.value}>
                 <button
-                  className="w-full text-left p-4 border rounded-lg hover:bg-gray-100 transition"
+                  className="w-full text-left p-4 border rounded-lg bg-gray-200 hover:bg-gray-300 transition"
                   onClick={() => handleLogicSelect(option)}
                 >
                   {option.label}
@@ -93,14 +92,14 @@ const ConnectionProcessing = ({ onComplete }) => {
             {selectedLogic.marker === "Q9" ? "QUERY 9" : "QUERY 10"} <br />
             Select the most appropriate intensity for the connection:
           </h2>
-          <div className="flex flex-col space-y-4">
+          <div className="flex flex-col gap-6">
             {(selectedLogic.marker === "Q9"
               ? query9Options
               : query10Options
             ).map((opt) => (
               <button
                 key={opt.value}
-                className="p-4 border rounded-lg hover:bg-gray-100 transition"
+                className="p-4 border rounded-lg bg-gray-200 hover:bg-gray-300 transition"
                 onClick={() => handleIntensitySelect(opt.value)}
               >
                 {opt.label}

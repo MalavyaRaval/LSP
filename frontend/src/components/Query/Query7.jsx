@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import axios from "axios";
 
 const Query7 = ({ onSave, nodeId, projectId, nodeName }) => {
-  // Added nodeName here
   const [rows, setRows] = useState([
     { offered: "", satisfaction: "" },
     { offered: "", satisfaction: "" },
@@ -20,6 +19,8 @@ const Query7 = ({ onSave, nodeId, projectId, nodeName }) => {
   };
 
   const validateRows = () => {
+    // Validate that each offered value is a valid number and
+    // that they are in strictly increasing order.
     for (let i = 0; i < rows.length - 1; i++) {
       const current = parseFloat(rows[i].offered);
       const next = parseFloat(rows[i + 1].offered);
@@ -38,12 +39,18 @@ const Query7 = ({ onSave, nodeId, projectId, nodeName }) => {
 
   const handleSaveQuery = async () => {
     if (validateRows()) {
+      // Transform rows into a range object:
+      // Use the first row's offered value as "from" and
+      // the last row's offered value as "to".
+      const fromVal = rows[0].offered;
+      const toVal = rows[rows.length - 1].offered;
+      const transformedValues = { from: fromVal, to: toVal };
       try {
         await axios.post("http://localhost:8000/api/query-results", {
           nodeId,
           nodeName, // Pass nodeName in payload
           queryType: "q7",
-          values: rows,
+          values: transformedValues,
           projectId,
         });
         onSave();
@@ -56,11 +63,7 @@ const Query7 = ({ onSave, nodeId, projectId, nodeName }) => {
 
   return (
     <div className="p-4 border rounded">
-      <h4 className="text-2xl font-bold mb-2">
-        You’ve mentioned that you prefer range of values. Let’s clarify your
-        preferences. Please answer the following, keeping in mind that the first
-        value should always be less than the second.
-      </h4>{" "}
+      <h4 className="text-2xl font-bold mb-2">Please answer the following.</h4>
       <table className="min-w-full border-collapse border border-gray-400 mb-4">
         <thead>
           <tr className="bg-gray-200">
@@ -109,7 +112,7 @@ const Query7 = ({ onSave, nodeId, projectId, nodeName }) => {
         className="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
         onClick={handleSaveQuery}
       >
-        Save and Next
+        Continue
       </button>
     </div>
   );

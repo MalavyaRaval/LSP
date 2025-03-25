@@ -3,7 +3,7 @@ import axios from "axios";
 
 const Query5 = ({ onSave, nodeId, projectId, nodeName }) => {
   // Added nodeName here
-  const [values, setValues] = useState({ first: "", second: "" });
+  const [values, setValues] = useState({ from: "", to: "" });
   const [error, setError] = useState("");
 
   const handleChange = (e) => {
@@ -11,8 +11,8 @@ const Query5 = ({ onSave, nodeId, projectId, nodeName }) => {
   };
 
   const validate = () => {
-    const firstNum = parseFloat(values.first);
-    const secondNum = parseFloat(values.second);
+    const firstNum = parseFloat(values.from);
+    const secondNum = parseFloat(values.to);
     if (isNaN(firstNum) || isNaN(secondNum)) {
       setError("Please enter valid numbers.");
       return false;
@@ -46,9 +46,8 @@ const Query5 = ({ onSave, nodeId, projectId, nodeName }) => {
   return (
     <div className="p-4 border rounded">
       <h4 className="text-2xl font-bold mb-2">
-        You’ve mentioned that you prefer Lower values. Let’s clarify your
-        preferences. Please answer the following, keeping in mind that the first
-        value should always be less than the second.
+        Please answer the following, keeping in mind that the first value should
+        always be less than the second.
       </h4>{" "}
       <table className="min-w-full border-collapse border border-gray-400 mb-4">
         <thead>
@@ -65,8 +64,8 @@ const Query5 = ({ onSave, nodeId, projectId, nodeName }) => {
             <td className="border border-gray-400 p-2">
               <input
                 type="number"
-                name="first"
-                value={values.first}
+                name="from"
+                value={values.from}
                 onChange={handleChange}
                 onBlur={validate}
                 className="w-full border rounded px-2 py-1"
@@ -80,8 +79,8 @@ const Query5 = ({ onSave, nodeId, projectId, nodeName }) => {
             <td className="border border-gray-400 p-2">
               <input
                 type="number"
-                name="second"
-                value={values.second}
+                name="to"
+                value={values.to}
                 onChange={handleChange}
                 onBlur={validate}
                 className="w-full border rounded px-2 py-1"
@@ -95,7 +94,7 @@ const Query5 = ({ onSave, nodeId, projectId, nodeName }) => {
         className="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
         onClick={handleSaveQuery}
       >
-        Save and Next
+        Continue
       </button>
     </div>
   );

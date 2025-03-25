@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 
 const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
-  const [values, setValues] = useState({ first: "", second: "" });
+  const [values, setValues] = useState({ from: "", to: "" });
   const [error, setError] = useState("");
 
   const handleChange = (e) => {
@@ -10,8 +10,8 @@ const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
   };
 
   const validate = () => {
-    const firstNum = parseFloat(values.first);
-    const secondNum = parseFloat(values.second);
+    const firstNum = parseFloat(values.from);
+    const secondNum = parseFloat(values.to);
     if (isNaN(firstNum) || isNaN(secondNum)) {
       setError("Please enter valid numbers.");
       return false;
@@ -46,9 +46,8 @@ const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
   return (
     <div className="p-4 border rounded">
       <h4 className="text-2xl font-bold mb-2">
-        You’ve mentioned that you prefer Higher values. Let’s clarify your
-        preferences. Please answer the following, keeping in mind that the first
-        value should always be less than the second.
+        Please answer the following, keeping in mind that the first value should
+        always be less than the second.
       </h4>
       <table className="min-w-full border-collapse border border-gray-400 mb-4">
         <thead>
@@ -60,13 +59,13 @@ const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
         <tbody>
           <tr className="hover:bg-gray-100">
             <td className="border border-gray-400 p-2">
-              What’s the minimum acceptable value?
+              It is unacceptable if the value is less than
             </td>
             <td className="border border-gray-400 p-2">
               <input
                 type="number"
-                name="first"
-                value={values.first}
+                name="from"
+                value={values.from}
                 onChange={handleChange}
                 onBlur={validate}
                 className="w-full border rounded px-2 py-1"
@@ -75,13 +74,13 @@ const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
           </tr>
           <tr className="hover:bg-gray-100">
             <td className="border border-gray-400 p-2">
-              What value would make you fully satisfied?
+              I am fully satisfied if the value is greater than
             </td>
             <td className="border border-gray-400 p-2">
               <input
                 type="number"
-                name="second"
-                value={values.second}
+                name="to"
+                value={values.to}
                 onChange={handleChange}
                 onBlur={validate}
                 className="w-full border rounded px-2 py-1"

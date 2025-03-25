@@ -89,7 +89,7 @@ const DisplayEvaluations = () => {
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-md mx-4">
-      <h1 className="text-2xl font-bold mb-4">Evaluations</h1>
+      <h1 className="text-2xl font-bold mb-4">Alternatives Comparision</h1>
       {error && <p className="text-red-500">{error}</p>}
       {!error && evaluations.length === 0 && <p>No evaluations found.</p>}
       {evaluations.length > 0 && (
@@ -97,8 +97,8 @@ const DisplayEvaluations = () => {
           <table className="min-w-full border-collapse border border-gray-300">
             <thead className="bg-gray-200">
               <tr>
-                {/* First column header: Metric name */}
-                <th className="border border-gray-300 p-2">Metric</th>
+                {/* First column header:Attribute name */}
+                <th className="border border-gray-300 p-2">Attribute</th>
                 {/* Each evaluation becomes a column */}
                 {evaluations.map((evalItem) => (
                   <th key={evalItem._id} className="border border-gray-300 p-2">
@@ -109,14 +109,14 @@ const DisplayEvaluations = () => {
             </thead>
             <tbody>
               {/* Row for Cost */}
-              <tr className="hover:bg-gray-100">
+              {/* <tr className="hover:bg-gray-100">
                 <td className="border border-gray-300 p-2 font-medium">Cost</td>
                 {evaluations.map((evalItem) => (
                   <td key={evalItem._id} className="border border-gray-300 p-2">
                     {evalItem.alternativeCost}
                   </td>
                 ))}
-              </tr>
+              </tr> */}
               {/* Row for each leaf key */}
               {allLeafKeys.map((key) => {
                 // Use project tree mapping first, then fallback to query mapping.

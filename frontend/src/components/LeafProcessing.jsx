@@ -29,8 +29,7 @@ const LeafProcessing = ({
   return (
     <div className="p-6 bg-white rounded-lg shadow-md mx-4">
       <h2 className="text-xl font-semibold mb-4">
-        For this item{" "}
-        <span className="text-indigo-600">{currentLeaf.name}</span>
+        For <span className="text-indigo-600">{currentLeaf.name}</span>
       </h2>
       {!composition ? (
         <>

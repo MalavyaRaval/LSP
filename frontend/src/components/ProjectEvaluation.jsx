@@ -166,15 +166,14 @@ const ProjectEvaluation = () => {
             <span className="font-medium">Cost:</span> {alternativeCost}
           </p>
         </div>
-        <p>Please fill in the alternative values for each leaf node.</p>
+        <p>Please fill in the alternative values</p>
         {error && <p className="text-red-500">{error}</p>}
         <div className="overflow-x-auto mt-4">
           <table className="min-w-full border-collapse border border-gray-300">
             <thead className="bg-gray-200">
               <tr>
                 <th className="border border-gray-300 p-2">Component Name</th>
-                <th className="border border-gray-300 p-2">Query Type</th>
-                <th className="border border-gray-300 p-2">Criteria Values</th>
+                <th className="border border-gray-300 p-2">Your range of </th>
                 <th className="border border-gray-300 p-2">
                   Values for {alternativeName}
                 </th>
@@ -186,14 +185,26 @@ const ProjectEvaluation = () => {
                 const result = queryResults.find(
                   (r) => r.nodeId === leaf.id || r.nodeName === leaf.name
                 );
-                const existingValue = result
-                  ? JSON.stringify(result.values)
-                  : "-";
-                const queryType = result ? result.queryType.toUpperCase() : "-";
+                let existingValue = "-";
+                if (result) {
+                  if (
+                    result.queryType === "q6" &&
+                    result.values &&
+                    result.values.lower !== undefined &&
+                    result.values.upper !== undefined
+                  ) {
+                    existingValue = `${result.values.lower} to ${result.values.upper}`;
+                  } else if (
+                    result.values &&
+                    result.values.from !== undefined &&
+                    result.values.to !== undefined
+                  ) {
+                    existingValue = `${result.values.from} to ${result.values.to}`;
+                  }
+                }
                 return (
                   <tr key={leaf.id} className="hover:bg-gray-100">
                     <td className="border border-gray-300 p-2">{leaf.name}</td>
-                    <td className="border border-gray-300 p-2">{queryType}</td>
                     <td className="border border-gray-300 p-2">
                       {existingValue}
                     </td>

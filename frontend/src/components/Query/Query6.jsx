@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 
 const Query6 = ({ onSave, nodeId, projectId, nodeName }) => {
-  // Changed state to include two middle values
+  // State contains lower, middleLower, middleUpper, and upper
   const [values, setValues] = useState({
     lower: "",
     middleLower: "",
@@ -47,7 +47,7 @@ const Query6 = ({ onSave, nodeId, projectId, nodeName }) => {
           nodeId,
           nodeName, // Pass nodeName in payload
           queryType: "q6",
-          values, // Now contains lower, middleLower, middleUpper, and upper
+          values, // Contains lower, middleLower, middleUpper, and upper
           projectId,
         });
         onSave();
@@ -61,9 +61,8 @@ const Query6 = ({ onSave, nodeId, projectId, nodeName }) => {
   return (
     <div className="p-4 border rounded">
       <h4 className="text-2xl font-bold mb-2">
-        You’ve mentioned that you prefer range of values. Let’s clarify your
-        preferences. Please answer the following, keeping in mind that the first
-        value should always be less than the second.
+        Please answer the following, keeping in mind that the first value should
+        always be less than the second.
       </h4>
       <table className="min-w-full border-collapse border border-gray-400 mb-4">
         <thead>
@@ -138,7 +137,7 @@ const Query6 = ({ onSave, nodeId, projectId, nodeName }) => {
         className="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
         onClick={handleSaveQuery}
       >
-        Save and Next
+        Continue
       </button>
     </div>
   );

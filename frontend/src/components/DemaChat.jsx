@@ -15,11 +15,12 @@ const getLeafNodes = (node) => {
   return leaves;
 };
 
-// Constant for initial children details (2 rows)
-const INITIAL_CHILDREN = [
-  { id: 0, name: "", decompose: null },
-  { id: 1, name: "", decompose: null },
-];
+// Set INITIAL_CHILDREN to 5 rows by default.
+const INITIAL_CHILDREN = Array.from({ length: 5 }, (_, id) => ({
+  id,
+  name: "",
+  decompose: null,
+}));
 
 const DemaChat = () => {
   const { username, projectname } = useParams();
@@ -31,7 +32,7 @@ const DemaChat = () => {
   const projectId = projectname;
   const [parentId, setParentId] = useState(parentIdQuery || null);
   const [parentName, setParentName] = useState("");
-  // Remove childrenCount and use initial children details directly
+  // Use five preset rows.
   const [childrenDetails, setChildrenDetails] = useState(INITIAL_CHILDREN);
   const [currentStep, setCurrentStep] = useState(0);
   const [processing, setProcessing] = useState(false);
@@ -52,16 +53,18 @@ const DemaChat = () => {
 
   const messagesEndRef = useRef(null);
 
-  const getInitialChildren = () => [
-    { id: 0, name: "", decompose: null },
-    { id: 1, name: "", decompose: null },
-  ];
+  const getInitialChildren = () =>
+    Array.from({ length: 5 }, (_, id) => ({
+      id,
+      name: "",
+      decompose: null,
+    }));
 
   // Single step: Enter details for each Component.
   const steps = [
     {
       id: "childrenDetails",
-      question: "Please provide the details for each component of ",
+      question: "Enter all components of ",
     },
   ];
 
@@ -135,14 +138,15 @@ const DemaChat = () => {
     setChildrenDetails(newDetails);
   };
 
-  const saveChildren = async () => {
+  // Update saveChildren to accept only the non-empty rows.
+  const saveChildren = async (childrenToSave) => {
     const effectiveParentId = parentId;
     if (!effectiveParentId) {
       alert("Parent node is not set. Please try again.");
       return [];
     }
 
-    const childrenNodes = childrenDetails.map((child, index) => ({
+    const childrenNodes = childrenToSave.map((child, index) => ({
       id: `${effectiveParentId}-${Date.now()}-${index}`,
       name: child.name.trim() || `Child ${index + 1}`,
       decompose: child.decompose,
@@ -194,28 +198,17 @@ const DemaChat = () => {
     }
   };
 
-  const handleProcessChildren = async () => {
+  // Update handleProcessChildren to work with the filtered non-empty rows.
+  const handleProcessChildren = async (nonEmptyChildren) => {
     try {
       setProcessing(true);
-      // Ensure that all component names are non-empty.
-      if (childrenDetails.some((child) => !child.name.trim())) {
-        alert("Please fill in all Component names.");
-        setProcessing(false);
-        return;
-      }
-      // Ensure that each component has a selection for yes/no.
-      if (childrenDetails.some((child) => child.decompose === null)) {
-        alert("Please select Yes or No for all components.");
-        setProcessing(false);
-        return;
-      }
-      const updatedQueue = await saveChildren();
+      const updatedQueue = await saveChildren(nonEmptyChildren);
       if (updatedQueue && updatedQueue.length > 0) {
         const [nextNode, ...remaining] = updatedQueue;
         sessionStorage.setItem("bfsQueue", JSON.stringify(remaining));
         setBfsQueue(remaining);
         setParentId(nextNode.id);
-        // Reset children details to initial two rows after processing.
+        // Reset children details to five preset rows after processing.
         setChildrenDetails(getInitialChildren());
       } else {
         finalizeNode();
@@ -228,11 +221,24 @@ const DemaChat = () => {
     }
   };
 
+  const handleNextStep = () => {
+    const nonEmpty = childrenDetails.filter((child) => child.name.trim());
+    if (nonEmpty.length < 2) {
+      alert("Please fill in at least 2 component names.");
+      return;
+    }
+    if (nonEmpty.some((child) => child.decompose === null)) {
+      alert("Please select Yes or No for all filled rows.");
+      return;
+    }
+    handleProcessChildren(nonEmpty);
+  };
+
   const finalizeNode = async () => {
-    alert("All decompositions complete for this node! Finalizing tree.");
+    alert("All decompositions complete.");
     window.dispatchEvent(new Event("refreshProjectTree"));
     setParentId(null);
-    // Reset children details to initial two rows.
+    // Reset children details to five preset rows.
     setChildrenDetails(getInitialChildren());
     try {
       const res = await axios.get(
@@ -377,7 +383,7 @@ const DemaChat = () => {
         />
       );
     }
-    // Single step to enter component details (no count asked)
+    // Render fixed five rows without an Add Row button.
     return (
       <div className="p-6 bg-white rounded-lg shadow-md mx-4">
         <h2 className="text-xl font-semibold text-gray-800 mb-4">
@@ -392,7 +398,7 @@ const DemaChat = () => {
                   Component Name
                 </th>
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">
-                  Do you want to break this down?{" "}
+                  Do you want to break this down?
                 </th>
               </tr>
             </thead>
@@ -434,51 +440,23 @@ const DemaChat = () => {
             </tbody>
           </table>
         </div>
-        <div className="flex justify-between items-center mt-6">
-          {childrenDetails.length < 5 && (
-            <button
-              onClick={() =>
-                setChildrenDetails([
-                  ...childrenDetails,
-                  { id: childrenDetails.length, name: "", decompose: null },
-                ])
-              }
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all duration-200 text-xl"
-            >
-              Add Row
-            </button>
-          )}
+        <div className="flex justify-end items-center mt-6">
           <button
             onClick={handleNextStep}
             className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all duration-200 text-xl"
             disabled={processing}
           >
-            {processing ? "Processing..." : "Process Components"}
+            {processing ? "Processing..." : "Continue"}
           </button>
         </div>
       </div>
     );
   };
 
-  const handleNextStep = () => {
-    // In our single-step form, just validate before processing.
-    if (childrenDetails.some((child) => !child.name.trim())) {
-      alert("Please fill in all Component names.");
-      return;
-    }
-    handleProcessChildren();
-  };
-
-  const handleBackStep = () => {
-    // Not required for the single-step form.
-  };
-
   return (
     <div className="w-full h-full p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:bg-gray-800 rounded-lg shadow-xl flex flex-col">
       <header className="flex items-center justify-between p-4 border-b bg-gray-200 rounded-t-lg">
-        <h1 className="text-xl font-bold text-gray-800">
-          LSP Rec Decision Assistant
-        </h1>
+        <h1 className="text-xl font-bold text-gray-800">LSP Rec</h1>
       </header>
       <main className="flex-1 p-4 overflow-y-auto">{renderStep()}</main>
       <div ref={messagesEndRef} />

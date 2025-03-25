@@ -82,8 +82,7 @@ const ParentProcessing = ({
   return (
     <div className="p-6 bg-white rounded-lg shadow-md mx-4">
       <h2 className="text-xl font-semibold mb-4">
-        Process the components of :{" "}
-        <span className="text-indigo-600">{currentParent.name}</span>
+        For : <span className="text-indigo-600">{currentParent.name}</span>
       </h2>
       {step === 1 ? (
         <ConnectionProcessing
@@ -125,7 +124,7 @@ const ParentProcessing = ({
               className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
               onClick={handleSave}
             >
-              Save and Next
+              Continue
             </button>
           </div>
         </>

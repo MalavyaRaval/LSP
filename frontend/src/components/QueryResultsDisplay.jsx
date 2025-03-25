@@ -38,28 +38,40 @@ const QueryResultsDisplay = () => {
             <thead>
               <tr className="bg-gray-200">
                 <th className="border border-gray-300 p-2">Node ID</th>
-                <th className="border border-gray-300 p-2">Query Type</th>
                 <th className="border border-gray-300 p-2">Values</th>
-                <th className="border border-gray-300 p-2">Created At</th>
               </tr>
             </thead>
             <tbody>
-              {results.map((result) => (
-                <tr key={result._id} className="hover:bg-gray-100">
-                  <td className="border border-gray-300 p-2">
-                    {result.nodeName}
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    {result.queryType.toUpperCase()}
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    {JSON.stringify(result.values)}
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    {new Date(result.createdAt).toLocaleString()}
-                  </td>
-                </tr>
-              ))}
+              {results.map((result) => {
+                let valuesStr = "-";
+                if (result.queryType === "q6") {
+                  // For query6, display lower and upper values as "lower-upper"
+                  if (
+                    result.values &&
+                    result.values.lower !== undefined &&
+                    result.values.upper !== undefined
+                  ) {
+                    valuesStr = `${result.values.lower} - ${result.values.upper}`;
+                  }
+                } else {
+                  // For other query types, use the original format.
+                  if (
+                    result.values &&
+                    result.values.from !== undefined &&
+                    result.values.to !== undefined
+                  ) {
+                    valuesStr = `${result.values.from} to ${result.values.to}`;
+                  }
+                }
+                return (
+                  <tr key={result._id} className="hover:bg-gray-100">
+                    <td className="border border-gray-300 p-2">
+                      {result.nodeName}
+                    </td>
+                    <td className="border border-gray-300 p-2">{valuesStr}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         )}

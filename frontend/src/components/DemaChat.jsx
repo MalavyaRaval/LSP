@@ -64,7 +64,7 @@ const DemaChat = () => {
   const steps = [
     {
       id: "childrenDetails",
-      question: "Enter all components of ",
+      question: "Defining components of the following compound item ",
     },
   ];
 
@@ -390,6 +390,9 @@ const DemaChat = () => {
           {steps[0].question}{" "}
           <span className="text-indigo-600">{parentName}</span>
         </h2>
+        <p className="text-red-500 text-ml mb-4">
+          Enter up to 5 components of the analyzed item
+        </p>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -398,7 +401,7 @@ const DemaChat = () => {
                   Component Name
                 </th>
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">
-                  Do you want to break this down?
+                  Do you want to further decompose this component?
                 </th>
               </tr>
             </thead>

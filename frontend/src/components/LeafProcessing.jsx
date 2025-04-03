@@ -41,25 +41,31 @@ const LeafProcessing = ({
               className="bg-gray-200 text-black px-8 py-4 rounded-lg shadow-sm hover:bg-gray-300 hover:shadow-md transition-all"
               onClick={() => handleSelectComposition("q4")}
             >
-              I prefer high values
+              I prefer high values of this item
             </button>
             <button
               className="bg-gray-200 text-black px-8 py-4 rounded-lg shadow-sm hover:bg-gray-300 hover:shadow-md transition-all"
               onClick={() => handleSelectComposition("q5")}
             >
-              I prefer low values
+              I prefer low values of this item
             </button>
             <button
               className="bg-gray-200 text-black px-8 py-4 rounded-lg shadow-sm hover:bg-gray-300 hover:shadow-md transition-all"
               onClick={() => handleSelectComposition("q6")}
             >
-              I prefer a specific range
+              I prefer a specific range of values
             </button>
             <button
               className="bg-gray-200 text-black px-8 py-4 rounded-lg shadow-sm hover:bg-gray-300 hover:shadow-md transition-all"
               onClick={() => handleSelectComposition("q7")}
             >
               I will specify a table of requirements
+            </button>
+            <button
+              className="bg-gray-200 text-black px-8 py-4 rounded-lg shadow-sm hover:bg-gray-300 hover:shadow-md transition-all"
+              onClick={() => handleSelectComposition("q7")}
+            >
+              I will select suitability from your table
             </button>
           </div>
         </>

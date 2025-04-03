@@ -59,7 +59,7 @@ const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
         <tbody>
           <tr className="hover:bg-gray-100">
             <td className="border border-gray-400 p-2">
-              It is unacceptable if the value is less than
+              It is unacceptable if the given value is less than
             </td>
             <td className="border border-gray-400 p-2">
               <input

@@ -205,7 +205,8 @@ const Home = () => {
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Project Name
+                        Please enter the name of object(s) you want to evaluate
+                        (e.g., car, home, laptop, job, school, hotel, etc.)
                       </label>
                       <input
                         type="text"

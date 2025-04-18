@@ -109,14 +109,14 @@ const DisplayEvaluations = () => {
             </thead>
             <tbody>
               {/* Row for Cost */}
-              {/* <tr className="hover:bg-gray-100">
+              <tr className="hover:bg-gray-100">
                 <td className="border border-gray-300 p-2 font-medium">Cost</td>
                 {evaluations.map((evalItem) => (
                   <td key={evalItem._id} className="border border-gray-300 p-2">
                     {evalItem.alternativeCost}
                   </td>
                 ))}
-              </tr> */}
+              </tr>
               {/* Row for each leaf key */}
               {allLeafKeys.map((key) => {
                 // Use project tree mapping first, then fallback to query mapping.

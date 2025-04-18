@@ -60,7 +60,7 @@ const Query6 = ({ onSave, nodeId, projectId, nodeName }) => {
 
   return (
     <div className="p-4 border rounded">
-      <h4 className="text-2xl font-bold mb-2">
+      <h4 className="text-2xl text-red-600 mb-2">
         Please answer the following, keeping in mind that the first value should
         always be less than the second.
       </h4>

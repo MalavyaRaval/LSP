@@ -134,7 +134,7 @@ const Dema = () => {
               className="border p-2 rounded-lg w-full mb-2"
             />
             <button
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+              className="yexy-xl bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
               onClick={handleComponentCountSubmit}
             >
               Continue
@@ -192,7 +192,7 @@ const Dema = () => {
               </div>
             ))}
             <button
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+              className="text-xl bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
               onClick={handleComponentDetailsSubmit}
             >
               Continue

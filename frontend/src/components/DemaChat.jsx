@@ -64,7 +64,7 @@ const DemaChat = () => {
   const steps = [
     {
       id: "childrenDetails",
-      question: "Defining components of the following compound item ",
+      question: "Analyzed item:",
     },
   ];
 
@@ -386,29 +386,29 @@ const DemaChat = () => {
     // Render fixed five rows without an Add Row button.
     return (
       <div className="p-6 bg-white rounded-lg shadow-md mx-4">
-        <h2 className="text-xl font-semibold text-gray-800 mb-4">
+        <h2 className="text-2xl font-semibold text-gray-800 mb-4">
           {steps[0].question}{" "}
           <span className="text-indigo-600">{parentName}</span>
         </h2>
-        <p className="text-red-500 text-ml mb-4">
-          Enter up to 5 components of the analyzed item
+        <p className="text-3xl text-red-700 mb-4">
+          Please enter up to 5 components of this item
         </p>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-2 py-2 text-left text-xl font-medium text-gray-700 uppercase">
                   Component Name
                 </th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">
-                  Do you want to further decompose this component?
+                <th className="px-2 py-2 text-center text-xl font-medium text-gray-700 uppercase">
+                  Would you further decompose this?
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {childrenDetails.map((child, index) => (
                 <tr key={index}>
-                  <td className="px-6 py-4">
+                  <td className="px-2 py-2">
                     <input
                       type="text"
                       placeholder={`Component ${index + 1} name`}
@@ -416,10 +416,11 @@ const DemaChat = () => {
                       onChange={(e) =>
                         handleDetailChange(index, "name", e.target.value)
                       }
-                      className="border border-gray-300 rounded-lg p-2 w-full"
+                      className="border border-gray-300 rounded-lg p-4 w-full text-2xl"
+                      style={{ fontSize: "1.5rem", width: "100%" }}
                     />
                   </td>
-                  <td className="px-6 py-4 text-center">
+                  <td className="px-2 py-2 text-center">
                     <select
                       value={
                         child.decompose === null
@@ -431,11 +432,18 @@ const DemaChat = () => {
                       onChange={(e) =>
                         handleDetailChange(index, "decompose", e.target.value)
                       }
-                      className="border border-gray-300 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="border border-gray-300 rounded-lg p-4 text-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      style={{ fontSize: "1.25rem" }}
                     >
-                      <option value="">Please select</option>
-                      <option value="true">Yes</option>
-                      <option value="false">No</option>
+                      <option value="" style={{ fontSize: "1.25rem" }}>
+                        Please select
+                      </option>
+                      <option value="true" style={{ fontSize: "1.25rem" }}>
+                        Yes
+                      </option>
+                      <option value="false" style={{ fontSize: "1.25rem" }}>
+                        No
+                      </option>
                     </select>
                   </td>
                 </tr>
@@ -446,16 +454,41 @@ const DemaChat = () => {
         <div className="flex justify-end items-center mt-6">
           <button
             onClick={handleNextStep}
-            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all duration-200 text-xl"
+            className="text-2xl font-extrabold bg-gradient-to-r from-green-500 to-green-700 text-white px-8 py-4 rounded-xl hover:from-green-600 hover:to-green-800 transition-all duration-300 shadow-xl transform hover:scale-105 disabled:opacity-70 disabled:cursor-not-allowed min-w-[250px] flex items-center justify-center"
             disabled={processing}
           >
-            {processing ? "Processing..." : "Continue"}
+            {processing ? (
+              <span className="flex items-center">
+                <svg
+                  className="animate-spin -ml-1 mr-3 h-8 w-8 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                <span style={{ fontSize: "1.5rem" }}>Processing...</span>
+              </span>
+            ) : (
+              <span style={{ fontSize: "2rem" }}>Continue</span>
+            )}
           </button>
         </div>
       </div>
     );
   };
-
   return (
     <div className="w-full h-full p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:bg-gray-800 rounded-lg shadow-xl flex flex-col">
       <header className="flex items-center justify-between p-4 border-b bg-gray-200 rounded-t-lg">

@@ -204,7 +204,7 @@ const Home = () => {
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-2xl font-medium text-gray-700 mb-2">
                         Please enter the name of object(s) you want to evaluate
                         (e.g., car, home, laptop, job, school, hotel, etc.)
                       </label>
@@ -230,6 +230,29 @@ const Home = () => {
                         required
                       ></textarea>
                     </div>
+                  </div>
+                  {/* Introduction to Next Steps */}
+                  <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                    <p className="text-blue-700 text-2xl mb-2">
+                      Welcome! This tool helps you choose the best option based
+                      on your input.
+                    </p>
+                    <ul className="text-blue-700 text-xl list-disc pl-5">
+                      <li>Create your project.</li>
+                      <li>
+                        Build an attribute tree by listing the key features of
+                        your object.
+                      </li>
+                      <li>
+                        Select your preferred evaluation criteria (e.g., low,
+                        high, range, etc.).
+                      </li>
+                      <li>Enter the alternative values for comparison.</li>
+                      <li>
+                        The system will analyze your inputs and recommend the
+                        best option.
+                      </li>
+                    </ul>
                   </div>
                   <div className="flex justify-end gap-4 mt-8">
                     <button

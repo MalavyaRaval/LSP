@@ -45,20 +45,24 @@ const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
 
   return (
     <div className="p-4 border rounded">
-      <h4 className="text-2xl font-bold mb-2">
-        Please answer the following, keeping in mind that the first value should
-        always be less than the second.
+      <h4 className="text-2xl mb-2" style={{ color: "#E53935" }}>
+        Please specify your requirements, keeping in mind that the first value
+        should always be less than the second.
       </h4>
       <table className="min-w-full border-collapse border border-gray-400 mb-4">
         <thead>
           <tr className="bg-gray-200">
-            <th className="border border-gray-400 p-2">Description</th>
-            <th className="border border-gray-400 p-2">Provide values</th>
+            <th className="text-2xl border border-gray-400 p-2">
+              Description of requirements
+            </th>
+            <th className="text-2xl border border-gray-400 p-2">
+              Your (numeric) values
+            </th>
           </tr>
         </thead>
         <tbody>
           <tr className="hover:bg-gray-100">
-            <td className="border border-gray-400 p-2">
+            <td className="text-2xl border border-gray-400 p-2">
               It is unacceptable if the given value is less than
             </td>
             <td className="border border-gray-400 p-2">
@@ -69,11 +73,12 @@ const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
                 onChange={handleChange}
                 onBlur={validate}
                 className="w-full border rounded px-2 py-1"
+                style={{ fontSize: "1.75rem" }} // Inline style to enforce larger font size
               />
             </td>
           </tr>
           <tr className="hover:bg-gray-100">
-            <td className="border border-gray-400 p-2">
+            <td className="text-2xl border border-gray-400 p-2">
               I am fully satisfied if the value is greater than
             </td>
             <td className="border border-gray-400 p-2">
@@ -84,18 +89,24 @@ const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
                 onChange={handleChange}
                 onBlur={validate}
                 className="w-full border rounded px-2 py-1"
+                style={{ fontSize: "1.75rem" }} // Inline style to enforce larger font size
               />
             </td>
           </tr>
         </tbody>
       </table>
       {error && <p className="text-red-500">{error}</p>}
-      <button
-        className="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-        onClick={handleSaveQuery}
-      >
-        Save and Next
-      </button>
+      <div className="flex justify-end mt-4">
+        <div className="flex justify-end mt-4">
+          <button
+            className="text-3xl font-extrabold bg-gradient-to-r from-green-500 to-green-700 text-white px-6 py-4 rounded-xl hover:from-green-600 hover:to-green-800 transition-all duration-300 shadow-xl transform hover:scale-105 min-w-[250px] flex items-center justify-center"
+            onClick={handleSaveQuery}
+            style={{ fontSize: "2rem" }} // Force large font size with inline style
+          >
+            Continue
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

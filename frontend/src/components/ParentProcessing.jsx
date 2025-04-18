@@ -121,7 +121,7 @@ const ParentProcessing = ({
               Back
             </button>
             <button
-              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+              className="text-xl bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
               onClick={handleSave}
             >
               Continue

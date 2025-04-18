@@ -28,15 +28,16 @@ const LeafProcessing = ({
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-md mx-4">
-      <h2 className="text-xl font-semibold mb-4">
-        For <span className="text-indigo-600">{currentLeaf.name}</span>
+      <h2 className="text-xl font-semibold mb-2">
+        Evaluated item:{" "}
+        <span className="text-indigo-600">{currentLeaf.name}</span>
       </h2>
+      {/* <p className="text-3xl text-red-600 mb-4">
+        Please select one of the following 5 options.
+      </p> */}
       {!composition ? (
         <>
-          <p className="mb-4">
-            How would you like to approach the composition?
-          </p>
-          <div className="text-xl flex flex-col gap-4">
+          <div className="text-4xl flex flex-col gap-4">
             <button
               className="bg-gray-200 text-black px-8 py-4 rounded-lg shadow-sm hover:bg-gray-300 hover:shadow-md transition-all"
               onClick={() => handleSelectComposition("q4")}
@@ -105,14 +106,6 @@ const LeafProcessing = ({
           )}
         </>
       )}
-      <div className="flex justify-start mt-6">
-        <button
-          className="bg-gray-200 text-black px-8 py-4 rounded-lg shadow-sm hover:bg-gray-300 hover:shadow-md transition-all"
-          onClick={onPrevLeaf}
-        >
-          Back
-        </button>
-      </div>
     </div>
   );
 };

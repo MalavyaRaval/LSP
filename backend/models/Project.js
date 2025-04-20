@@ -12,6 +12,7 @@ const nodeAttributesSchema = new mongoose.Schema({
 const treeNodeSchema = new mongoose.Schema({
   id: { type: Number, required: true },
   name: { type: String, required: true },
+  nodeNumber: { type: String, default: "1" }, // Adding node number
   attributes: nodeAttributesSchema,
   children: { type: [mongoose.Schema.Types.Mixed], default: [] },
   parent: { type: Number, default: null }
@@ -27,6 +28,7 @@ const projectSchema = new mongoose.Schema({
     default: () => ({
       id: Date.now(),
       name: "Root",
+      nodeNumber: "1",
       attributes: { importance: null, connection: null, created: Date.now() },
       children: [],
       parent: null

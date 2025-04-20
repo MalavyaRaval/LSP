@@ -32,6 +32,7 @@ const DemaChat = () => {
   const projectId = projectname;
   const [parentId, setParentId] = useState(parentIdQuery || null);
   const [parentName, setParentName] = useState("");
+  const [parentNodeNumber, setParentNodeNumber] = useState("1"); // Store parent's node number
   // Use five preset rows.
   const [childrenDetails, setChildrenDetails] = useState(INITIAL_CHILDREN);
   const [currentStep, setCurrentStep] = useState(0);
@@ -93,6 +94,7 @@ const DemaChat = () => {
           );
           if (res.data && res.data.id) {
             setParentId(res.data.id.toString());
+            setParentNodeNumber(res.data.nodeNumber || "1"); // Get root node number
           } else {
             console.warn("No root node found; check backend logic.");
           }
@@ -117,6 +119,9 @@ const DemaChat = () => {
             const treeData = res.data;
             const node = findNodeById(treeData, parentId);
             setParentName((node && node.name) || "Unknown");
+            setParentNodeNumber(
+              node && node.nodeNumber ? node.nodeNumber : "1"
+            );
           }
         } catch (err) {
           console.error("Error fetching parent details:", err);
@@ -138,7 +143,7 @@ const DemaChat = () => {
     setChildrenDetails(newDetails);
   };
 
-  // Update saveChildren to accept only the non-empty rows.
+  // Update saveChildren to include nodeNumber for each child
   const saveChildren = async (childrenToSave) => {
     const effectiveParentId = parentId;
     if (!effectiveParentId) {
@@ -146,14 +151,21 @@ const DemaChat = () => {
       return [];
     }
 
-    const childrenNodes = childrenToSave.map((child, index) => ({
-      id: `${effectiveParentId}-${Date.now()}-${index}`,
-      name: child.name.trim() || `Child ${index + 1}`,
-      decompose: child.decompose,
-      attributes: { created: Date.now() },
-      children: [],
-      parent: effectiveParentId,
-    }));
+    // Create nodeNumbers for children based on parent's nodeNumber
+    const childrenNodes = childrenToSave.map((child, index) => {
+      // Create a new node number based on parent's node number and child index (1-based)
+      const nodeNumber = `${parentNodeNumber}${index + 1}`;
+
+      return {
+        id: `${effectiveParentId}-${Date.now()}-${index}`,
+        name: child.name.trim() || `Child ${index + 1}`,
+        nodeNumber: nodeNumber, // Add the nodeNumber to the node
+        decompose: child.decompose,
+        attributes: { created: Date.now() },
+        children: [],
+        parent: effectiveParentId,
+      };
+    });
 
     try {
       const res = await axios.post(
@@ -208,6 +220,7 @@ const DemaChat = () => {
         sessionStorage.setItem("bfsQueue", JSON.stringify(remaining));
         setBfsQueue(remaining);
         setParentId(nextNode.id);
+        setParentNodeNumber(nextNode.nodeNumber || "1"); // Update parent node number for next iteration
         // Reset children details to five preset rows after processing.
         setChildrenDetails(getInitialChildren());
       } else {
@@ -388,7 +401,9 @@ const DemaChat = () => {
       <div className="p-6 bg-white rounded-lg shadow-md mx-4">
         <h2 className="text-2xl font-semibold text-gray-800 mb-4">
           {steps[0].question}{" "}
-          <span className="text-indigo-600">{parentName}</span>
+          <span className="text-indigo-600">
+            [{parentNodeNumber}] {parentName}
+          </span>
         </h2>
         <p className="text-3xl text-red-700 mb-4">
           Please enter up to 5 components of this item

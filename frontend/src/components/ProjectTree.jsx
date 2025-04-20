@@ -87,7 +87,7 @@ const TreeNode = ({
           ) : (
             <div className="space-y-2">
               <span className="block text-3xl font-bold text-gray-900">
-                {node.name}
+                [{node.nodeNumber || "1"}] {node.name}
               </span>
             </div>
           )}

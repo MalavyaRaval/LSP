@@ -47,22 +47,22 @@ const DisplayEvaluations = () => {
         );
         const treeData = res.data;
         setProjectTree(treeData); // Store the complete tree
-        
+
         // Extract and store node details (nodeNumber only)
         const nodeDetailsMap = {};
         const extractNodeDetails = (node) => {
           nodeDetailsMap[node.id.toString()] = {
-            nodeNumber: node.nodeNumber || "1"
+            nodeNumber: node.nodeNumber || "1",
           };
-          
+
           if (node.children && node.children.length > 0) {
-            node.children.forEach(child => extractNodeDetails(child));
+            node.children.forEach((child) => extractNodeDetails(child));
           }
         };
-        
+
         extractNodeDetails(treeData);
         setNodeDetails(nodeDetailsMap);
-        
+
         // Continue with leaf mapping as before
         const leaves = getLeafNodes(treeData);
         const mapping = {};
@@ -87,17 +87,17 @@ const DisplayEvaluations = () => {
         );
         const mapping = {};
         const queryDetailsMap = {};
-        
+
         res.data.forEach((result) => {
           mapping[result.nodeId.toString()] = result.nodeName;
-          
+
           // Store query type and values for each node
           queryDetailsMap[result.nodeId.toString()] = {
             queryType: result.queryType,
-            values: result.values
+            values: result.values,
           };
         });
-        
+
         setQueryMapping(mapping);
         setQueryDetails(queryDetailsMap);
       } catch (err) {
@@ -181,11 +181,11 @@ const DisplayEvaluations = () => {
                   leafMapping[key.toString()] ||
                   queryMapping[key.toString()] ||
                   `Leaf ${key}`;
-                
+
                 // Get node details
                 const node = nodeDetails[key.toString()] || {};
                 const query = queryDetails[key.toString()];
-                
+
                 return (
                   <tr key={key} className="hover:bg-gray-100">
                     <td className="border border-gray-300 p-2 font-medium">

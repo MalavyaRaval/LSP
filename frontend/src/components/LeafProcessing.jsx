@@ -4,6 +4,7 @@ import Query4 from "./Query/Query4.jsx";
 import Query5 from "./Query/Query5.jsx";
 import Query6 from "./Query/Query6.jsx";
 import Query7 from "./Query/Query7.jsx";
+import Query13 from "./Query/Query13.jsx";
 
 const LeafProcessing = ({
   leafNodes,
@@ -64,7 +65,7 @@ const LeafProcessing = ({
             </button>
             <button
               className="bg-gray-200 text-black px-8 py-4 rounded-lg shadow-sm hover:bg-gray-300 hover:shadow-md transition-all"
-              onClick={() => handleSelectComposition("q7")}
+              onClick={() => handleSelectComposition("q13")}
             >
               I will select suitability from your table
             </button>
@@ -98,6 +99,14 @@ const LeafProcessing = ({
           )}
           {composition === "q7" && (
             <Query7
+              onSave={handleSaveAndNext}
+              nodeId={currentLeaf.id}
+              projectId={projectname}
+              nodeName={currentLeaf.name}
+            />
+          )}
+          {composition === "q13" && (
+            <Query13
               onSave={handleSaveAndNext}
               nodeId={currentLeaf.id}
               projectId={projectname}

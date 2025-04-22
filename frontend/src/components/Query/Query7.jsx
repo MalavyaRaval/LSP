@@ -38,37 +38,43 @@ const Query7 = ({ onSave, nodeId, projectId, nodeName }) => {
   };
 
   const handleSaveQuery = async () => {
-    if (validateRows()) {
-      // Transform rows into a range object:
-      // Use the first row's offered value as "from" and
-      // the last row's offered value as "to".
-      const fromVal = rows[0].offered;
-      const toVal = rows[rows.length - 1].offered;
-      const transformedValues = { from: fromVal, to: toVal };
-      try {
-        await axios.post("http://localhost:8000/api/query-results", {
-          nodeId,
-          nodeName, // Pass nodeName in payload
-          queryType: "q7",
-          values: transformedValues,
-          projectId,
-        });
-        onSave();
-      } catch (err) {
-        setError("Failed to save query result.");
-        console.error(err);
-      }
+    if (!validateRows()) return;
+
+    // Transform rows into a range object:
+    // Use the first row's offered value as "from" and
+    // the last row's offered value as "to".
+    const fromVal = rows[0].offered;
+    const toVal = rows[rows.length - 1].offered;
+    const transformedValues = { from: fromVal, to: toVal };
+
+    try {
+      const payload = {
+        nodeId,
+        nodeName,
+        queryType: "q7",
+        values: transformedValues,
+        projectId,
+      };
+      await axios.post("http://localhost:8000/api/query-results", payload);
+      onSave();
+    } catch (err) {
+      console.error("Error saving Query7", err);
+      setError("Failed to save query result.");
     }
   };
 
   return (
     <div className="p-4 border rounded">
-      <h4 className="text-2xl font-bold mb-2">Please answer the following.</h4>
+      <h4 className="text-2xl mb-2" style={{ color: "#E53935" }}>
+        Please specify your requirements with values in ascending order.
+      </h4>
       <table className="min-w-full border-collapse border border-gray-400 mb-4">
         <thead>
           <tr className="bg-gray-200">
-            <th className="border border-gray-400 p-2">Provide values</th>
-            <th className="border border-gray-400 p-2">
+            <th className="text-2xl border border-gray-400 p-2">
+              Provide values
+            </th>
+            <th className="text-2xl border border-gray-400 p-2">
               Degree of Satisfaction (%)
             </th>
           </tr>
@@ -85,6 +91,7 @@ const Query7 = ({ onSave, nodeId, projectId, nodeName }) => {
                   }
                   onBlur={validateRows}
                   className="w-full border rounded px-2 py-1"
+                  style={{ fontSize: "1.75rem" }}
                 />
               </td>
               <td className="border border-gray-400 p-2">
@@ -95,6 +102,7 @@ const Query7 = ({ onSave, nodeId, projectId, nodeName }) => {
                     handleChange(index, "satisfaction", e.target.value)
                   }
                   className="w-full border rounded px-2 py-1"
+                  style={{ fontSize: "1.75rem" }}
                 />
               </td>
             </tr>
@@ -103,17 +111,20 @@ const Query7 = ({ onSave, nodeId, projectId, nodeName }) => {
       </table>
       <button
         onClick={addRow}
-        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-xl font-bold"
       >
         Add Row
       </button>
       {error && <p className="text-red-500 mt-2">{error}</p>}
-      <button
-        className="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-        onClick={handleSaveQuery}
-      >
-        Continue
-      </button>
+      <div className="flex justify-end mt-4">
+        <button
+          className="text-3xl font-extrabold bg-gradient-to-r from-green-500 to-green-700 text-white px-6 py-4 rounded-xl hover:from-green-600 hover:to-green-800 transition-all duration-300 shadow-xl transform hover:scale-105 min-w-[250px] flex items-center justify-center"
+          onClick={handleSaveQuery}
+          style={{ fontSize: "2rem" }}
+        >
+          Continue
+        </button>
+      </div>
     </div>
   );
 };

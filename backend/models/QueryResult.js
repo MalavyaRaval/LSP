@@ -12,7 +12,7 @@ const queryResultSchema = new mongoose.Schema({
   queryType: {
     type: String,
     required: true,
-    enum: ["q4", "q5", "q6", "q7"],
+    enum: ["q4", "q5", "q6", "q7", "q13"],
   },
   values: {
     type: mongoose.Schema.Types.Mixed,

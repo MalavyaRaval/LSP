@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+import {
+  scoreIncreasing,
+  scoreDecreasing,
+  scoreInRange,
+  calculateAttributeSatisfaction,
+} from "./utils/satisfactionCalculator";
 
 // Helper: recursively extract leaf nodes (nodes with no children)
 const getLeafNodes = (node) => {
@@ -123,8 +129,85 @@ const DisplayEvaluations = () => {
       return `Ideal range: ${values.lower} to ${values.upper}`;
     } else if (queryInfo.queryType === "q7") {
       return `Custom table: ${values.from} to ${values.to}`;
+    } else if (queryInfo.queryType === "q13") {
+      return `Suitability: ${values.suitabilityLabel} (${values.suitabilityValue}%)`;
     }
     return JSON.stringify(values);
+  };
+
+  // Calculate satisfaction percentage based on query type and value
+  const calculateSatisfaction = (nodeId, value) => {
+    const queryInfo = queryDetails[nodeId];
+    if (!queryInfo || value === "-" || value === undefined) return null;
+
+    const queryType = queryInfo.queryType;
+    const values = queryInfo.values;
+    let satisfaction = 0;
+
+    try {
+      // Convert value to number
+      const numValue = Number(value);
+
+      if (isNaN(numValue)) return null;
+
+      if (queryType === "q4") {
+        // Prefer high values
+        const min = Number(values.from);
+        const max = Number(values.to);
+        satisfaction = scoreIncreasing(numValue, min, max);
+      } else if (queryType === "q5") {
+        // Prefer low values
+        const min = Number(values.from);
+        const max = Number(values.to);
+        satisfaction = scoreDecreasing(numValue, min, max);
+      } else if (queryType === "q6") {
+        // Ideal range
+        const lower = Number(values.lower);
+        const upper = Number(values.upper);
+        satisfaction = scoreInRange(numValue, lower, upper);
+      } else if (queryType === "q7") {
+        // Custom table (similar approach to q6 for now)
+        const min = Number(values.from);
+        const max = Number(values.to);
+        satisfaction = scoreInRange(numValue, min, max);
+      } else if (queryType === "q13") {
+        // Percentage value directly
+        satisfaction = numValue / 100;
+      }
+
+      // Ensure satisfaction is within [0, 1]
+      satisfaction = Math.max(0, Math.min(1, satisfaction));
+      return satisfaction;
+    } catch (error) {
+      console.error("Error calculating satisfaction:", error);
+      return null;
+    }
+  };
+
+  // Component for satisfaction bar
+  const SatisfactionBar = ({ percentage }) => {
+    if (percentage === null) return null;
+
+    const barWidth = `${Math.round(percentage * 100)}%`;
+    const barColor = (() => {
+      if (percentage < 0.3) return "bg-red-500";
+      if (percentage < 0.7) return "bg-yellow-500";
+      return "bg-green-500";
+    })();
+
+    return (
+      <div className="mt-1">
+        <div className="w-full bg-gray-200 h-2 rounded-full">
+          <div
+            className={`h-2 rounded-full ${barColor}`}
+            style={{ width: barWidth }}
+          ></div>
+        </div>
+        <div className="text-xs text-gray-600 text-right">
+          {Math.round(percentage * 100)}%
+        </div>
+      </div>
+    );
   };
 
   // Compute union of all keys in alternativeValues from evaluations.
@@ -209,6 +292,14 @@ const DisplayEvaluations = () => {
                         evalItem.alternativeValues[key] !== undefined
                           ? evalItem.alternativeValues[key]
                           : "-"}
+                        <SatisfactionBar
+                          percentage={calculateSatisfaction(
+                            key.toString(),
+                            evalItem.alternativeValues
+                              ? evalItem.alternativeValues[key]
+                              : "-"
+                          )}
+                        />
                       </td>
                     ))}
                   </tr>

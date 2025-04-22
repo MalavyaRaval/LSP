@@ -33,9 +33,9 @@ const LeafProcessing = ({
         Evaluated item:{" "}
         <span className="text-indigo-600">{currentLeaf.name}</span>
       </h2>
-      {/* <p className="text-3xl text-red-600 mb-4">
+      <p className="text-3xl text-red-600 mb-4">
         Please select one of the following 5 options.
-      </p> */}
+      </p>
       {!composition ? (
         <>
           <div className="text-4xl flex flex-col gap-4">

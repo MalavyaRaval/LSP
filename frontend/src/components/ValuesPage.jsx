@@ -77,6 +77,9 @@ const ValuesPage = () => {
               </td>
               <td className="border border-gray-400 p-2">
                 I will specify a table of requirements
+                <Link to={`/q13${search}`} className="text-blue-500 underline">
+                  Q13
+                </Link>
               </td>
             </tr>
           </tbody>

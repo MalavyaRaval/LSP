@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 
 const Query6 = ({ onSave, nodeId, projectId, nodeName }) => {
-  // State contains lower, middleLower, middleUpper, and upper
+  // State contains lower, middleLower, middleUpper, and upper but we'll map to A,B,C,D when saving
   const [values, setValues] = useState({
     lower: "",
     middleLower: "",
@@ -20,6 +20,7 @@ const Query6 = ({ onSave, nodeId, projectId, nodeName }) => {
     const middleLower = parseFloat(values.middleLower);
     const middleUpper = parseFloat(values.middleUpper);
     const upper = parseFloat(values.upper);
+
     if (
       isNaN(lower) ||
       isNaN(middleLower) ||
@@ -29,7 +30,7 @@ const Query6 = ({ onSave, nodeId, projectId, nodeName }) => {
       setError("Please enter valid numbers in all fields.");
       return false;
     }
-    // Validate that lower < middleLower < middleUpper < upper
+
     if (
       !(lower < middleLower && middleLower < middleUpper && middleUpper < upper)
     ) {
@@ -43,11 +44,19 @@ const Query6 = ({ onSave, nodeId, projectId, nodeName }) => {
   const handleSaveQuery = async () => {
     if (!validate()) return;
     try {
+      // Map the values to A,B,C,D format while maintaining the old UI
+      const mappedValues = {
+        A: values.lower, // unacceptable if less than
+        B: values.middleLower, // start of fully satisfied
+        C: values.middleUpper, // end of fully satisfied
+        D: values.upper, // unacceptable if greater than
+      };
+
       const payload = {
         nodeId,
         nodeName,
         queryType: "q6",
-        values,
+        values: mappedValues, // Send the mapped A,B,C,D values
         projectId,
       };
       await axios.post("http://localhost:8000/api/query-results", payload);

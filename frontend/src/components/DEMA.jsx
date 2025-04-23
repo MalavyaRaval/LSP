@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
+// import { numberToConnection } from "./utils/connectionConverter";
 
 const Dema = () => {
   const location = useLocation();
@@ -79,7 +80,7 @@ const Dema = () => {
         name: detail.name,
         attributes: {
           importance: parseInt(detail.importance),
-          connection: parseInt(detail.connection),
+          connection: numberToConnection(detail.connection), // Convert to string format
         },
         children: [],
         parent: parseInt(parentId),
@@ -156,8 +157,8 @@ const Dema = () => {
                   <input
                     type="number"
                     min="1"
-                    max="5"
-                    placeholder="Importance (1-5)"
+                    max="9"
+                    placeholder="Importance (1-9)"
                     value={comp.importance}
                     onChange={(e) =>
                       handleComponentDetailChange(
@@ -168,19 +169,10 @@ const Dema = () => {
                     }
                     className="border p-2 rounded-lg w-1/2"
                   />
-                  <input
-                    type="number"
-                    placeholder="Connection (1-5)"
-                    value={comp.connection}
-                    onChange={(e) =>
-                      handleComponentDetailChange(
-                        index,
-                        "connection",
-                        e.target.value
-                      )
+                  <ConnectionProcessing
+                    onComplete={(value) =>
+                      handleComponentDetailChange(index, "connection", value)
                     }
-                    className="border p-2 rounded-lg w-1/2"
-                    step="any"
                   />
                 </div>
               </div>

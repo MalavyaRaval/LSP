@@ -26,20 +26,18 @@ const ParentProcessing = ({
     { value: 1, label: "Lowest" },
   ];
 
-  // Step: 1 = Ask connection; 2 = Ask importance.
   const [step, setStep] = useState(1);
   const [values, setValues] = useState({
     importance: currentParent.attributes?.importance || "",
-    connection: "",
+    connection: currentParent.attributes?.connection || "",
   });
   const [error, setError] = useState("");
 
-  // Reset the step and connection value whenever the current parent changes.
   useEffect(() => {
     setStep(1);
     setValues({
       importance: currentParent.attributes?.importance || "",
-      connection: "",
+      connection: currentParent.attributes?.connection || "",
     });
     setError("");
   }, [currentParent]);
@@ -51,10 +49,9 @@ const ParentProcessing = ({
   const handleSave = async () => {
     try {
       const imp = parseInt(values.importance, 10);
-      const con = parseInt(values.connection, 10);
       await axios.put(
         `http://localhost:8000/api/projects/${projectId}/nodes/${currentParent.id}`,
-        { attributes: { importance: imp, connection: con } }
+        { attributes: { importance: imp, connection: values.connection } }
       );
       onNextParent();
     } catch (err) {

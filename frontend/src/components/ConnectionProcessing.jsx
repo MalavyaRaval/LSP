@@ -1,85 +1,60 @@
 import React, { useState } from "react";
+import {
+  getConnectionOptions,
+  getLabelForConnection,
+} from "./utils/connectionConverter";
 
 const connectionLogicOptions = [
   {
     value: "opt1",
     label:
       "All components are mandatory and must be simultaneously highly satisfied. It is not acceptable to have a single component requirement not satisfied.",
-    marker: "Q9",
+    marker: "Q1",
+    connectionType: "HC",
   },
   {
     value: "opt2",
     label:
       "Simultaneously high satisfaction of all components is desirable but not mandatory. We can tolerate the cases where some input requirements are not satisfied.",
-    marker: "Q10",
+    marker: "Q2",
+    connectionType: "SC",
   },
   {
     value: "opt3",
     label: "Nice to have a good satisfaction of most component requirements.",
-    autoConnection: 4,
+    autoConnection: "A",
   },
   {
     value: "opt4",
     label:
       "These components can effectively substitute each other. The positive impact of large input values is stronger than the negative impact of small input values.",
-    marker: "Q10",
+    marker: "Q4",
+    connectionType: "SD",
   },
   {
     value: "opt5",
     label:
       "It is enough to have any input highly satisfied. A single fully satisfied component requirement is sufficient to fully satisfy the compound requirement.",
-    marker: "Q9",
+    marker: "Q5",
+    connectionType: "HD",
   },
-];
-
-const query9Options = [
-  { value: 8, label: "Highest" },
-  { value: 7, label: "High" },
-  { value: 6, label: "Medium" },
-  { value: 5, label: "Low" },
-];
-
-const query10Options = [
-  { value: 3, label: "High" },
-  { value: 2, label: "Medium" },
-  { value: 1, label: "Low" },
 ];
 
 const ConnectionProcessing = ({ onComplete }) => {
   const [step, setStep] = useState(1);
   const [selectedLogic, setSelectedLogic] = useState(null);
-  const [customValue, setCustomValue] = useState("");
 
   const handleLogicSelect = (option) => {
     setSelectedLogic(option);
-    if (option.autoConnection !== undefined) {
-      const value =
-        option.value === "opt4" || option.value === "opt5"
-          ? -option.autoConnection
-          : option.autoConnection;
-      onComplete(value);
+    if (option.autoConnection) {
+      onComplete(option.autoConnection);
     } else {
       setStep(2);
     }
   };
 
-  const handleIntensitySelect = (value) => {
-    const finalValue =
-      selectedLogic.value === "opt4" || selectedLogic.value === "opt5"
-        ? -Math.abs(value)
-        : value;
-    onComplete(finalValue);
-  };
-
-  const handleCustomValueSubmit = () => {
-    if (customValue !== "") {
-      const value = Number(customValue);
-      const finalValue =
-        selectedLogic.value === "opt4" || selectedLogic.value === "opt5"
-          ? -Math.abs(value)
-          : value;
-      onComplete(finalValue);
-    }
+  const handleConnectionSelect = (connection) => {
+    onComplete(connection);
   };
 
   return (
@@ -107,43 +82,22 @@ const ConnectionProcessing = ({ onComplete }) => {
       {step === 2 && selectedLogic && (
         <div>
           <h2 className="text-xl font-semibold mb-4">
-            {selectedLogic.marker === "Q9" ? "QUERY 9" : "QUERY 10"} <br />
-            Select the connection value:
+            {selectedLogic.marker} <br />
+            Select the connection level:
           </h2>
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
-              <p className="text-lg">Predefined options:</p>
-              {(selectedLogic.marker === "Q9"
-                ? query9Options
-                : query10Options
-              ).map((opt) => (
-                <button
-                  key={opt.value}
-                  className="p-4 border rounded-lg bg-gray-200 hover:bg-gray-300 transition"
-                  onClick={() => handleIntensitySelect(opt.value)}
-                >
-                  {opt.label} ({opt.value})
-                </button>
-              ))}
-            </div>
-            <div className="mt-4">
-              <p className="text-lg mb-2">Or enter any numeric value:</p>
-              <div className="flex gap-2">
-                <input
-                  type="number"
-                  value={customValue}
-                  onChange={(e) => setCustomValue(e.target.value)}
-                  className="w-full p-4 border rounded-lg"
-                  step="any"
-                  placeholder="Enter any numeric value"
-                />
-                <button
-                  className="p-4 border rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition"
-                  onClick={handleCustomValueSubmit}
-                >
-                  Use Value
-                </button>
-              </div>
+              {getConnectionOptions(selectedLogic.connectionType).map(
+                (connection) => (
+                  <button
+                    key={connection}
+                    className="p-4 border rounded-lg bg-gray-200 hover:bg-gray-300 transition"
+                    onClick={() => handleConnectionSelect(connection)}
+                  >
+                    {getLabelForConnection(connection)} ({connection})
+                  </button>
+                )
+              )}
             </div>
           </div>
         </div>

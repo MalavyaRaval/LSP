@@ -132,7 +132,7 @@ router.post("/:projectId/nodes", async (req, res) => {
             ...child,
             attributes: {
               importance: Number(child.attributes?.importance),
-              connection: Number(child.attributes?.connection),
+              connection: child.attributes?.connection, // Keep connection as string
               created: new Date(child.attributes?.created || Date.now()),
             },
             parent: node.id,

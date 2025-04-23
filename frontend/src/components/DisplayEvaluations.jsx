@@ -5,6 +5,7 @@ import {
   scoreIncreasing,
   scoreDecreasing,
   scoreInRange,
+  scoreBasedOnRange,
 } from "./utils/satisfactionCalculator";
 
 // Helper: recursively extract leaf nodes (nodes with no children)
@@ -127,7 +128,7 @@ const DisplayEvaluations = () => {
     } else if (queryInfo.queryType === "q6") {
       return `Acceptance range: A=${values.A}, B=${values.B}, C=${values.C}, D=${values.D}`;
     } else if (queryInfo.queryType === "q7") {
-      return `Custom table: ${values.from} to ${values.to}`;
+      return `${values.points.length} points from ${values.from} to ${values.to}`;
     } else if (queryInfo.queryType === "q13") {
       return `Suitability: ${values.suitabilityLabel} (${values.suitabilityValue}%)`;
     }
@@ -158,16 +159,13 @@ const DisplayEvaluations = () => {
         const max = Number(values.to);
         satisfaction = scoreDecreasing(numValue, min, max);
       } else if (queryType === "q6") {
-        // Use all four values A, B, C, D for Q6
         const A = Number(values.A);
         const B = Number(values.B);
         const C = Number(values.C);
         const D = Number(values.D);
         satisfaction = scoreInRange(numValue, A, B, C, D);
       } else if (queryType === "q7") {
-        const min = Number(values.from);
-        const max = Number(values.to);
-        satisfaction = scoreIncreasing(numValue, min, max);
+        satisfaction = scoreBasedOnRange(numValue, values.points);
       } else if (queryType === "q13") {
         satisfaction = numValue / 100;
       }

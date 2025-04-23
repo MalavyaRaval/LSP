@@ -69,28 +69,31 @@ export function scoreInRange(
   return 0;
 }
 
-// (Q7) Scoring for "specific range preferred" with n values (n1, n2, n3, ..., nN)
-export function scoreInRangeN(
-  values,
-  outsideMin = DEFAULT_DOMAIN_MIN,
-  outsideMax = DEFAULT_DOMAIN_MAX
-) {
-  values = values.map(Number);
-  outsideMin = Number(outsideMin);
-  outsideMax = Number(outsideMax);
+// (Q7) Function to calculate satisfaction percentage based on given value and range of points
+export function scoreBasedOnRange(value, range) {
+  // Sort the range of points in case it's not sorted
+  range.sort((a, b) => a.value - b.value);
 
-  if (values.some(isNaN)) return 0;
+  // Check if the value is smaller than the first point
+  if (value <= range[0].value) return range[0].percentage;
 
-  const minVal = Math.min(...values);
-  const maxVal = Math.max(...values);
+  // Check if the value is larger than the last point
+  if (value >= range[range.length - 1].value) return range[range.length - 1].percentage;
 
-  if (minVal < outsideMin || maxVal > outsideMax) return 0;
+  // Loop through the range to find the two closest points for interpolation
+  for (let i = 0; i < range.length - 1; i++) {
+    const point1 = range[i];
+    const point2 = range[i + 1];
 
-  const range = maxVal - minVal;
-  if (range === 0) return 1;
+    // Check if the value lies between point1 and point2
+    if (value >= point1.value && value <= point2.value) {
+      // Linear interpolation: Calculate the percentage based on the position between point1 and point2
+      const percentage = point1.percentage + 
+        ((value - point1.value) / (point2.value - point1.value)) * (point2.percentage - point1.percentage);
+      return percentage;
+    }
+  }
 
-  return (
-    values.reduce((acc, val) => acc + (val - minVal), 0) /
-    (values.length * range)
-  );
+  // Default return (shouldn't hit this, but it's safe to have it)
+  return 0;
 }

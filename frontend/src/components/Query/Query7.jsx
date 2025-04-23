@@ -3,8 +3,8 @@ import axios from "axios";
 
 const Query7 = ({ onSave, nodeId, projectId, nodeName }) => {
   const [rows, setRows] = useState([
-    { offered: "", satisfaction: "" },
-    { offered: "", satisfaction: "" },
+    { value: "", percentage: "" },
+    { value: "", percentage: "" },
   ]);
   const [error, setError] = useState("");
 
@@ -15,21 +15,27 @@ const Query7 = ({ onSave, nodeId, projectId, nodeName }) => {
   };
 
   const addRow = () => {
-    setRows([...rows, { offered: "", satisfaction: "" }]);
+    setRows([...rows, { value: "", percentage: "" }]);
   };
 
   const validateRows = () => {
-    // Validate that each offered value is a valid number and
-    // that they are in strictly increasing order.
-    for (let i = 0; i < rows.length - 1; i++) {
-      const current = parseFloat(rows[i].offered);
-      const next = parseFloat(rows[i + 1].offered);
-      if (isNaN(current) || isNaN(next)) {
-        setError("Please enter valid numbers for all offered values.");
+    // Validate that each value is a valid number and they are in increasing order
+    for (let i = 0; i < rows.length; i++) {
+      const value = parseFloat(rows[i].value);
+      const percentage = parseFloat(rows[i].percentage);
+
+      if (isNaN(value) || isNaN(percentage)) {
+        setError("Please enter valid numbers for all fields.");
         return false;
       }
-      if (current >= next) {
-        setError("Offered values must be in strictly increasing order.");
+
+      if (percentage < 0 || percentage > 100) {
+        setError("Satisfaction percentage must be between 0 and 100.");
+        return false;
+      }
+
+      if (i > 0 && value <= parseFloat(rows[i - 1].value)) {
+        setError("Values must be in strictly increasing order.");
         return false;
       }
     }
@@ -40,19 +46,22 @@ const Query7 = ({ onSave, nodeId, projectId, nodeName }) => {
   const handleSaveQuery = async () => {
     if (!validateRows()) return;
 
-    // Transform rows into a range object:
-    // Use the first row's offered value as "from" and
-    // the last row's offered value as "to".
-    const fromVal = rows[0].offered;
-    const toVal = rows[rows.length - 1].offered;
-    const transformedValues = { from: fromVal, to: toVal };
-
     try {
+      // Transform rows to match the format needed for scoreBasedOnRange
+      const transformedRows = rows.map((row) => ({
+        value: parseFloat(row.value),
+        percentage: parseFloat(row.percentage) / 100, // Convert percentage to decimal
+      }));
+
       const payload = {
         nodeId,
         nodeName,
         queryType: "q7",
-        values: transformedValues,
+        values: {
+          points: transformedRows,
+          from: transformedRows[0].value,
+          to: transformedRows[transformedRows.length - 1].value,
+        },
         projectId,
       };
       await axios.post("http://localhost:8000/api/query-results", payload);
@@ -71,11 +80,9 @@ const Query7 = ({ onSave, nodeId, projectId, nodeName }) => {
       <table className="min-w-full border-collapse border border-gray-400 mb-4">
         <thead>
           <tr className="bg-gray-200">
+            <th className="text-2xl border border-gray-400 p-2">Value</th>
             <th className="text-2xl border border-gray-400 p-2">
-              Provide values
-            </th>
-            <th className="text-2xl border border-gray-400 p-2">
-              Degree of Satisfaction (%)
+              Satisfaction (0-100%)
             </th>
           </tr>
         </thead>
@@ -85,24 +92,27 @@ const Query7 = ({ onSave, nodeId, projectId, nodeName }) => {
               <td className="border border-gray-400 p-2">
                 <input
                   type="number"
-                  value={row.offered}
-                  onChange={(e) =>
-                    handleChange(index, "offered", e.target.value)
-                  }
+                  value={row.value}
+                  onChange={(e) => handleChange(index, "value", e.target.value)}
                   onBlur={validateRows}
                   className="w-full border rounded px-2 py-1"
                   style={{ fontSize: "1.75rem" }}
+                  placeholder="Enter value"
                 />
               </td>
               <td className="border border-gray-400 p-2">
                 <input
                   type="number"
-                  value={row.satisfaction}
+                  value={row.percentage}
                   onChange={(e) =>
-                    handleChange(index, "satisfaction", e.target.value)
+                    handleChange(index, "percentage", e.target.value)
                   }
+                  onBlur={validateRows}
+                  min="0"
+                  max="100"
                   className="w-full border rounded px-2 py-1"
                   style={{ fontSize: "1.75rem" }}
+                  placeholder="0-100"
                 />
               </td>
             </tr>

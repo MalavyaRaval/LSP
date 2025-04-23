@@ -48,20 +48,38 @@ const query10Options = [
 const ConnectionProcessing = ({ onComplete }) => {
   const [step, setStep] = useState(1);
   const [selectedLogic, setSelectedLogic] = useState(null);
+  const [customValue, setCustomValue] = useState("");
 
   const handleLogicSelect = (option) => {
     setSelectedLogic(option);
     if (option.autoConnection !== undefined) {
-      // Option 3: auto assign connection, then complete process immediately
-      onComplete(option.autoConnection);
+      const value =
+        option.value === "opt4" || option.value === "opt5"
+          ? -option.autoConnection
+          : option.autoConnection;
+      onComplete(value);
     } else {
-      // Move to intensity selection if marker exists.
       setStep(2);
     }
   };
 
   const handleIntensitySelect = (value) => {
-    onComplete(value);
+    const finalValue =
+      selectedLogic.value === "opt4" || selectedLogic.value === "opt5"
+        ? -Math.abs(value)
+        : value;
+    onComplete(finalValue);
+  };
+
+  const handleCustomValueSubmit = () => {
+    if (customValue !== "") {
+      const value = Number(customValue);
+      const finalValue =
+        selectedLogic.value === "opt4" || selectedLogic.value === "opt5"
+          ? -Math.abs(value)
+          : value;
+      onComplete(finalValue);
+    }
   };
 
   return (
@@ -90,21 +108,43 @@ const ConnectionProcessing = ({ onComplete }) => {
         <div>
           <h2 className="text-xl font-semibold mb-4">
             {selectedLogic.marker === "Q9" ? "QUERY 9" : "QUERY 10"} <br />
-            Select the most appropriate intensity for the connection:
+            Select the connection value:
           </h2>
-          <div className="flex flex-col gap-6">
-            {(selectedLogic.marker === "Q9"
-              ? query9Options
-              : query10Options
-            ).map((opt) => (
-              <button
-                key={opt.value}
-                className="p-4 border rounded-lg bg-gray-200 hover:bg-gray-300 transition"
-                onClick={() => handleIntensitySelect(opt.value)}
-              >
-                {opt.label}
-              </button>
-            ))}
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <p className="text-lg">Predefined options:</p>
+              {(selectedLogic.marker === "Q9"
+                ? query9Options
+                : query10Options
+              ).map((opt) => (
+                <button
+                  key={opt.value}
+                  className="p-4 border rounded-lg bg-gray-200 hover:bg-gray-300 transition"
+                  onClick={() => handleIntensitySelect(opt.value)}
+                >
+                  {opt.label} ({opt.value})
+                </button>
+              ))}
+            </div>
+            <div className="mt-4">
+              <p className="text-lg mb-2">Or enter any numeric value:</p>
+              <div className="flex gap-2">
+                <input
+                  type="number"
+                  value={customValue}
+                  onChange={(e) => setCustomValue(e.target.value)}
+                  className="w-full p-4 border rounded-lg"
+                  step="any"
+                  placeholder="Enter any numeric value"
+                />
+                <button
+                  className="p-4 border rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition"
+                  onClick={handleCustomValueSubmit}
+                >
+                  Use Value
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

@@ -48,34 +48,18 @@ const ParentProcessing = ({
     setValues({ ...values, [e.target.name]: e.target.value });
   };
 
-  const validateImportance = () => {
-    const importance = parseInt(values.importance, 10);
-    if (isNaN(importance)) {
-      setError("Please select a valid level for importance.");
-      return false;
-    }
-    if (importance < 1 || importance > 9) {
-      setError("Importance must be between 1 and 9.");
-      return false;
-    }
-    setError("");
-    return true;
-  };
-
   const handleSave = async () => {
-    if (validateImportance()) {
-      try {
-        const imp = Math.max(1, Math.min(9, parseInt(values.importance, 10)));
-        const con = parseInt(values.connection, 10);
-        await axios.put(
-          `http://localhost:8000/api/projects/${projectId}/nodes/${currentParent.id}`,
-          { attributes: { importance: imp, connection: con } }
-        );
-        onNextParent();
-      } catch (err) {
-        console.error("Failed to update parent node:", err);
-        setError("Failed to update node. Please try again.");
-      }
+    try {
+      const imp = parseInt(values.importance, 10);
+      const con = parseInt(values.connection, 10);
+      await axios.put(
+        `http://localhost:8000/api/projects/${projectId}/nodes/${currentParent.id}`,
+        { attributes: { importance: imp, connection: con } }
+      );
+      onNextParent();
+    } catch (err) {
+      console.error("Failed to update parent node:", err);
+      setError("Failed to update node. Please try again.");
     }
   };
 

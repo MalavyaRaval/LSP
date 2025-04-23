@@ -1,8 +1,12 @@
 const mongoose = require("mongoose");
 
 const nodeAttributesSchema = new mongoose.Schema({
-  importance: { type: Number, min: [1, "Minimum is 1"], max: [9, "Maximum is 9"] },
-  connection: { type: Number, min: [1, "Minimum is 1"], max: [8, "Maximum is 8"] },
+  importance: {
+    type: Number,
+    min: [1, "Minimum is 1"],
+    max: [9, "Maximum is 9"],
+  },
+  connection: { type: Number },
   created: { type: Date, default: Date.now },
   decisionProcess: String,
   objectName: String,
@@ -15,12 +19,16 @@ const treeNodeSchema = new mongoose.Schema({
   nodeNumber: { type: String, default: "1" }, // Adding node number
   attributes: nodeAttributesSchema,
   children: { type: [mongoose.Schema.Types.Mixed], default: [] },
-  parent: { type: Number, default: null }
+  parent: { type: Number, default: null },
 });
 
 const projectSchema = new mongoose.Schema({
-  projectId: { 
-    type: String, required: true, unique: true, trim: true, lowercase: true
+  projectId: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true,
+    lowercase: true,
   },
   treeData: {
     type: treeNodeSchema,
@@ -31,21 +39,21 @@ const projectSchema = new mongoose.Schema({
       nodeNumber: "1",
       attributes: { importance: null, connection: null, created: Date.now() },
       children: [],
-      parent: null
-    })
+      parent: null,
+    }),
   },
   // New eventInfo field to store event details from /event route.
   eventInfo: {
     name: String,
     description: String,
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-    createdAt: Date
+    createdAt: Date,
   },
   createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
+  updatedAt: { type: Date, default: Date.now },
 });
 
-projectSchema.pre('save', function(next) {
+projectSchema.pre("save", function (next) {
   this.updatedAt = Date.now();
   next();
 });

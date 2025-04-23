@@ -57,20 +57,15 @@ const Dema = () => {
     setComponentDetails(newDetails);
   };
 
-  const handleComponentDetailsSubmit = () => {
+  const handleDetailsValidation = () => {
     for (let i = 0; i < componentDetails.length; i++) {
       const { name, importance, connection } = componentDetails[i];
       if (!name.trim() || !importance || !connection) {
         alert(`Please fill all fields for component ${i + 1}`);
         return;
       }
-      if (
-        importance < 1 ||
-        importance > 5 ||
-        connection < 1 ||
-        connection > 5
-      ) {
-        alert(`Component ${i + 1}: Values must be between 1-5`);
+      if (importance < 1 || importance > 5) {
+        alert(`Component ${i + 1}: Importance must be between 1-5`);
         return;
       }
     }
@@ -175,8 +170,6 @@ const Dema = () => {
                   />
                   <input
                     type="number"
-                    min="1"
-                    max="5"
                     placeholder="Connection (1-5)"
                     value={comp.connection}
                     onChange={(e) =>
@@ -187,13 +180,14 @@ const Dema = () => {
                       )
                     }
                     className="border p-2 rounded-lg w-1/2"
+                    step="any"
                   />
                 </div>
               </div>
             ))}
             <button
               className="text-xl bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-              onClick={handleComponentDetailsSubmit}
+              onClick={handleDetailsValidation}
             >
               Continue
             </button>

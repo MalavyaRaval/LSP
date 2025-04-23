@@ -69,31 +69,27 @@ export function scoreInRange(
   return 0;
 }
 
-// (Q7) Function to calculate satisfaction percentage based on given value and range of points
+// (Q7) Scoring given list of values and range of points
 export function scoreBasedOnRange(value, range) {
-  // Sort the range of points in case it's not sorted
   range.sort((a, b) => a.value - b.value);
 
-  // Check if the value is smaller than the first point
   if (value <= range[0].value) return range[0].percentage;
 
-  // Check if the value is larger than the last point
-  if (value >= range[range.length - 1].value) return range[range.length - 1].percentage;
+  if (value >= range[range.length - 1].value)
+    return range[range.length - 1].percentage;
 
-  // Loop through the range to find the two closest points for interpolation
   for (let i = 0; i < range.length - 1; i++) {
     const point1 = range[i];
     const point2 = range[i + 1];
 
-    // Check if the value lies between point1 and point2
     if (value >= point1.value && value <= point2.value) {
-      // Linear interpolation: Calculate the percentage based on the position between point1 and point2
-      const percentage = point1.percentage + 
-        ((value - point1.value) / (point2.value - point1.value)) * (point2.percentage - point1.percentage);
+      const percentage =
+        point1.percentage +
+        ((value - point1.value) / (point2.value - point1.value)) *
+          (point2.percentage - point1.percentage);
       return percentage;
     }
   }
 
-  // Default return (shouldn't hit this, but it's safe to have it)
   return 0;
 }

@@ -48,22 +48,6 @@ const TreeNode = ({
     action();
   };
 
-  const handleAddLeafValues = () => {
-    if (projectId && username && projectname && node && node.id) {
-      navigate(
-        `/values?projectId=${projectId}&parentId=${node.id}&username=${username}&projectname=${projectname}&add=values`
-      );
-    }
-  };
-
-  const handleAddWithDEMA = () => {
-    if (projectId && username && projectname) {
-      navigate(
-        `/dema?projectId=${projectId}&parentId=${node.id}&username=${username}&projectname=${projectname}`
-      );
-    }
-  };
-
   return (
     <div className={`relative my-8`} style={{ marginLeft: `${level * 80}px` }}>
       {node.parent && (
@@ -111,29 +95,9 @@ const TreeNode = ({
             >
               Edit
             </button>
-            <button
-              className="px-4 py-2 bg-purple-500 text-white rounded-lg shadow hover:bg-purple-600 transition-colors whitespace-nowrap"
-              onClick={() => handleOptionClick(handleAddWithDEMA)}
-              disabled={node.children.length >= 5}
-              title={
-                node.children.length >= 5 ? "Maximum 5 children allowed" : ""
-              }
-            >
-              Add with DEMA
-            </button>
-            <button
-              className={`px-4 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition-colors whitespace-nowrap ${
-                node.children && node.children.length === 0 ? "" : "hidden"
-              }`}
-              onClick={() => handleOptionClick(handleAddLeafValues)}
-              disabled={node.children && node.children.length > 0}
-            >
-              Add Values
-            </button>
           </div>
         )}
 
-        {/* Add Child Input */}
         {showAddChildInput && (
           <div className="absolute left-full ml-4 top-0 flex items-center bg-white p-2 rounded shadow z-10">
             <input

@@ -65,7 +65,6 @@ const ProjectEvaluation = () => {
   }, [evaluationStep, projectname]);
 
   const handleNextStep = () => {
-    // Validate step 1: Name non-empty, cost is a positive number
     if (!alternativeName.trim()) {
       setError("Please enter a valid name.");
       return;
@@ -87,7 +86,6 @@ const ProjectEvaluation = () => {
   };
 
   const handleSubmitEvaluation = async () => {
-    // Validate that all component values are provided
     const emptyLeaf = leafNodes.find(
       (leaf) => !alternativeValues[leaf.id]?.toString().trim()
     );
@@ -105,7 +103,6 @@ const ProjectEvaluation = () => {
         alternativeValues, // object mapping each leaf id to a number
       };
       await axios.post("http://localhost:8000/api/evaluations", payload);
-      // Instead of window.confirm, show an inline confirmation UI.
       setShowAlternativeConfirm(true);
     } catch (err) {
       console.error("Error submitting evaluation:", err);
@@ -113,7 +110,6 @@ const ProjectEvaluation = () => {
     }
   };
 
-  // Handlers for inline confirmation
   const handleConfirmYes = () => {
     // Reset the form for a new alternative entry.
     setAlternativeName("");

@@ -173,7 +173,6 @@ const Home = () => {
         <span className="text-3xl font-bold">+</span>
       </button>
       <div className="flex-1 container mx-auto px-4 py-8">
-        {/* Create Project Modal */}
         <div
           className="modal fade"
           id="createEventModal"
@@ -182,7 +181,7 @@ const Home = () => {
         >
           <div className="modal-dialog modal-lg">
             <div className="modal-content p-6 bg-white rounded-xl">
-              <div className="modal-header flex justify-between items-center mb-6">
+              <div className="modal-header flex justify-between items-center mb-0">
                 <h3 className="text-2xl font-bold text-gray-800">
                   Create New Project
                 </h3>
@@ -197,43 +196,41 @@ const Home = () => {
               </div>
               <div className="modal-body">
                 {successMessage && (
-                  <div className="p-3 mb-4 bg-green-100 text-green-700 rounded-lg">
+                  <div className="p-3 mb-2 bg-green-100 text-green-700 rounded-lg">
                     {successMessage}
                   </div>
                 )}
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-2xl font-medium text-gray-700 mb-2">
-                        Please enter the name of object(s) you want to evaluate
-                        (e.g., car, home, laptop, job, school, hotel, etc.)
-                      </label>
-                      <input
-                        type="text"
-                        name="name"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        value={eventDetails.name}
-                        onChange={handleChange}
-                        placeholder="Enter project name"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Description
-                      </label>
-                      <textarea
-                        name="description"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent h-32"
-                        value={eventDetails.description}
-                        onChange={handleChange}
-                        required
-                      ></textarea>
-                    </div>
+                <form onSubmit={handleSubmit}>
+                  <div>
+                    <label className="block text-2xl font-medium text-gray-700 mb-1">
+                      Please enter the name of object(s) you want to evaluate
+                      (e.g., car, home, laptop, job, school, hotel, etc.)
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      className="w-full px-4 py-0 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      value={eventDetails.name}
+                      onChange={handleChange}
+                      placeholder="Enter project name"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xl font-medium text-gray-700 mb-2">
+                      Description
+                    </label>
+                    <textarea
+                      name="description"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent h-8"
+                      value={eventDetails.description}
+                      onChange={handleChange}
+                      required
+                    ></textarea>
                   </div>
                   {/* Introduction to Next Steps */}
-                  <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                    <p className="text-blue-700 text-2xl mb-2">
+                  <div className="bg-blue-50 p-2 rounded-lg border border-blue-200">
+                    <p className="text-blue-700 text-xl mb-2">
                       Welcome! This tool helps you choose the best option based
                       on your input.
                     </p>
@@ -254,17 +251,17 @@ const Home = () => {
                       </li>
                     </ul>
                   </div>
-                  <div className="flex justify-end gap-4 mt-8">
+                  <div className="flex justify-end gap-8 mt-4">
                     <button
                       type="button"
-                      className="px-6 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200"
+                      className="px-6 py-0 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200"
                       data-bs-dismiss="modal"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
-                      className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      className="px-6 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                     >
                       Create Project
                     </button>

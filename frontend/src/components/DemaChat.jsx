@@ -398,44 +398,44 @@ const DemaChat = () => {
     }
     // Render fixed five rows without an Add Row button.
     return (
-      <div className="p-6 bg-white rounded-lg shadow-md mx-4">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+      <div className="p-0 bg-white rounded-lg mx-4">
+        <h2 className="text-xl font-semibold text-gray-800 mb-0">
           {steps[0].question}{" "}
           <span className="text-indigo-600">
             [{parentNodeNumber}] {parentName}
           </span>
         </h2>
-        <p className="text-3xl text-red-700 mb-4">
+        <p className="text-2xl text-red-700 mt-0 mb-3">
           Please enter up to 5 components of this item
         </p>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-2 py-2 text-left text-xl font-medium text-gray-700 uppercase">
+                <th className="px-1 py-0 text-left text-lg font-medium text-gray-700 uppercase">
                   Component Name
                 </th>
-                <th className="px-2 py-2 text-center text-xl font-medium text-gray-700 uppercase">
-                  Would you further decompose this?
+                <th className="px-1 py-0 text-center text-lg font-medium text-gray-700 uppercase">
+                  Further decompose?
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {childrenDetails.map((child, index) => (
                 <tr key={index}>
-                  <td className="px-2 py-2">
+                  <td className="px-2 py-0">
                     <input
                       type="text"
-                      placeholder={`Component ${index + 1} name`}
+                      placeholder={`Please enter Component ${index + 1} name`}
                       value={child.name}
                       onChange={(e) =>
                         handleDetailChange(index, "name", e.target.value)
                       }
-                      className="border border-gray-300 rounded-lg p-4 w-full text-2xl"
-                      style={{ fontSize: "1.5rem", width: "100%" }}
+                      className="border border-gray-300 rounded-lg py-2 px-3 w-full text-lg"
+                      style={{ fontSize: "1.2rem", width: "100%" }}
                     />
                   </td>
-                  <td className="px-2 py-2 text-center">
+                  <td className="px-2 py-1 text-center">
                     <select
                       value={
                         child.decompose === null
@@ -447,16 +447,16 @@ const DemaChat = () => {
                       onChange={(e) =>
                         handleDetailChange(index, "decompose", e.target.value)
                       }
-                      className="border border-gray-300 rounded-lg p-4 text-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      style={{ fontSize: "1.25rem" }}
+                      className="border border-gray-300 rounded-lg py-2 px-3 text-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      style={{ fontSize: "1.2rem" }}
                     >
-                      <option value="" style={{ fontSize: "1.25rem" }}>
-                        Please select
+                      <option value="" style={{ fontSize: "1.2rem" }}>
+                        Select
                       </option>
-                      <option value="true" style={{ fontSize: "1.25rem" }}>
+                      <option value="true" style={{ fontSize: "1.2rem" }}>
                         Yes
                       </option>
-                      <option value="false" style={{ fontSize: "1.25rem" }}>
+                      <option value="false" style={{ fontSize: "1.2rem" }}>
                         No
                       </option>
                     </select>
@@ -466,16 +466,16 @@ const DemaChat = () => {
             </tbody>
           </table>
         </div>
-        <div className="flex justify-end items-center mt-6">
+        <div className="flex justify-end items-center mt-4">
           <button
             onClick={handleNextStep}
-            className="text-2xl font-extrabold bg-gradient-to-r from-green-500 to-green-700 text-white px-8 py-4 rounded-xl hover:from-green-600 hover:to-green-800 transition-all duration-300 shadow-xl transform hover:scale-105 disabled:opacity-70 disabled:cursor-not-allowed min-w-[250px] flex items-center justify-center"
+            className="text-lg font-extrabold bg-gradient-to-r from-green-500 to-green-700 text-white px-6 py-2 rounded-lg hover:from-green-600 hover:to-green-800 transition-all duration-300 shadow-lg transform hover:scale-105 disabled:opacity-70 disabled:cursor-not-allowed min-w-[200px] flex items-center justify-center"
             disabled={processing}
           >
             {processing ? (
               <span className="flex items-center">
                 <svg
-                  className="animate-spin -ml-1 mr-3 h-8 w-8 text-white"
+                  className="animate-spin -ml-1 mr-3 h-6 w-6 text-white"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -505,11 +505,8 @@ const DemaChat = () => {
     );
   };
   return (
-    <div className="w-full h-full p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:bg-gray-800 rounded-lg shadow-xl flex flex-col">
-      <header className="flex items-center justify-between p-4 border-b bg-gray-200 rounded-t-lg">
-        <h1 className="text-xl font-bold text-gray-800">LSP Rec</h1>
-      </header>
-      <main className="flex-1 p-4 overflow-y-auto">{renderStep()}</main>
+    <div className="w-full h-full bg-gray-50">
+      {renderStep()}
       <div ref={messagesEndRef} />
     </div>
   );

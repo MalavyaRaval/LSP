@@ -21,6 +21,7 @@ const ProjectPage = () => {
   const [projectDisplayName, setProjectDisplayName] = useState("");
   // State for scale (for zoom/drag features)
   const [scale, setScale] = useState(1);
+  const [activeTab, setActiveTab] = useState("chat"); // Track active tab: "chat" or "tree"
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -61,98 +62,99 @@ const ProjectPage = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
+    <div className="flex flex-col min-h-screen bg-gray-50">
       <Navbar />
 
-      {/* Main Content Wrapper */}
-      <div className="flex-grow p-4">
-        {/* Top Navigation Section */}
-        <div className="flex items-center justify-between bg-white dark:bg-gray-800 shadow-md p-3 rounded mb-4">
-          <div className="flex items-center gap-2">
-            <span className="text-lg font-semibold text-gray-900 dark:text-gray-900">
-              LSP Rec Project
-            </span>
+      {/* Ultra-compact header with navigation buttons */}
+      <header className="border-b border-gray-200 py-0.5 -mt-2">
+        <div className="flex flex-wrap items-center justify-between px-3 gap-1">
+          <div className="flex items-center">
+            <h1 className="text-2xl font-semibold text-gray-800 flex items-center gap-6">
+              <span>
+                {projectDisplayName ||
+                  (projectname ? projectname : "LSP Rec Project")}
+              </span>
+              <span className="h-6 border-l border-gray-300 mx-2"></span>
+              <span className="text-lg text-gray-600 font-normal">
+                User: <span className="font-medium">{evaluatorName}</span>
+              </span>
+            </h1>
           </div>
-          <div className="flex items-center gap-4">
+
+          <div className="flex flex-wrap gap-1">
             <button
-              className="px-4 py-2 bg-blue-500 text-black rounded hover:bg-blue-600"
+              className="px-3 py-1 border border-gray-300 text-gray-700 rounded bg-gray-200 hover:bg-gray-300 text-xl font-medium"
               onClick={() => handleNav("projects")}
             >
               All Projects
             </button>
             <button
-              className="px-4 py-2 bg-green-500 text-black rounded hover:bg-green-600"
+              className="px-3 py-1 border border-gray-300 text-gray-700 rounded bg-gray-200 hover:bg-gray-300 text-xl font-medium"
               onClick={() => handleNav("validation")}
             >
               Validation
             </button>
             <button
-              className="px-4 py-2 bg-teal-500 text-black rounded hover:bg-teal-600"
+              className="px-3 py-1 border border-gray-300 text-gray-700 rounded bg-gray-200 hover:bg-gray-300 text-xl font-medium"
               onClick={() => handleNav("evaluate")}
             >
               Evaluate
             </button>
             <button
-              className="px-4 py-2 bg-purple-500 text-black rounded hover:bg-purple-600"
+              className="px-3 py-1 border border-gray-300 text-gray-700 rounded bg-gray-200 hover:bg-gray-300 text-xl font-medium"
               onClick={() => handleNav("queryResults")}
             >
               Query Results
             </button>
             <button
-              className="px-4 py-2 bg-red-500 text-black rounded hover:bg-red-600"
+              className={`px-3 py-1 border border-gray-300 rounded bg-gray-200 hover:bg-gray-300 text-xl font-medium ${
+                activeTab === "tree"
+                  ? "bg-gray-100 text-gray-900"
+                  : "text-gray-700"
+              }`}
+              onClick={() => setActiveTab("tree")}
+            >
+              Project Tree
+            </button>
+            <button
+              className="px-3 py-1 border border-gray-300 text-gray-700 rounded bg-gray-200 hover:bg-gray-300 text-xl font-medium"
               onClick={() => handleNav("exit")}
             >
               Exit
             </button>
           </div>
         </div>
+      </header>
 
-        {/* Project and Evaluator Information */}
-        <div className="mb-4">
-          <p className="text-lg text-gray-700 dark:text-gray-900">
-            <strong>User:</strong> {evaluatorName}
-          </p>
-          <p className="text-lg text-gray-700 dark:text-gray-900">
-            <strong>Project:</strong>{" "}
-            {projectDisplayName ||
-              (projectname ? projectname.toUpperCase() : "N/A")}
-          </p>
-        </div>
-
-        {/* Main Content Area (Vertical Stack) */}
-        <div className="flex flex-col gap-6 items-center">
-          {" "}
-          <div
-            style={{
-              width: "1200px",
-              minHeight: "700px", // Set a minimum height to ensure it doesn't shrink too small
-              height: "auto", // Allow the height to auto-adjust based on content
-            }}
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mx-auto"
-          >
+      {/* Main content area - pushed closer to header */}
+      <main className="flex-grow pt-0.5 px-4 pb-4 max-w-6xl mx-auto w-full text-lg">
+        {activeTab === "chat" && (
+          <div className="border border-gray-200 rounded bg-white text-lg">
             <DemaChat />
           </div>
-          {/* Project Tree Container */}
+        )}
+
+        {activeTab === "tree" && (
           <Resizable
             defaultSize={{
-              width: 1200,
-              height: 800,
+              width: "100%",
+              height: 700,
             }}
             minWidth={300}
-            minHeight={200}
+            minHeight={400}
             enable={{
               top: false,
-              right: true,
+              right: false,
               bottom: true,
               left: false,
-              topRight: true,
+              topRight: false,
               bottomRight: true,
               bottomLeft: true,
-              topLeft: true,
+              topLeft: false,
             }}
           >
             <div
-              className="relative bg-white rounded-lg shadow-lg overflow-hidden p-4"
+              className="relative border border-gray-200 rounded bg-white overflow-hidden text-lg"
               style={{
                 width: "100%",
                 height: "100%",
@@ -186,7 +188,7 @@ const ProjectPage = () => {
                       </div>
                     </TransformComponent>
                     <button
-                      className="absolute bottom-4 right-4 px-3 py-2 bg-blue-500 text-black rounded-lg shadow-md hover:bg-blue-600 z-50"
+                      className="absolute bottom-4 right-4 px-3 py-1.5 border border-gray-300 bg-white text-gray-700 rounded hover:bg-gray-100"
                       onClick={() => resetTransform()}
                     >
                       Reset View
@@ -196,9 +198,10 @@ const ProjectPage = () => {
               </TransformWrapper>
             </div>
           </Resizable>
-        </div>
-        <Footer />
-      </div>
+        )}
+      </main>
+
+      <Footer />
     </div>
   );
 };

@@ -48,36 +48,33 @@ const Query13 = ({ onSave, nodeId, projectId, nodeName }) => {
   };
 
   return (
-    <div className="p-4 border rounded">
-      <h4 className="text-2xl font-bold mb-4">
-        QUERY 13: Select the most appropriate degree of suitability
-      </h4>
-      <p className="text-lg mb-4">
-        Please select the most appropriate degree of suitability (or
-        satisfaction or truth) using the following options:
+    <div className="p-2 border rounded">
+      <p className="text-lg mb-0">
+        Please select the most appropriate degree of suitability using the
+        following options:
       </p>
 
-      <div className="mb-6">
-        <table className="min-w-full border-collapse border border-gray-400">
+      <div className="mb-0 overflow-auto">
+        <table className="min-w-full border-collapse border border-gray-400 text-xl">
           <thead>
             <tr className="bg-gray-200">
-              <th className="border border-gray-400 p-3">
+              <th className="border border-gray-400 p-1">
                 Qualitative Description
               </th>
-              <th className="border border-gray-400 p-3">Quantitative Value</th>
-              <th className="border border-gray-400 p-3">Select</th>
+              <th className="border border-gray-400 p-1">Quantitative Value</th>
+              <th className="border border-gray-400 p-1">Select</th>
             </tr>
           </thead>
           <tbody>
             {suitabilityOptions.map((option) => (
               <tr key={option.label} className="hover:bg-gray-100">
-                <td className="border border-gray-400 p-3 text-lg">
+                <td className="border border-gray-400 p-1 text-lg">
                   {option.label}
                 </td>
-                <td className="border border-gray-400 p-3 text-lg">
+                <td className="border border-gray-400 p-1 text-lg">
                   {option.value}%
                 </td>
-                <td className="border border-gray-400 p-3">
+                <td className="border border-gray-400 p-1">
                   <div className="flex justify-center">
                     <input
                       type="radio"
@@ -85,7 +82,7 @@ const Query13 = ({ onSave, nodeId, projectId, nodeName }) => {
                       value={option.label}
                       checked={selectedOption === option.label}
                       onChange={() => setSelectedOption(option.label)}
-                      className="w-5 h-5"
+                      className="w-4 h-4"
                     />
                   </div>
                 </td>
@@ -95,13 +92,13 @@ const Query13 = ({ onSave, nodeId, projectId, nodeName }) => {
         </table>
       </div>
 
-      {error && <p className="text-red-500 mb-4">{error}</p>}
+      {error && <p className="text-red-500 mb-1 text-base">{error}</p>}
 
-      <div className="flex justify-end mt-4">
+      <div className="flex justify-end">
         <button
-          className="text-3xl font-extrabold bg-gradient-to-r from-green-500 to-green-700 text-white px-6 py-4 rounded-xl hover:from-green-600 hover:to-green-800 transition-all duration-300 shadow-xl transform hover:scale-105 min-w-[250px] flex items-center justify-center"
+          className="text-xl font-bold bg-gradient-to-r from-green-500 to-green-700 text-white px-4 py-1 rounded hover:from-green-600 hover:to-green-800 transition-all duration-300 shadow transform hover:scale-105 min-w-[200px] flex items-center justify-center"
           onClick={handleSaveQuery}
-          style={{ fontSize: "2rem" }}
+          style={{ fontSize: "1.5rem" }}
         >
           Continue
         </button>

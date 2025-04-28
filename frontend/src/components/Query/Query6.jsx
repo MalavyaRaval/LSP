@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import axios from "axios";
 
 const Query6 = ({ onSave, nodeId, projectId, nodeName }) => {
-  // State contains lower, middleLower, middleUpper, and upper but we'll map to A,B,C,D when saving
   const [values, setValues] = useState({
     lower: "",
     middleLower: "",
@@ -44,7 +43,6 @@ const Query6 = ({ onSave, nodeId, projectId, nodeName }) => {
   const handleSaveQuery = async () => {
     if (!validate()) return;
     try {
-      // Map the values to A,B,C,D format while maintaining the old UI
       const mappedValues = {
         A: values.lower, // unacceptable if less than
         B: values.middleLower, // start of fully satisfied
@@ -69,17 +67,17 @@ const Query6 = ({ onSave, nodeId, projectId, nodeName }) => {
 
   return (
     <div className="p-4 border rounded">
-      <h4 className="text-2xl mb-2" style={{ color: "#E53935" }}>
+      <h4 className="text-xl mb-0" style={{ color: "#E53935" }}>
         Please specify your requirements, ensuring values are in ascending
         order.
       </h4>
-      <table className="min-w-full border-collapse border border-gray-400 mb-4">
+      <table className="min-w-full border-collapse border border-gray-400 mb-0">
         <thead>
           <tr className="bg-gray-200">
-            <th className="text-2xl border border-gray-400 p-2">
+            <th className="text-xl border border-gray-400 p-2">
               Description of requirements
             </th>
-            <th className="text-2xl border border-gray-400 p-2">
+            <th className="text-xl border border-gray-400 p-2">
               Your (numeric) values
             </th>
           </tr>
@@ -96,8 +94,8 @@ const Query6 = ({ onSave, nodeId, projectId, nodeName }) => {
                 value={values.lower}
                 onChange={handleChange}
                 onBlur={validate}
-                className="w-full border rounded px-2 py-1"
-                style={{ fontSize: "1.75rem" }}
+                className="w-full border rounded px-2 py-0"
+                style={{ fontSize: "1.5rem" }}
               />
             </td>
           </tr>
@@ -115,8 +113,8 @@ const Query6 = ({ onSave, nodeId, projectId, nodeName }) => {
                   onChange={handleChange}
                   onBlur={validate}
                   placeholder="Lower bound"
-                  className="w-1/2 border rounded px-2 py-1"
-                  style={{ fontSize: "1.75rem" }}
+                  className="w-1/2 border rounded px-2 py-0"
+                  style={{ fontSize: "1.5rem" }}
                 />
                 <input
                   type="number"
@@ -125,8 +123,8 @@ const Query6 = ({ onSave, nodeId, projectId, nodeName }) => {
                   onChange={handleChange}
                   onBlur={validate}
                   placeholder="Upper bound"
-                  className="w-1/2 border rounded px-2 py-1"
-                  style={{ fontSize: "1.75rem" }}
+                  className="w-1/2 border rounded px-2 py-0"
+                  style={{ fontSize: "1.5rem" }}
                 />
               </div>
             </td>
@@ -142,8 +140,8 @@ const Query6 = ({ onSave, nodeId, projectId, nodeName }) => {
                 value={values.upper}
                 onChange={handleChange}
                 onBlur={validate}
-                className="w-full border rounded px-2 py-1"
-                style={{ fontSize: "1.75rem" }}
+                className="w-full border rounded px-2 py-0"
+                style={{ fontSize: "1.5rem" }}
               />
             </td>
           </tr>
@@ -152,7 +150,7 @@ const Query6 = ({ onSave, nodeId, projectId, nodeName }) => {
       {error && <p className="text-red-500">{error}</p>}
       <div className="flex justify-end mt-4">
         <button
-          className="text-3xl font-extrabold bg-gradient-to-r from-green-500 to-green-700 text-white px-6 py-4 rounded-xl hover:from-green-600 hover:to-green-800 transition-all duration-300 shadow-xl transform hover:scale-105 min-w-[250px] flex items-center justify-center"
+          className="text-3xl font-extrabold bg-gradient-to-r from-green-500 to-green-700 text-white px-6 py-2 rounded-xl hover:from-green-600 hover:to-green-800 transition-all duration-300 shadow-xl transform hover:scale-105 min-w-[250px] flex items-center justify-center"
           onClick={handleSaveQuery}
           style={{ fontSize: "2rem" }}
         >

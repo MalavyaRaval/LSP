@@ -95,8 +95,8 @@ const Query7 = ({ onSave, nodeId, projectId, nodeName }) => {
                   value={row.value}
                   onChange={(e) => handleChange(index, "value", e.target.value)}
                   onBlur={validateRows}
-                  className="w-full border rounded px-2 py-1"
-                  style={{ fontSize: "1.75rem" }}
+                  className="w-full border rounded px-2 py-0"
+                  style={{ fontSize: "1.5rem" }}
                   placeholder="Enter value"
                 />
               </td>
@@ -110,8 +110,8 @@ const Query7 = ({ onSave, nodeId, projectId, nodeName }) => {
                   onBlur={validateRows}
                   min="0"
                   max="100"
-                  className="w-full border rounded px-2 py-1"
-                  style={{ fontSize: "1.75rem" }}
+                  className="w-full border rounded px-2 py-0"
+                  style={{ fontSize: "1.5rem" }}
                   placeholder="0-100"
                 />
               </td>
@@ -121,14 +121,14 @@ const Query7 = ({ onSave, nodeId, projectId, nodeName }) => {
       </table>
       <button
         onClick={addRow}
-        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-xl font-bold"
+        className="px-4 py-0 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-xl font-bold"
       >
         Add Row
       </button>
       {error && <p className="text-red-500 mt-2">{error}</p>}
       <div className="flex justify-end mt-4">
         <button
-          className="text-3xl font-extrabold bg-gradient-to-r from-green-500 to-green-700 text-white px-6 py-4 rounded-xl hover:from-green-600 hover:to-green-800 transition-all duration-300 shadow-xl transform hover:scale-105 min-w-[250px] flex items-center justify-center"
+          className="text-3xl font-extrabold bg-gradient-to-r from-green-500 to-green-700 text-white px-6 py-2 rounded-xl hover:from-green-600 hover:to-green-800 transition-all duration-300 shadow-xl transform hover:scale-105 min-w-[250px] flex items-center justify-center"
           onClick={handleSaveQuery}
           style={{ fontSize: "2rem" }}
         >

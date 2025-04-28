@@ -87,6 +87,15 @@ const ProjectEvaluation = () => {
   };
 
   const handleSubmitEvaluation = async () => {
+    // Validate that all component values are provided
+    const emptyLeaf = leafNodes.find(
+      (leaf) => !alternativeValues[leaf.id]?.toString().trim()
+    );
+    if (emptyLeaf) {
+      setError("Please fill in a value for all components.");
+      return;
+    }
+    setError("");
     try {
       const payload = {
         projectId: projectname, // using projectname as project id
@@ -121,8 +130,8 @@ const ProjectEvaluation = () => {
 
   if (evaluationStep === 1) {
     return (
-      <div className="p-6 bg-white rounded-lg shadow-md mx-4">
-        <h1 className="text-2xl font-bold mb-4">Project Evaluation</h1>
+      <div className="p-4 leading-tight space-y-2 bg-white rounded-lg shadow-md mx-4">
+        <h1 className="text-2xl font-bold mb-2">Project Evaluation</h1>
         <p>Please enter the alternative details.</p>
         <div className="mt-4">
           <label className="block mb-2">Alternative Name:</label>
@@ -157,16 +166,18 @@ const ProjectEvaluation = () => {
     return (
       <div className="p-6 bg-white rounded-lg shadow-md mx-4">
         <h1 className="text-2xl font-bold mb-4">Project Evaluation</h1>
-        <div className="mb-4">
-          <p>
+        <div className="mb-4 flex gap-4">
+          <p className="m-0">
             <span className="font-medium">Alternative Name:</span>{" "}
             {alternativeName}
           </p>
-          <p>
+          <p className="m-0">
             <span className="font-medium">Cost:</span> {alternativeCost}
           </p>
         </div>
-        <p>Please fill in the alternative values</p>
+        <p className="text-red-700 m-0 leading-tight">
+          Please fill in the alternative values
+        </p>
         {error && <p className="text-red-500">{error}</p>}
         <div className="overflow-x-auto mt-4">
           <table className="min-w-full border-collapse border border-gray-300">
@@ -249,7 +260,7 @@ const ProjectEvaluation = () => {
         ) : (
           <button
             onClick={handleSubmitEvaluation}
-            className="mt-4 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+            className="mt-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
           >
             Submit Evaluation
           </button>

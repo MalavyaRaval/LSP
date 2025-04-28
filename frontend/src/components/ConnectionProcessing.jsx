@@ -8,33 +8,32 @@ const connectionLogicOptions = [
   {
     value: "opt1",
     label:
-      "All components are mandatory and must be simultaneously highly satisfied. It is not acceptable to have a single component requirement not satisfied.",
+      "All components are mandatory and must be simultaneously highly satisfied.",
     marker: "Q1",
     connectionType: "HC",
   },
   {
     value: "opt2",
-    label:
-      "Simultaneously high satisfaction of all components is desirable but not mandatory. We can tolerate the cases where some input requirements are not satisfied.",
+    label: "All components satisfied is desirable but not mandatory.",
     marker: "Q2",
     connectionType: "SC",
   },
   {
     value: "opt3",
-    label: "Nice to have a good satisfaction of most component requirements.",
+    label: "Good satisfaction of most component requirements is appreciated.",
     autoConnection: "A",
   },
   {
     value: "opt4",
     label:
-      "These components can effectively substitute each other. The positive impact of large input values is stronger than the negative impact of small input values.",
+      "Components can substitute each other with high values outweighing negatives.",
     marker: "Q4",
     connectionType: "SD",
   },
   {
     value: "opt5",
     label:
-      "It is enough to have any input highly satisfied. A single fully satisfied component requirement is sufficient to fully satisfy the compound requirement.",
+      "Any single fully satisfied component is sufficient for the compound requirement.",
     marker: "Q5",
     connectionType: "HD",
   },
@@ -58,18 +57,17 @@ const ConnectionProcessing = ({ onComplete }) => {
   };
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md mx-4">
+    <div className="p-2 bg-white rounded shadow-md mx-2 text-2xl">
       {step === 1 && (
         <div>
-          <p className="text-xl mb-4">
-            Select the most appropriate logic requirement that should be
-            satisfied by the listed components.
+          <p className="leading-tight mb-1 text-red-700">
+            Select the logic requirement for the components:
           </p>
-          <ul className="text-xl space-y-4">
+          <ul className="space-y-1">
             {connectionLogicOptions.map((option) => (
               <li key={option.value}>
                 <button
-                  className="w-full text-left p-4 border rounded-lg bg-gray-200 hover:bg-gray-300 transition"
+                  className="w-full text-left p-2 border rounded bg-gray-200 hover:bg-gray-300 transition"
                   onClick={() => handleLogicSelect(option)}
                 >
                   {option.label}
@@ -81,24 +79,21 @@ const ConnectionProcessing = ({ onComplete }) => {
       )}
       {step === 2 && selectedLogic && (
         <div>
-          <h2 className="text-xl font-semibold mb-4">
-            {selectedLogic.marker} <br />
-            Select the connection level:
+          <h2 className="font-semibold leading-tight mb-1">
+            Select the intensity level:
           </h2>
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-col gap-2">
-              {getConnectionOptions(selectedLogic.connectionType).map(
-                (connection) => (
-                  <button
-                    key={connection}
-                    className="p-4 border rounded-lg bg-gray-200 hover:bg-gray-300 transition"
-                    onClick={() => handleConnectionSelect(connection)}
-                  >
-                    {getLabelForConnection(connection)} ({connection})
-                  </button>
-                )
-              )}
-            </div>
+          <div className="flex flex-col gap-1">
+            {getConnectionOptions(selectedLogic.connectionType).map(
+              (connection) => (
+                <button
+                  key={connection}
+                  className="p-1 border rounded bg-gray-200 hover:bg-gray-300 transition"
+                  onClick={() => handleConnectionSelect(connection)}
+                >
+                  {getLabelForConnection(connection)} ({connection})
+                </button>
+              )
+            )}
           </div>
         </div>
       )}

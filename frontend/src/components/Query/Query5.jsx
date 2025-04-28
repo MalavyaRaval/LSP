@@ -99,7 +99,7 @@ const Query5 = ({ onSave, nodeId, projectId, nodeName }) => {
       {error && <p className="text-red-500">{error}</p>}
       <div className="flex justify-end mt-4">
         <button
-          className="text-3xl font-extrabold bg-gradient-to-r from-green-500 to-green-700 text-white px-6 py-4 rounded-xl hover:from-green-600 hover:to-green-800 transition-all duration-300 shadow-xl transform hover:scale-105 min-w-[250px] flex items-center justify-center"
+          className="text-3xl font-extrabold bg-gradient-to-r from-green-500 to-green-700 text-white px-6 py-2 rounded-xl hover:from-green-600 hover:to-green-800 transition-all duration-300 shadow-xl transform hover:scale-105 min-w-[250px] flex items-center justify-center"
           onClick={handleSaveQuery}
           style={{ fontSize: "2rem" }}
         >

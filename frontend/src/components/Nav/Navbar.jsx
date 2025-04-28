@@ -66,8 +66,10 @@ const Navbar = () => {
             className={`${burger_class} w-6 h-1 bg-white transition-all duration-500 ease-in-out`}
           ></div>
         </div>
-        {/* Center - Website Name */}
-        <h1 className="text-white text-xl font-extrabold absolute left-1/2 transform -translate-x-1/2">
+        <h1
+          className="text-white font-extrabold absolute left-1/2 transform -translate-x-1/2"
+          style={{ fontSize: "4rem" }}
+        >
           LSP Rec
         </h1>
       </nav>

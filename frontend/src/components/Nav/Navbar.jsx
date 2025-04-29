@@ -70,7 +70,7 @@ const Navbar = () => {
           className="text-white font-extrabold absolute left-1/2 transform -translate-x-1/2"
           style={{ fontSize: "4rem" }}
         >
-          LSP Rec
+          LSPrec
         </h1>
       </nav>
 

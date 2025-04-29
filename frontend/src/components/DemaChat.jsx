@@ -174,7 +174,7 @@ const DemaChat = () => {
           parentId: effectiveParentId,
           children: childrenNodes,
           metadata: {
-            decisionProcess: "LSP Rec",
+            decisionProcess: "LSPrec",
             objectName: "My Object",
           },
         }

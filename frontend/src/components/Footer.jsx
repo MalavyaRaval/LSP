@@ -9,7 +9,7 @@ const Footer = () => {
         <p className="text-lg md:text-xl text-center mb-3">
           {" "}
           &copy; {new Date().getFullYear()} Malavya Raval | mraval@sfsu.edu |
-          LSP REC Project
+          LSPrec Project
         </p>
         <div className="flex space-x-6 justify-center">
           {" "}

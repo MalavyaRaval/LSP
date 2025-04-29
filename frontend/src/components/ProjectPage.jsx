@@ -72,7 +72,7 @@ const ProjectPage = () => {
             <h1 className="text-2xl font-semibold text-gray-800 flex items-center gap-6">
               <span>
                 {projectDisplayName ||
-                  (projectname ? projectname : "LSP Rec Project")}
+                  (projectname ? projectname : "LSPrec Project")}
               </span>
               <span className="h-6 border-l border-gray-300 mx-2"></span>
               <span className="text-lg text-gray-600 font-normal">

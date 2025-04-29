@@ -1,13 +1,43 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const Navbar = () => {
   const [burger_class, setBurgerClass] = useState("burger-bar unclicked");
   const [menu_class, setMenuClass] = useState("menu hidden");
   const [isMenuClicked, setIsMenuClicked] = useState(false);
+  const [currentPage, setCurrentPage] = useState("Home");
   const navigate = useNavigate();
+  const location = useLocation();
   const menuRef = useRef(null);
   const burgerRef = useRef(null);
+
+  // Determine current page based on URL
+  useEffect(() => {
+    const path = location.pathname;
+    if (path.includes("/home")) {
+      setCurrentPage("Home");
+    } else if (path.includes("/login")) {
+      setCurrentPage("Login");
+    } else if (path.includes("/signup")) {
+      setCurrentPage("Sign Up");
+    } else if (path.includes("/aboutus")) {
+      setCurrentPage("About Us");
+    } else if (path.includes("/myprofile")) {
+      setCurrentPage("My Profile");
+    } else if (path.includes("/project")) {
+      if (path.includes("/validation")) {
+        setCurrentPage("Project Validation");
+      } else if (path.includes("/evaluate")) {
+        setCurrentPage("Project Evaluation");
+      } else if (path.includes("/Queryresults")) {
+        setCurrentPage("Query Results");
+      } else {
+        setCurrentPage("Project Page");
+      }
+    } else if (path === "/") {
+      setCurrentPage("Introduction");
+    }
+  }, [location]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -47,31 +77,37 @@ const Navbar = () => {
 
   return (
     <div className="navbar-container relative">
-      <nav className="w-full h-20 bg-gradient-to-r from-indigo-600 via-blue-500 to-purple-500 flex items-center px-6 shadow-lg mb-4">
-        {" "}
-        {/* Added mb-4 for space below */}
-        {/* Left Side - Burger Menu (Always visible) */}
-        <div
-          className="burger-menu w-16 h-16 flex flex-col justify-center items-center cursor-pointer absolute left-0"
-          onClick={updateMenu}
-          ref={burgerRef}
-        >
+      <nav className="w-full h-20 bg-gradient-to-r from-indigo-600 via-blue-500 to-purple-500 flex items-center justify-between px-6 shadow-lg mb-4 relative">
+        {/* Left section with burger menu and LSPrec */}
+        <div className="flex items-center h-20">
           <div
-            className={`${burger_class} w-6 h-1 bg-white mb-1 transition-all duration-500 ease-in-out`}
-          ></div>
-          <div
-            className={`${burger_class} w-6 h-1 bg-white mb-1 transition-all duration-500 ease-in-out`}
-          ></div>
-          <div
-            className={`${burger_class} w-6 h-1 bg-white transition-all duration-500 ease-in-out`}
-          ></div>
+            className="burger-menu w-12 h-12 flex flex-col justify-center items-center cursor-pointer mr-4"
+            onClick={updateMenu}
+            ref={burgerRef}
+          >
+            <div
+              className={`${burger_class} w-6 h-1 bg-white mb-1 transition-all duration-500 ease-in-out`}
+            ></div>
+            <div
+              className={`${burger_class} w-6 h-1 bg-white mb-1 transition-all duration-500 ease-in-out`}
+            ></div>
+            <div
+              className={`${burger_class} w-6 h-1 bg-white transition-all duration-500 ease-in-out`}
+            ></div>
+          </div>
+          {/* LSPrec text on the left */}
+          <h1 className="text-white font-extrabold !text-4xl">LSPrec</h1>
         </div>
-        <h1
-          className="text-white font-extrabold absolute left-1/2 transform -translate-x-1/2"
-          style={{ fontSize: "4rem" }}
-        >
-          LSPrec
-        </h1>
+
+        {/* Current Page Title in Center, moved up */}
+        <div className="absolute left-1/2 -translate-x-1/2 top-3">
+          <h2 className="text-white font-bold !text-4xl whitespace-nowrap">
+            {currentPage}
+          </h2>
+        </div>
+
+        {/* Right empty space for balance */}
+        <div className="w-32"></div>
       </nav>
 
       {/* Mobile Menu - Slide In from the left */}
@@ -83,7 +119,7 @@ const Navbar = () => {
           <li>
             <a
               href="/home"
-              className="block px-4 py-2 rounded-lg hover:bg-blue-100 transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="block px-6 py-3 rounded-xl bg-gray-200 shadow hover:bg-blue-200 transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 !text-2xl font-semibold"
             >
               Home
             </a>
@@ -91,7 +127,7 @@ const Navbar = () => {
           <li>
             <a
               href="/login"
-              className="block px-4 py-2 rounded-lg hover:bg-blue-100 transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="block px-6 py-3 rounded-xl bg-gray-200 shadow hover:bg-blue-200 transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 !text-2xl font-semibold"
             >
               Login
             </a>
@@ -99,7 +135,7 @@ const Navbar = () => {
           <li>
             <a
               href="/signup"
-              className="block px-4 py-2 rounded-lg hover:bg-blue-100 transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="block px-6 py-3 rounded-xl bg-gray-200 shadow hover:bg-blue-200 transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 !text-2xl font-semibold"
             >
               Sign Up
             </a>
@@ -107,7 +143,7 @@ const Navbar = () => {
           <li>
             <a
               href="/aboutus"
-              className="block px-4 py-2 rounded-lg hover:bg-blue-100 transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="block px-6 py-3 rounded-xl bg-gray-200 shadow hover:bg-blue-200 transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 !text-2xl font-semibold"
             >
               About Us
             </a>
@@ -115,7 +151,7 @@ const Navbar = () => {
           <li>
             <a
               href="/myprofile"
-              className="block px-4 py-2 rounded-lg hover:bg-blue-100 transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="block px-6 py-3 rounded-xl bg-gray-200 shadow hover:bg-blue-200 transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 !text-2xl font-semibold"
             >
               My Profile
             </a>
@@ -124,7 +160,7 @@ const Navbar = () => {
             <a
               href="#"
               onClick={handleSignOut}
-              className="block px-4 py-2 rounded-lg hover:bg-blue-100 transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="block px-6 py-3 rounded-xl bg-gray-200 shadow hover:bg-blue-200 transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 !text-2xl font-semibold"
             >
               Sign Out
             </a>

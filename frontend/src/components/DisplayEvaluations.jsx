@@ -7,6 +7,7 @@ import {
   scoreInRange,
   scoreBasedOnRange,
 } from "./utils/satisfactionCalculator";
+import Navbar from "./Nav/Navbar";
 
 // Helper: recursively get all nodes in tree order
 const getAllNodesInOrder = (node, nodesList = []) => {
@@ -264,98 +265,101 @@ const DisplayEvaluations = () => {
   }, []);
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md mx-4">
-      <h1 className="text-2xl font-bold mb-4">Project Evaluation Analysis</h1>
-      {error && <p className="text-red-500">{error}</p>}
+    <>
+      <Navbar />
+      <div className="p-6 bg-white rounded-lg shadow-md mx-4">
+        <h1 className="text-2xl font-bold mb-4">Project Evaluation Analysis</h1>
+        {error && <p className="text-red-500">{error}</p>}
 
-      <div className="overflow-x-auto">
-        <table className="min-w-full border-collapse border border-gray-300">
-          <thead className="bg-gray-200">
-            <tr>
-              <th className="border border-gray-300 p-2">Node #</th>
-              <th className="border border-gray-300 p-2">Node Name</th>
-              <th className="border border-gray-300 p-2">Importance</th>
-              <th className="border border-gray-300 p-2">Connection</th>
-              <th className="border border-gray-300 p-2">Query Type</th>
-              <th className="border border-gray-300 p-2">Criteria</th>
-              {evaluations.map((evalItem) => (
-                <th key={evalItem._id} className="border border-gray-300 p-2">
-                  {evalItem.alternativeName}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {/* Cost Row */}
-            <tr className="hover:bg-gray-100">
-              <td className="border border-gray-300 p-2">-</td>
-              <td className="border border-gray-300 p-2 font-medium">Cost</td>
-              <td className="border border-gray-300 p-2">-</td>
-              <td className="border border-gray-300 p-2">-</td>
-              <td className="border border-gray-300 p-2">-</td>
-              <td className="border border-gray-300 p-2">-</td>
-              {evaluations.map((evalItem) => (
-                <td key={evalItem._id} className="border border-gray-300 p-2">
-                  {evalItem.alternativeCost}
-                </td>
-              ))}
-            </tr>
+        <div className="overflow-x-auto">
+          <table className="min-w-full border-collapse border border-gray-300">
+            <thead className="bg-gray-200">
+              <tr>
+                <th className="border border-gray-300 p-2">Node #</th>
+                <th className="border border-gray-300 p-2">Node Name</th>
+                <th className="border border-gray-300 p-2">Importance</th>
+                <th className="border border-gray-300 p-2">Connection</th>
+                <th className="border border-gray-300 p-2">Query Type</th>
+                <th className="border border-gray-300 p-2">Criteria</th>
+                {evaluations.map((evalItem) => (
+                  <th key={evalItem._id} className="border border-gray-300 p-2">
+                    {evalItem.alternativeName}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {/* Cost Row */}
+              <tr className="hover:bg-gray-100">
+                <td className="border border-gray-300 p-2">-</td>
+                <td className="border border-gray-300 p-2 font-medium">Cost</td>
+                <td className="border border-gray-300 p-2">-</td>
+                <td className="border border-gray-300 p-2">-</td>
+                <td className="border border-gray-300 p-2">-</td>
+                <td className="border border-gray-300 p-2">-</td>
+                {evaluations.map((evalItem) => (
+                  <td key={evalItem._id} className="border border-gray-300 p-2">
+                    {evalItem.alternativeCost}
+                  </td>
+                ))}
+              </tr>
 
-            {/* All Nodes Rows */}
-            {allNodes.map((node) => {
-              const isLeaf = allLeafKeys.includes(node.id.toString());
-              const query = queryDetails[node.id.toString()];
+              {/* All Nodes Rows */}
+              {allNodes.map((node) => {
+                const isLeaf = allLeafKeys.includes(node.id.toString());
+                const query = queryDetails[node.id.toString()];
 
-              return (
-                <tr key={node.id} className="hover:bg-gray-100">
-                  <td className="border border-gray-300 p-2">
-                    {node.nodeNumber}
-                  </td>
-                  <td className="border border-gray-300 p-2">{node.name}</td>
-                  <td className="border border-gray-300 p-2">
-                    {node.importance || "-"}
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    {getConnectionLabel(node.connection)}
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    {isLeaf && query ? query.queryType.toUpperCase() : "-"}
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    {isLeaf ? getQueryValuesDisplay(node.id.toString()) : "-"}
-                  </td>
-                  {evaluations.map((evalItem) => (
-                    <td
-                      key={evalItem._id}
-                      className="border border-gray-300 p-2"
-                    >
-                      {isLeaf ? (
-                        <>
-                          {evalItem.alternativeValues &&
-                          evalItem.alternativeValues[node.id] !== undefined
-                            ? evalItem.alternativeValues[node.id]
-                            : "-"}
-                          <SatisfactionBar
-                            percentage={calculateSatisfaction(
-                              node.id.toString(),
-                              evalItem.alternativeValues
-                                ? evalItem.alternativeValues[node.id]
-                                : "-"
-                            )}
-                          />
-                        </>
-                      ) : (
-                        "-"
-                      )}
+                return (
+                  <tr key={node.id} className="hover:bg-gray-100">
+                    <td className="border border-gray-300 p-2">
+                      {node.nodeNumber}
                     </td>
-                  ))}
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                    <td className="border border-gray-300 p-2">{node.name}</td>
+                    <td className="border border-gray-300 p-2">
+                      {node.importance || "-"}
+                    </td>
+                    <td className="border border-gray-300 p-2">
+                      {getConnectionLabel(node.connection)}
+                    </td>
+                    <td className="border border-gray-300 p-2">
+                      {isLeaf && query ? query.queryType.toUpperCase() : "-"}
+                    </td>
+                    <td className="border border-gray-300 p-2">
+                      {isLeaf ? getQueryValuesDisplay(node.id.toString()) : "-"}
+                    </td>
+                    {evaluations.map((evalItem) => (
+                      <td
+                        key={evalItem._id}
+                        className="border border-gray-300 p-2"
+                      >
+                        {isLeaf ? (
+                          <>
+                            {evalItem.alternativeValues &&
+                            evalItem.alternativeValues[node.id] !== undefined
+                              ? evalItem.alternativeValues[node.id]
+                              : "-"}
+                            <SatisfactionBar
+                              percentage={calculateSatisfaction(
+                                node.id.toString(),
+                                evalItem.alternativeValues
+                                  ? evalItem.alternativeValues[node.id]
+                                  : "-"
+                              )}
+                            />
+                          </>
+                        ) : (
+                          "-"
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

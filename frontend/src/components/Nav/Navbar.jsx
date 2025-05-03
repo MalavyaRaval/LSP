@@ -1,13 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
+import axios from "axios";
 
 const Navbar = () => {
   const [burger_class, setBurgerClass] = useState("burger-bar unclicked");
   const [menu_class, setMenuClass] = useState("menu hidden");
   const [isMenuClicked, setIsMenuClicked] = useState(false);
   const [currentPage, setCurrentPage] = useState("Home");
+  const [projectDisplayName, setProjectDisplayName] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
+  const { projectname } = useParams();
   const menuRef = useRef(null);
   const burgerRef = useRef(null);
 
@@ -59,6 +62,24 @@ const Navbar = () => {
     };
   }, [isMenuClicked]);
 
+  useEffect(() => {
+    // If on a project page, fetch the project display name
+    if (location.pathname.includes("/project") && projectname) {
+      axios
+        .get(`http://localhost:8000/api/projects/${projectname}`)
+        .then((res) => {
+          if (res.data && res.data.name) {
+            setProjectDisplayName(res.data.name);
+          } else {
+            setProjectDisplayName(projectname);
+          }
+        })
+        .catch(() => setProjectDisplayName(projectname));
+    } else {
+      setProjectDisplayName("");
+    }
+  }, [location, projectname]);
+
   const updateMenu = () => {
     if (!isMenuClicked) {
       setBurgerClass("burger-bar clicked");
@@ -77,11 +98,11 @@ const Navbar = () => {
 
   return (
     <div className="navbar-container relative">
-      <nav className="w-full h-20 bg-gradient-to-r from-indigo-600 via-blue-500 to-purple-500 flex items-center justify-between px-6 shadow-lg mb-4 relative">
+      <nav className="w-full h-20 bg-gradient-to-r from-indigo-600 via-blue-500 to-purple-500 grid grid-cols-3 items-center px-6 shadow-lg mb-2">
         {/* Left section with burger menu and LSPrec */}
-        <div className="flex items-center h-20">
+        <div className="flex items-center">
           <div
-            className="burger-menu w-12 h-12 flex flex-col justify-center items-center cursor-pointer mr-4"
+            className="burger-menu w-12 h-20 flex flex-col justify-center items-center cursor-pointer mr-4"
             onClick={updateMenu}
             ref={burgerRef}
           >
@@ -95,19 +116,24 @@ const Navbar = () => {
               className={`${burger_class} w-6 h-1 bg-white transition-all duration-500 ease-in-out`}
             ></div>
           </div>
-          {/* LSPrec text on the left */}
-          <h1 className="text-white font-extrabold !text-4xl">LSPrec</h1>
+          <h1 className="text-white font-extrabold !text-5xl">LSPrec</h1>
         </div>
 
-        {/* Current Page Title in Center, moved up */}
-        <div className="absolute left-1/2 -translate-x-1/2 top-3">
-          <h2 className="text-white font-bold !text-4xl whitespace-nowrap">
+        {/* Current Page Title in Center */}
+        <div className="text-center">
+          <h2 className="text-white font-bold !text-5xl whitespace-nowrap !-mt-16">
             {currentPage}
           </h2>
         </div>
 
-        {/* Right empty space for balance */}
-        <div className="w-32"></div>
+        {/* Project Name on the Right if on project page */}
+        <div className="flex justify-end">
+          {projectDisplayName && (
+            <span className="text-white font-bold !text-5xl whitespace-nowrap !-mt-14">
+              {projectDisplayName}
+            </span>
+          )}
+        </div>
       </nav>
 
       {/* Mobile Menu - Slide In from the left */}

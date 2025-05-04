@@ -51,6 +51,10 @@ const DemaChat = () => {
   // New state to track processed parent IDs.
   const [processedParentIds, setProcessedParentIds] = useState(new Set());
   const [evaluationStarted, setEvaluationStarted] = useState(false);
+  const [history, setHistory] = useState([]); // Add history state to track previous states
+  const [createdNodeIds, setCreatedNodeIds] = useState({}); // Track node IDs created at each parent
+  const [nodeCreationTimestamps, setNodeCreationTimestamps] = useState({}); // Track when nodes were created
+  const [lastNavigationTimestamp, setLastNavigationTimestamp] = useState(0); // Track when we last visited a node
 
   const messagesEndRef = useRef(null);
 
@@ -143,7 +147,7 @@ const DemaChat = () => {
     setChildrenDetails(newDetails);
   };
 
-  // Update saveChildren to include nodeNumber for each child
+  // Update saveChildren to track created node IDs
   const saveChildren = async (childrenToSave) => {
     const effectiveParentId = parentId;
     if (!effectiveParentId) {
@@ -156,14 +160,18 @@ const DemaChat = () => {
       // Create a new node number based on parent's node number and child index (1-based)
       const nodeNumber = `${parentNodeNumber}${index + 1}`;
 
+      // Generate a unique ID for this child
+      const childId = `${effectiveParentId}-${Date.now()}-${index}`;
+
       return {
-        id: `${effectiveParentId}-${Date.now()}-${index}`,
+        id: childId,
         name: child.name.trim() || `Child ${index + 1}`,
         nodeNumber: nodeNumber, // Add the nodeNumber to the node
         decompose: child.decompose,
         attributes: { created: Date.now() },
         children: [],
         parent: effectiveParentId,
+        processed: false, // Add a flag to track processed state
       };
     });
 
@@ -190,17 +198,41 @@ const DemaChat = () => {
         finalizeNode();
         return [];
       }
-      const createdChildren = parentNode.children;
-      const nodesToDecompose = createdChildren.filter(
-        (child) =>
-          child.decompose === true ||
-          (child.attributes && child.attributes.decompose === true)
-      );
 
-      const storedQueue = JSON.parse(
+      // Extract the IDs of the newly created children
+      const newChildrenIds = childrenNodes.map((node) => node.id);
+
+      // Save these IDs for this parent
+      setCreatedNodeIds((prev) => ({
+        ...prev,
+        [effectiveParentId]: [
+          ...(prev[effectiveParentId] || []),
+          ...newChildrenIds,
+        ],
+      }));
+
+      // Mark the current parent as processed
+      const currentQueue = JSON.parse(
         sessionStorage.getItem("bfsQueue") || "[]"
       );
-      const updatedQueue = [...storedQueue, ...nodesToDecompose];
+      const updatedCurrentQueue = currentQueue.map((node) =>
+        node.id === effectiveParentId ? { ...node, processed: true } : node
+      );
+
+      const createdChildren = parentNode.children;
+      const nodesToDecompose = createdChildren
+        .filter(
+          (child) =>
+            child.decompose === true ||
+            (child.attributes && child.attributes.decompose === true)
+        )
+        .map((node) => ({
+          ...node,
+          processed: false,
+        }));
+
+      // Combine current queue with new nodes
+      const updatedQueue = [...updatedCurrentQueue, ...nodesToDecompose];
       sessionStorage.setItem("bfsQueue", JSON.stringify(updatedQueue));
       setBfsQueue(updatedQueue);
       return updatedQueue;
@@ -216,13 +248,27 @@ const DemaChat = () => {
       setProcessing(true);
       const updatedQueue = await saveChildren(nonEmptyChildren);
       if (updatedQueue && updatedQueue.length > 0) {
-        const [nextNode, ...remaining] = updatedQueue;
-        sessionStorage.setItem("bfsQueue", JSON.stringify(remaining));
-        setBfsQueue(remaining);
-        setParentId(nextNode.id);
-        setParentNodeNumber(nextNode.nodeNumber || "1"); // Update parent node number for next iteration
-        // Reset children details to five preset rows after processing.
-        setChildrenDetails(getInitialChildren());
+        // Find the FIRST unprocessed node to maintain BFS order
+        const nextNode = updatedQueue.find((node) => !node.processed);
+        if (nextNode) {
+          // Mark this node as currently being processed
+          const newQueue = updatedQueue.map((node) =>
+            node.id === nextNode.id
+              ? { ...node, currentlyProcessing: true }
+              : node
+          );
+
+          // Update the queue but don't remove the node - it stays in the queue until its children are added
+          sessionStorage.setItem("bfsQueue", JSON.stringify(newQueue));
+          setBfsQueue(newQueue);
+
+          // Navigate to this node
+          setParentId(nextNode.id);
+          setParentNodeNumber(nextNode.nodeNumber || "1");
+          setChildrenDetails(getInitialChildren());
+        } else {
+          finalizeNode();
+        }
       } else {
         finalizeNode();
       }
@@ -244,7 +290,176 @@ const DemaChat = () => {
       alert("Please select Yes or No for all filled rows.");
       return;
     }
+
+    // Save current state to history before proceeding
+    const currentBfsQueue = JSON.parse(
+      sessionStorage.getItem("bfsQueue") || "[]"
+    );
+
+    setHistory((prev) => [
+      ...prev,
+      {
+        parentId,
+        parentName,
+        parentNodeNumber,
+        bfsQueue: currentBfsQueue,
+      },
+    ]);
+
     handleProcessChildren(nonEmpty);
+  };
+
+  const handleBack = async () => {
+    if (history.length > 0) {
+      // Get the last history entry - this is where we're going back to
+      const previousState = history[history.length - 1];
+
+      // Remove the entry from history
+      setHistory((prev) => prev.slice(0, -1));
+
+      try {
+        // Get the IDs of nodes created under this parent - these are the ones we'll delete
+        const nodesToDelete = createdNodeIds[previousState.parentId] || [];
+
+        if (nodesToDelete.length > 0) {
+          // Delete specifically these nodes
+          await axios.delete(
+            `http://localhost:8000/api/projects/${projectId}/nodes`,
+            {
+              data: { nodeIds: nodesToDelete },
+            }
+          );
+          console.log(
+            `Successfully removed ${nodesToDelete.length} nodes created under ${previousState.parentId}`
+          );
+
+          // Remove these IDs from our tracking state
+          setCreatedNodeIds((prev) => {
+            const newState = { ...prev };
+            delete newState[previousState.parentId];
+            return newState;
+          });
+        }
+
+        // Restore the parent state
+        setParentId(previousState.parentId);
+        setParentName(previousState.parentName);
+        setParentNodeNumber(previousState.parentNodeNumber);
+
+        // Reset the children details
+        setChildrenDetails(getInitialChildren());
+
+        // CRITICAL CHANGE: Restore the BFS queue from the history instead of clearing it
+        // This ensures we preserve the siblings that need processing
+        if (previousState.bfsQueue) {
+          sessionStorage.setItem(
+            "bfsQueue",
+            JSON.stringify(previousState.bfsQueue)
+          );
+          setBfsQueue(previousState.bfsQueue);
+        }
+
+        // Reset processing states
+        setProcessingLeaves(false);
+        setProcessingParents(false);
+        setEvaluationStarted(false);
+
+        // Refresh the project tree to reflect changes
+        window.dispatchEvent(new Event("refreshProjectTree"));
+      } catch (err) {
+        console.error("Error during back operation:", err);
+        // Fallback - at minimum restore the parent state
+        setParentId(previousState.parentId);
+        setParentName(previousState.parentName);
+        setParentNodeNumber(previousState.parentNodeNumber);
+        setChildrenDetails(getInitialChildren());
+
+        // Even in error case, try to restore queue
+        if (previousState.bfsQueue) {
+          sessionStorage.setItem(
+            "bfsQueue",
+            JSON.stringify(previousState.bfsQueue)
+          );
+          setBfsQueue(previousState.bfsQueue);
+        }
+      }
+    } else {
+      // If no history, go back to the root
+      try {
+        const res = await axios.get(
+          `http://localhost:8000/api/projects/${projectId}`
+        );
+        if (res.data && res.data.id) {
+          const rootId = res.data.id.toString();
+
+          // Keep track of existing nodes to scan for proper BFS ordering
+          let existingTree = res.data;
+
+          // Set to root node
+          setParentId(rootId);
+          setParentNodeNumber(res.data.nodeNumber || "1");
+          setParentName(res.data.name || "Root");
+          setChildrenDetails(getInitialChildren());
+
+          // Get all direct children of the root that should be processed
+          let bfsQueue = [];
+          if (existingTree.children && existingTree.children.length > 0) {
+            bfsQueue = existingTree.children
+              .filter(
+                (child) =>
+                  child.decompose === true ||
+                  (child.attributes && child.attributes.decompose === true)
+              )
+              .map((node) => ({
+                ...node,
+                processed: false,
+              }));
+          }
+
+          // Update the queue with these nodes
+          sessionStorage.setItem("bfsQueue", JSON.stringify(bfsQueue));
+          setBfsQueue(bfsQueue);
+
+          // Reset all states
+          setProcessingLeaves(false);
+          setProcessingParents(false);
+          setEvaluationStarted(false);
+          setCreatedNodeIds({});
+
+          // Refresh the project tree to reflect changes
+          window.dispatchEvent(new Event("refreshProjectTree"));
+        }
+      } catch (err) {
+        console.error("Failed to fetch project root:", err);
+      }
+    }
+  };
+
+  // Helper function to get all descendant IDs of a node (for removing from queue)
+  const getAllDescendantIds = (node) => {
+    if (!node) return [];
+    if (!node.children || node.children.length === 0) return [];
+
+    let descendants = [];
+
+    const collectDescendants = (currentNode) => {
+      if (!currentNode) return;
+      if (currentNode.id) descendants.push(currentNode.id.toString());
+
+      if (currentNode.children && currentNode.children.length > 0) {
+        currentNode.children.forEach((child) => {
+          if (child.id) descendants.push(child.id.toString());
+          collectDescendants(child);
+        });
+      }
+    };
+
+    node.children.forEach((child) => {
+      if (child.id) descendants.push(child.id.toString());
+      collectDescendants(child);
+    });
+
+    return descendants;
   };
 
   const finalizeNode = async () => {
@@ -466,7 +681,13 @@ const DemaChat = () => {
             </tbody>
           </table>
         </div>
-        <div className="flex justify-end items-center mt-4">
+        <div className="flex justify-end items-center mt-4 space-x-4">
+          <button
+            onClick={handleBack}
+            className="text-lg font-extrabold bg-gradient-to-r from-gray-500 to-gray-700 text-white px-6 py-2 rounded-lg hover:from-gray-600 hover:to-gray-800 transition-all duration-300 shadow-lg transform hover:scale-105 disabled:opacity-70 disabled:cursor-not-allowed min-w-[200px] flex items-center justify-center"
+          >
+            <span style={{ fontSize: "2rem" }}>Back</span>
+          </button>
           <button
             onClick={handleNextStep}
             className="text-lg font-extrabold bg-gradient-to-r from-green-500 to-green-700 text-white px-6 py-2 rounded-lg hover:from-green-600 hover:to-green-800 transition-all duration-300 shadow-lg transform hover:scale-105 disabled:opacity-70 disabled:cursor-not-allowed min-w-[200px] flex items-center justify-center"

@@ -247,6 +247,76 @@ router.delete("/node/:nodeId", async (req, res) => {
   }
 });
 
+// DELETE all children of a node
+router.delete("/:projectId/nodes/:nodeId/children", async (req, res) => {
+  try {
+    const project = await Project.findOne({ projectId: req.params.projectId });
+    if (!project) return res.status(404).json({ message: "Project not found" });
+
+    // Get timestamp parameter - only remove nodes created after this time
+    const timestamp = req.query.timestamp ? parseInt(req.query.timestamp) : 0;
+    const targetNodeId = req.params.nodeId;
+
+    function removeAllChildren(node, nodeId) {
+      if (node.id.toString() === nodeId.toString()) {
+        // Found the target node
+        if (timestamp > 0) {
+          // If timestamp provided, only remove children created after the timestamp
+          // Keep track of how many children were removed
+          const originalChildrenCount = node.children.length;
+
+          // Filter children based on their creation timestamp
+          node.children = node.children.filter((child) => {
+            // Get creation time from attributes
+            const childCreatedAt = child.attributes?.created
+              ? new Date(child.attributes.created).getTime()
+              : Infinity;
+
+            // Keep child if it was created before or at the specified timestamp
+            return childCreatedAt <= timestamp;
+          });
+
+          return originalChildrenCount !== node.children.length; // Return true if any children were removed
+        } else {
+          // No timestamp provided, remove all children (original behavior)
+          const hadChildren = node.children.length > 0;
+          node.children = [];
+          return hadChildren;
+        }
+      }
+
+      if (node.children && node.children.length > 0) {
+        for (let i = 0; i < node.children.length; i++) {
+          if (removeAllChildren(node.children[i], nodeId)) {
+            return true;
+          }
+        }
+      }
+
+      return false;
+    }
+
+    const nodeModified = removeAllChildren(project.treeData, targetNodeId);
+
+    if (!nodeModified) {
+      return res
+        .status(404)
+        .json({ message: "Node not found or no children were removed" });
+    }
+
+    project.markModified("treeData");
+    await project.save();
+
+    res.json({
+      message: "Children of the node have been removed successfully",
+      treeData: project.treeData,
+    });
+  } catch (err) {
+    console.error("Error removing children:", err);
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // DELETE a project and all its related data.
 router.delete("/:projectId", authenticationToken, async (req, res) => {
   try {
@@ -317,6 +387,63 @@ router.post("/event", authenticationToken, async (req, res) => {
     await project.save();
     res.json({ event: project.eventInfo, projectId: project.projectId });
   } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// DELETE specific nodes by their IDs
+router.delete("/:projectId/nodes", async (req, res) => {
+  try {
+    const project = await Project.findOne({ projectId: req.params.projectId });
+    if (!project) return res.status(404).json({ message: "Project not found" });
+
+    // Get the list of node IDs to remove
+    const { nodeIds } = req.body;
+    if (!nodeIds || !Array.isArray(nodeIds) || nodeIds.length === 0) {
+      return res.status(400).json({ message: "Node IDs array is required" });
+    }
+
+    // Convert all IDs to strings for consistency in comparison
+    const idsToRemove = nodeIds.map((id) => id.toString());
+
+    // Function to recursively remove nodes with matching IDs
+    function removeSpecificNodes(node) {
+      if (!node) return null;
+
+      // If this is a node to remove, return null (delete it)
+      if (idsToRemove.includes(node.id?.toString())) {
+        return null;
+      }
+
+      // Otherwise, process its children
+      if (node.children && node.children.length > 0) {
+        // Filter out children that should be removed
+        const newChildren = [];
+        for (const child of node.children) {
+          const processedChild = removeSpecificNodes(child);
+          if (processedChild) {
+            newChildren.push(processedChild);
+          }
+        }
+        node.children = newChildren;
+      }
+
+      return node;
+    }
+
+    // Process the tree, removing specified nodes
+    project.treeData = removeSpecificNodes(project.treeData);
+
+    // Save the updated tree
+    project.markModified("treeData");
+    await project.save();
+
+    res.json({
+      message: "Specified nodes have been removed successfully",
+      treeData: project.treeData,
+    });
+  } catch (err) {
+    console.error("Error removing specific nodes:", err);
     res.status(500).json({ message: err.message });
   }
 });

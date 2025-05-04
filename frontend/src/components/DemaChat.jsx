@@ -681,7 +681,7 @@ const DemaChat = () => {
             </tbody>
           </table>
         </div>
-        <div className="flex justify-end items-center mt-4 space-x-4">
+        <div className="flex justify-between items-center mt-4 space-x-4">
           <button
             onClick={handleBack}
             className="text-lg font-extrabold bg-gradient-to-r from-gray-500 to-gray-700 text-white px-6 py-2 rounded-lg hover:from-gray-600 hover:to-gray-800 transition-all duration-300 shadow-lg transform hover:scale-105 disabled:opacity-70 disabled:cursor-not-allowed min-w-[200px] flex items-center justify-center"

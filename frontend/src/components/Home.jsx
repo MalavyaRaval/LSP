@@ -165,12 +165,12 @@ const Home = () => {
       {/* Fixed Create Project Button */}
       <button
         type="button"
-        className="fixed top-22 right-4 w-14 h-14 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-full shadow-lg hover:shadow-xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 transform hover:scale-110 focus:outline-none z-50 flex items-center justify-center"
+        className="fixed top-22 left-4 w-auto px-4 h-14 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg shadow-lg hover:shadow-xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 transform hover:scale-110 focus:outline-none z-10 flex items-center justify-center"
         data-bs-toggle="modal"
         data-bs-target="#createEventModal"
         aria-label="Create New Project"
       >
-        <span className="text-3xl font-bold">+</span>
+        <span className="text-lg font-bold">Create New Project</span>
       </button>
       <div className="flex-1 container mx-auto px-4 py-8">
         <div

@@ -8,8 +8,8 @@ const Footer = () => {
       <footer className="w-full h-24 bg-gradient-to-r from-indigo-600 via-blue-500 to-purple-500 flex flex-col items-center justify-center px-6 shadow-lg text-white">
         <p className="text-lg md:text-xl text-center mb-3">
           {" "}
-          &copy; {new Date().getFullYear()} Malavya Raval | mraval@sfsu.edu |
-          LSPrec Project
+          &copy; {new Date().getFullYear()} Malavya Raval & Jozo Dujmovic |
+          mraval@sfsu.edu | LSPrec Project
         </p>
         <div className="flex space-x-6 justify-center">
           {" "}

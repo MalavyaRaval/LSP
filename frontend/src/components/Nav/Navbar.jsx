@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 
 const Navbar = () => {
   const [burger_class, setBurgerClass] = useState("burger-bar unclicked");
@@ -63,10 +63,9 @@ const Navbar = () => {
   }, [isMenuClicked]);
 
   useEffect(() => {
-    // If on a project page, fetch the project display name
-    if (location.pathname.includes("/project") && projectname) {
-      axios
-        .get(`http://localhost:8000/api/projects/${projectname}`)
+    if (projectname) {
+      axiosInstance
+        .get(`/api/projects/${projectname}`)
         .then((res) => {
           if (res.data && res.data.name) {
             setProjectDisplayName(res.data.name);
@@ -74,11 +73,12 @@ const Navbar = () => {
             setProjectDisplayName(projectname);
           }
         })
-        .catch(() => setProjectDisplayName(projectname));
-    } else {
-      setProjectDisplayName("");
+        .catch((err) => {
+          console.error("Error loading project name:", err);
+          setProjectDisplayName(projectname);
+        });
     }
-  }, [location, projectname]);
+  }, [projectname]);
 
   const updateMenu = () => {
     if (!isMenuClicked) {

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 
 const Query6 = ({ onSave, nodeId, projectId, nodeName }) => {
   const [values, setValues] = useState({
@@ -57,7 +57,7 @@ const Query6 = ({ onSave, nodeId, projectId, nodeName }) => {
         values: mappedValues, // Send the mapped A,B,C,D values
         projectId,
       };
-      await axios.post("http://localhost:8000/api/query-results", payload);
+      await axiosInstance.post("/api/query-results", payload);
       onSave();
     } catch (err) {
       console.error("Error saving Query6", err);

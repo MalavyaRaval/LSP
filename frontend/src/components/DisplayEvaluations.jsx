@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import axiosInstance from "./utils/axiosInstance";
 import { useParams } from "react-router-dom";
 import {
   scoreIncreasing,
@@ -76,8 +76,8 @@ const DisplayEvaluations = () => {
   useEffect(() => {
     const fetchEvaluations = async () => {
       try {
-        const res = await axios.get(
-          `http://localhost:8000/api/evaluations?project=${projectname}`
+        const res = await axiosInstance.get(
+          `/api/evaluations?project=${projectname}`
         );
         setEvaluations(res.data);
       } catch (err) {
@@ -92,9 +92,7 @@ const DisplayEvaluations = () => {
   useEffect(() => {
     const fetchProjectTree = async () => {
       try {
-        const res = await axios.get(
-          `http://localhost:8000/api/projects/${projectname}`
-        );
+        const res = await axiosInstance.get(`/api/projects/${projectname}`);
         const treeData = res.data;
         setProjectTree(treeData);
 
@@ -137,8 +135,8 @@ const DisplayEvaluations = () => {
   useEffect(() => {
     const fetchQueryResultsMapping = async () => {
       try {
-        const res = await axios.get(
-          `http://localhost:8000/api/queryResults?project=${projectname}`
+        const res = await axiosInstance.get(
+          `/api/queryResults?project=${projectname}`
         );
         const mapping = {};
         const queryDetailsMap = {};

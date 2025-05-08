@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "./utils/axiosInstance";
 
 const TreeNode = ({
   node,
@@ -148,9 +148,7 @@ const ProjectTree = ({ projectId, username, projectname }) => {
   const loadProject = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(
-        `http://localhost:8000/api/projects/${projectId}`
-      );
+      const response = await axiosInstance.get(`/api/projects/${projectId}`);
       setTree(response.data);
     } catch (error) {
       console.error("Error loading project:", error);
@@ -174,10 +172,7 @@ const ProjectTree = ({ projectId, username, projectname }) => {
 
   const saveProject = async (updatedTree) => {
     try {
-      await axios.put(
-        `http://localhost:8000/api/projects/${projectId}`,
-        updatedTree
-      );
+      await axiosInstance.put(`/api/projects/${projectId}`, updatedTree);
     } catch (error) {
       console.error("Error saving project:", error);
       alert("Failed to save changes");
@@ -220,8 +215,8 @@ const ProjectTree = ({ projectId, username, projectname }) => {
     setTree(updatedTree);
     await saveProject(updatedTree);
     // Also call the backend to delete query results for this node:
-    await axios.delete(
-      `http://localhost:8000/api/projects/node/${nodeId}?projectId=${projectId}`
+    await axiosInstance.delete(
+      `/api/projects/node/${nodeId}?projectId=${projectId}`
     );
   };
 

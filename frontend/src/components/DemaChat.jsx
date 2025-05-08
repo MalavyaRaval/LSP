@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "./utils/axiosInstance";
 import LeafProcessing from "./LeafProcessing.jsx";
 import ParentProcessing from "./ParentProcessing.jsx";
 import ProjectEvaluation from "./ProjectEvaluation.jsx";
@@ -92,16 +92,12 @@ const DemaChat = () => {
   useEffect(() => {
     const fetchRoot = async () => {
       try {
-        if (!parentId) {
-          const res = await axios.get(
-            `http://localhost:8000/api/projects/${projectId}`
-          );
-          if (res.data && res.data.id) {
-            setParentId(res.data.id.toString());
-            setParentNodeNumber(res.data.nodeNumber || "1"); // Get root node number
-          } else {
-            console.warn("No root node found; check backend logic.");
-          }
+        const res = await axiosInstance.get(`/api/projects/${projectId}`);
+        if (res.data && res.data.id) {
+          setParentId(res.data.id.toString());
+          setParentNodeNumber(res.data.nodeNumber || "1"); // Get root node number
+        } else {
+          console.warn("No root node found; check backend logic.");
         }
       } catch (err) {
         console.error("Failed to fetch project root:", err);
@@ -116,9 +112,7 @@ const DemaChat = () => {
     const fetchParentName = async () => {
       if (parentId) {
         try {
-          const res = await axios.get(
-            `http://localhost:8000/api/projects/${projectId}`
-          );
+          const res = await axiosInstance.get(`/api/projects/${projectId}`);
           if (res.data) {
             const treeData = res.data;
             const node = findNodeById(treeData, parentId);
@@ -176,17 +170,14 @@ const DemaChat = () => {
     });
 
     try {
-      const res = await axios.post(
-        `http://localhost:8000/api/projects/${projectId}/nodes`,
-        {
-          parentId: effectiveParentId,
-          children: childrenNodes,
-          metadata: {
-            decisionProcess: "LSPrec",
-            objectName: "My Object",
-          },
-        }
-      );
+      const res = await axiosInstance.post(`/api/projects/${projectId}/nodes`, {
+        parentId: effectiveParentId,
+        children: childrenNodes,
+        metadata: {
+          decisionProcess: "LSPrec",
+          objectName: "My Object",
+        },
+      });
       const treeData = res.data;
       const parentNode = findNodeById(treeData, effectiveParentId);
       if (
@@ -323,12 +314,9 @@ const DemaChat = () => {
 
         if (nodesToDelete.length > 0) {
           // Delete specifically these nodes
-          await axios.delete(
-            `http://localhost:8000/api/projects/${projectId}/nodes`,
-            {
-              data: { nodeIds: nodesToDelete },
-            }
-          );
+          await axiosInstance.delete(`/api/projects/${projectId}/nodes`, {
+            data: { nodeIds: nodesToDelete },
+          });
           console.log(
             `Successfully removed ${nodesToDelete.length} nodes created under ${previousState.parentId}`
           );
@@ -386,9 +374,7 @@ const DemaChat = () => {
     } else {
       // If no history, go back to the root
       try {
-        const res = await axios.get(
-          `http://localhost:8000/api/projects/${projectId}`
-        );
+        const res = await axiosInstance.get(`/api/projects/${projectId}`);
         if (res.data && res.data.id) {
           const rootId = res.data.id.toString();
 
@@ -469,9 +455,7 @@ const DemaChat = () => {
     // Reset children details to five preset rows.
     setChildrenDetails(getInitialChildren());
     try {
-      const res = await axios.get(
-        `http://localhost:8000/api/projects/${projectId}`
-      );
+      const res = await axiosInstance.get(`/api/projects/${projectId}`);
       const treeData = res.data;
       const leaves = getLeafNodes(treeData);
       console.log("Leaf nodes found:", leaves);
@@ -494,9 +478,7 @@ const DemaChat = () => {
   // Parent processing functions remain unchanged...
   const startParentProcessing = async () => {
     try {
-      const res = await axios.get(
-        `http://localhost:8000/api/projects/${projectId}`
-      );
+      const res = await axiosInstance.get(`/api/projects/${projectId}`);
       const treeData = res.data;
       let initialParentIds = new Set();
       leafNodes.forEach((leaf) => {
@@ -530,9 +512,7 @@ const DemaChat = () => {
 
   const processNextParentLevel = async () => {
     try {
-      const res = await axios.get(
-        `http://localhost:8000/api/projects/${projectId}`
-      );
+      const res = await axiosInstance.get(`/api/projects/${projectId}`);
       const treeData = res.data;
       let nextLevelParentIds = new Set();
       parentNodes.forEach((node) => {

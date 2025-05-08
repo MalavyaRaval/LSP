@@ -1,7 +1,7 @@
 // src/components/Validation.jsx
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "./utils/axiosInstance";
 
 // Helper function to flatten the tree into an array (excluding the root)
 const flattenTree = (node) => {
@@ -35,9 +35,7 @@ const Validation = () => {
   useEffect(() => {
     const fetchTree = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:8000/api/projects/${projectId}`
-        );
+        const response = await axiosInstance.get(`/api/projects/${projectId}`);
         setTreeData(response.data);
         const flattened = flattenTree(response.data);
         setFlatNodes(flattened);

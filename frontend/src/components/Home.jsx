@@ -162,7 +162,6 @@ const Home = () => {
   return (
     <div className="flex flex-col min-h-screen bg-gray-200">
       <Navbar />
-      {/* Fixed Create Project Button */}
       <button
         type="button"
         className="fixed top-22 left-4 w-auto px-4 h-14 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg shadow-lg hover:shadow-xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 transform hover:scale-110 focus:outline-none z-10 flex items-center justify-center"

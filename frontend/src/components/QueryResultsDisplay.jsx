@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axiosInstance from "./utils/axiosInstance";
 import { useParams } from "react-router-dom";
 import Navbar from "./Nav/Navbar";
 import Footer from "./Footer";
@@ -13,10 +13,8 @@ const QueryResultsDisplay = () => {
   const fetchResults = async () => {
     try {
       const [resultsRes, treeRes] = await Promise.all([
-        axios.get(
-          `http://localhost:8000/api/query-results?project=${projectname}`
-        ),
-        axios.get(`http://localhost:8000/api/projects/${projectname}`),
+        axiosInstance.get(`/api/query-results?project=${projectname}`),
+        axiosInstance.get(`/api/projects/${projectname}`),
       ]);
       setResults(resultsRes.data);
       setTreeData(treeRes.data);

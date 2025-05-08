@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import axiosInstance from "./utils/axiosInstance";
 import Navbar from "./Nav/Navbar";
 import Footer from "./Footer";
 import ProjectTree from "./ProjectTree";
 import DemaChat from "./DemaChat.jsx";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
-import axios from "axios";
 import { Resizable } from "re-resizable";
 
 const ProjectPage = () => {
@@ -29,8 +29,8 @@ const ProjectPage = () => {
 
   useEffect(() => {
     if (projectSlug) {
-      axios
-        .get(`http://localhost:8000/api/projects/${projectSlug}`)
+      axiosInstance
+        .get(`/api/projects/${projectSlug}`)
         .then((res) => {
           if (res.data && res.data.name) {
             setProjectDisplayName(res.data.name);

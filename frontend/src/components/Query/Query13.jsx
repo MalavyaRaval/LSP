@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 
 const Query13 = ({ onSave, nodeId, projectId, nodeName }) => {
   const [selectedOption, setSelectedOption] = useState("");
@@ -30,7 +30,7 @@ const Query13 = ({ onSave, nodeId, projectId, nodeName }) => {
         (option) => option.label === selectedOption
       )?.value;
 
-      await axios.post("http://localhost:8000/api/query-results", {
+      await axiosInstance.post("/api/query-results", {
         nodeId,
         nodeName,
         queryType: "q13",

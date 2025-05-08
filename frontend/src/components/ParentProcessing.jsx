@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import axiosInstance from "./utils/axiosInstance";
 import ConnectionProcessing from "./ConnectionProcessing.jsx";
 
 const ParentProcessing = ({
@@ -49,8 +49,8 @@ const ParentProcessing = ({
   const handleSave = async () => {
     try {
       const imp = parseInt(values.importance, 10);
-      await axios.put(
-        `http://localhost:8000/api/projects/${projectId}/nodes/${currentParent.id}`,
+      await axiosInstance.put(
+        `/api/projects/${projectId}/nodes/${currentParent.id}`,
         { attributes: { importance: imp, connection: values.connection } }
       );
       onNextParent();

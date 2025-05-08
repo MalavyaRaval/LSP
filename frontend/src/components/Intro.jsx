@@ -55,99 +55,46 @@ const Intro = () => {
         maintaining its accuracy.
       </p>
     ),
-    why: (
-      <ul className="space-y-4 text-lg text-gray-700">
-        <li>
-          <strong className="text-blue-600">Simplified Decision Making:</strong>{" "}
-          LSPrec simplifies complex decision-making by reducing the number of
-          criteria you need to consider.
-        </li>
-        <li>
-          <strong className="text-blue-600">
-            No Technical Knowledge Required:
-          </strong>{" "}
-          Users don't need to understand the underlying logic, just using the
-          users preferences, and LSPrec uses the graded logic to get the results
-          for the user.
-        </li>
-        <li>
-          <strong className="text-blue-600">
-            Personalized Recommendations:
-          </strong>{" "}
-          This tool can be used for decision-making ranging from choosing a
-          hotel, house, or car. LSPrec helps to get the best choice based on
-          users' criteria.
-        </li>
-      </ul>
-    ),
-    features: (
-      <ul className="space-y-4 text-lg text-gray-700">
-        <li>
-          <strong className="text-blue-600">User-Friendly Interface:</strong>{" "}
-          Easily enter your preferences using intuitive values.
-        </li>
-        <li>
-          <strong className="text-blue-600">Accurate Results:</strong> LSPrec
-          uses the same proven methodology as the full LSP method to ensure
-          high-quality recommendations.
-        </li>
-      </ul>
-    ),
   };
 
   return (
     <>
       <Navbar />
-      <div className="bg-gray-50 text-gray-800 min-h-screen flex flex-col items-center justify-center">
+      <div className="bg-gradient-to-b from-gray-50 to-blue-50 text-gray-800 min-h-screen flex flex-col items-center justify-center">
         <div className="container mx-auto px-6 text-center max-w-4xl">
-          <div className="mb-12">
-            <h1 className="text-5xl font-bold text-blue-600 mb-6">
-              Welcome to LSPrec
-            </h1>
-            <p className="text-xl text-gray-600 mb-10">
+          <div className="mb-12 backdrop-blur-sm bg-white/30 p-8 rounded-2xl shadow-xl">
+            <h1 className="text-6xl font-bold">Welcome to LSPrec</h1>
+            <p className="text-4xl text-gray-800 mb-12">
               Decision making and recommendation Aid for everybody.
             </p>
 
-            {/* Information buttons */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            {/* Information button */}
+            <div className="mb-12">
               <button
-                className="bg-white hover:bg-blue-50 transition-colors text-blue-600 font-semibold py-4 px-6 rounded-lg shadow-md hover:shadow-lg"
+                className="bg-white hover:bg-blue-50 transition-all duration-300 text-blue-600 font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-1 w-full md:w-auto"
                 onClick={() =>
                   handleShowInfo(aboutContent.what, "What is LSPrec?")
                 }
+                style={{ fontSize: "2rem" }}
               >
                 What is LSPrec?
-              </button>
-
-              <button
-                className="bg-white hover:bg-blue-50 transition-colors text-blue-600 font-semibold py-4 px-6 rounded-lg shadow-md hover:shadow-lg"
-                onClick={() => handleShowInfo(aboutContent.why, "Why LSPrec?")}
-              >
-                Why LSPrec?
-              </button>
-
-              <button
-                className="bg-white hover:bg-blue-50 transition-colors text-blue-600 font-semibold py-4 px-6 rounded-lg shadow-md hover:shadow-lg"
-                onClick={() =>
-                  handleShowInfo(aboutContent.features, "Features of LSPrec")
-                }
-              >
-                Features
               </button>
             </div>
 
             {/* Action buttons */}
-            <div className="flex flex-col md:flex-row justify-center gap-6 mt-8">
+            <div className="flex flex-col md:flex-row justify-center gap-8 mt-8">
               <button
-                className="bg-blue-600 hover:bg-blue-700 transition-colors text-white text-xl font-bold py-4 px-12 rounded-lg shadow-lg hover:shadow-xl"
+                className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transition-all duration-300 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 w-full md:w-auto"
                 onClick={handleStartClick}
+                style={{ fontSize: "2rem" }}
               >
                 Start
               </button>
 
               <button
-                className="bg-green-600 hover:bg-green-700 transition-colors text-white text-xl font-bold py-4 px-12 rounded-lg shadow-lg hover:shadow-xl"
+                className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 transition-all duration-300 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 w-full md:w-auto"
                 onClick={handleRegisterClick}
+                style={{ fontSize: "2rem" }}
               >
                 Register
               </button>
@@ -157,14 +104,14 @@ const Intro = () => {
 
         {/* Modal for displaying information */}
         {showModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6 max-h-[80vh] overflow-y-auto">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-3xl font-semibold text-blue-600">
                   {modalTitle}
                 </h2>
                 <button
-                  className="text-gray-500 hover:text-gray-700 text-2xl"
+                  className="text-gray-500 hover:text-gray-700 text-2xl transition-colors"
                   onClick={handleCloseModal}
                 >
                   ×
@@ -173,7 +120,7 @@ const Intro = () => {
               <div className="mb-6">{modalContent}</div>
               <div className="flex justify-end">
                 <button
-                  className="bg-blue-600 text-white py-2 px-6 rounded hover:bg-blue-700"
+                  className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-2 px-6 rounded transition-all duration-300"
                   onClick={handleCloseModal}
                 >
                   Close

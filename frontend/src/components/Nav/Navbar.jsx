@@ -35,7 +35,7 @@ const Navbar = () => {
       } else if (path.includes("/Queryresults")) {
         setCurrentPage("Query Results");
       } else {
-        setCurrentPage("Project Page");
+        setCurrentPage("Queries");
       }
     } else if (path === "/") {
       setCurrentPage("Introduction");

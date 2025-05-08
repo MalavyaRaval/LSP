@@ -20,7 +20,12 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-app.use(cors({ origin: "*" }));
+app.use(
+  cors({
+    origin: "https://lsp-malavyaravals-projects.vercel.app",
+    credentials: true,
+  })
+);
 app.use("/api/query-results", queryResultsRouter);
 app.use("/api/evaluations", evaluationsRouter);
 

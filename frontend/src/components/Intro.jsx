@@ -69,35 +69,14 @@ const Intro = () => {
               Decision making and recommendation aid for everybody.
             </p>
 
-            {/* Information button */}
-            <div className="mb-12">
+            {/* Center Start button */}
+            <div className="flex justify-center mt-8">
               <button
-                className="bg-white hover:bg-blue-50 transition-all duration-300 text-blue-600 font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-1 w-full md:w-auto"
-                onClick={() =>
-                  handleShowInfo(aboutContent.what, "What is LSPrec?")
-                }
-                style={{ fontSize: "2rem" }}
-              >
-                What is LSPrec?
-              </button>
-            </div>
-
-            {/* Action buttons */}
-            <div className="flex flex-col md:flex-row justify-center gap-8 mt-8">
-              <button
-                className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transition-all duration-300 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 w-full md:w-auto"
+                className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transition-all duration-300 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                 onClick={handleStartClick}
                 style={{ fontSize: "2rem" }}
               >
                 Start
-              </button>
-
-              <button
-                className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 transition-all duration-300 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 w-full md:w-auto"
-                onClick={handleRegisterClick}
-                style={{ fontSize: "2rem" }}
-              >
-                Register
               </button>
             </div>
           </div>

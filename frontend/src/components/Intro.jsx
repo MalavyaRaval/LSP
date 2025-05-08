@@ -48,11 +48,12 @@ const Intro = () => {
   const aboutContent = {
     what: (
       <p className="text-lg text-gray-700 leading-relaxed">
-        LSPrec is built on the Logic Scoring of Preference (LSP) method, a
-        powerful technique used for making complex decisions based on multiple
-        criteria and graded logic. Unlike traditional systems, LSPrec is
-        designed for nonprofessional users, making it easy to use while still
-        maintaining its accuracy.
+        LSPrec is a decision-making tool that everybody can easily use without
+        any preparation. LSPrec is built on the Logic Scoring of Preference
+        (LSP) decision method, used by professionals for making complex
+        decisions based on multiple criteria and graded logic. Based in simple
+        queries, LSPrec is designed for nonprofessional users, making it easy to
+        use while still maintaining its accuracy.
       </p>
     ),
   };
@@ -65,7 +66,7 @@ const Intro = () => {
           <div className="mb-12 backdrop-blur-sm bg-white/30 p-8 rounded-2xl shadow-xl">
             <h1 className="text-6xl font-bold">Welcome to LSPrec</h1>
             <p className="text-4xl text-gray-800 mb-12">
-              Decision making and recommendation Aid for everybody.
+              Decision making and recommendation aid for everybody.
             </p>
 
             {/* Information button */}
@@ -110,12 +111,6 @@ const Intro = () => {
                 <h2 className="text-3xl font-semibold text-blue-600">
                   {modalTitle}
                 </h2>
-                <button
-                  className="text-gray-500 hover:text-gray-700 text-2xl transition-colors"
-                  onClick={handleCloseModal}
-                >
-                  ×
-                </button>
               </div>
               <div className="mb-6">{modalContent}</div>
               <div className="flex justify-end">

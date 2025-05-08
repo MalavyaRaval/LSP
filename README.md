@@ -1,6 +1,6 @@
 # LSP-REC
 
-git clone https://github.com/MalavyaRaval/LSP-REC.git
+git clone https://github.com/MalavyaRaval/LSP
 
 ## Backend Setup  
 cd backend  

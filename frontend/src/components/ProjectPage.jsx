@@ -68,19 +68,6 @@ const ProjectPage = () => {
       {/* Ultra-compact header with navigation buttons */}
       <header className="border-b border-gray-200 py-0.5 -mt-2">
         <div className="flex flex-wrap items-center justify-between px-3 gap-1">
-          <div className="flex items-center">
-            <h1 className="text-2xl font-semibold text-gray-800 flex items-center gap-6">
-              <span>
-                {projectDisplayName ||
-                  (projectname ? projectname : "LSPrec Project")}
-              </span>
-              <span className="h-6 border-l border-gray-300 mx-2"></span>
-              <span className="text-lg text-gray-600 font-normal">
-                User: <span className="font-medium">{evaluatorName}</span>
-              </span>
-            </h1>
-          </div>
-
           <div className="flex flex-wrap gap-1">
             <button
               className="px-3 py-1 border border-gray-300 text-gray-700 rounded bg-gray-200 hover:bg-gray-300 text-xl font-medium"

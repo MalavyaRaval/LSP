@@ -13,8 +13,6 @@ const User = require("./models/user.model");
 const queryResultsRouter = require("./routes/queryResults");
 const evaluationsRouter = require("./routes/evaluations");
 
-
-
 // Import your authentication utility
 const { authenticationToken } = require("./utilities");
 
@@ -29,18 +27,14 @@ app.use("/api/evaluations", evaluationsRouter);
 app.use("/api/queryResults", require("./routes/queryResults"));
 app.use("/api/evaluations", require("./routes/evaluations"));
 
-
 // Set up multer for file uploads
 
-
-
 // Example authentication middleware (adjust as needed)
-
 
 // Routes
 
 const projectsRouter = require("./routes/projects");
-app.use('/api/projects', projectsRouter);
+app.use("/api/projects", projectsRouter);
 
 app.get("/", (req, res) => {
   res.json({ data: "hello" });
@@ -50,11 +44,15 @@ app.get("/", (req, res) => {
 app.post("/create-account", async (req, res) => {
   const { fullName, email, password, address, city, state, zip } = req.body;
   if (!fullName || !email || !password || !address || !city || !state || !zip) {
-    return res.status(400).json({ error: true, message: "All fields are required" });
+    return res
+      .status(400)
+      .json({ error: true, message: "All fields are required" });
   }
   const isUser = await User.findOne({ email });
   if (isUser) {
-    return res.status(400).json({ error: true, message: "User already exists" });
+    return res
+      .status(400)
+      .json({ error: true, message: "User already exists" });
   }
   const user = new User({
     fullName,
@@ -63,15 +61,19 @@ app.post("/create-account", async (req, res) => {
     address,
     city,
     state,
-    zip
+    zip,
   });
   await user.save();
-  const accessToken = jwt.sign({ userId: user._id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "3000m" });
+  const accessToken = jwt.sign(
+    { userId: user._id },
+    process.env.ACCESS_TOKEN_SECRET,
+    { expiresIn: "3000m" }
+  );
   return res.json({
     error: false,
     user,
     accessToken,
-    message: "Registration Successful!"
+    message: "Registration Successful!",
   });
 });
 
@@ -80,10 +82,14 @@ app.post("/login", async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
   if (user && user.password === password) {
-    const accessToken = jwt.sign({ userId: user._id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "6000m" });
+    const accessToken = jwt.sign(
+      { userId: user._id },
+      process.env.ACCESS_TOKEN_SECRET,
+      { expiresIn: "6000m" }
+    );
     return res.json({
       accessToken,
-      fullName: user.fullName
+      fullName: user.fullName,
     });
   } else {
     return res.status(400).json({ message: "Invalid credentials" });
@@ -106,9 +112,9 @@ app.get("/get-user", authenticationToken, async (req, res) => {
         city: user.city,
         state: user.state,
         zip: user.zip,
-        createdOn: user.createdOn
+        createdOn: user.createdOn,
       },
-      message: ""
+      message: "",
     });
   } catch (error) {
     return res.sendStatus(500);
@@ -116,7 +122,6 @@ app.get("/get-user", authenticationToken, async (req, res) => {
 });
 
 // Add Event
-
 
 // Edit Account
 app.put("/edit-account", authenticationToken, async (req, res) => {
@@ -153,9 +158,7 @@ app.put("/edit-account", authenticationToken, async (req, res) => {
 
 // Get all Events
 
-
 // Delete Event
-
 
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {

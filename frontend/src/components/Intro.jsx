@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import symbol from "../images/symbol.jpg";
 import Navbar from "./Nav/Navbar";
 import Footer from "./Footer";
+import axiosInstance from "../utils/axiosInstance";
 
 const Intro = () => {
   const navigate = useNavigate();
@@ -20,8 +21,23 @@ const Intro = () => {
     setShowModal(false);
   };
 
-  const handleStartClick = () => {
-    navigate("/home");
+  const handleStartClick = async () => {
+    try {
+      const response = await axiosInstance.post("/login", {
+        email: "test@mymail.com",
+        password: "1",
+      });
+
+      if (response.data && response.data.accessToken) {
+        localStorage.setItem("token", response.data.accessToken);
+        if (response.data.fullName) {
+          localStorage.setItem("fullName", response.data.fullName);
+        }
+        navigate("/home");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+    }
   };
 
   const handleRegisterClick = () => {

@@ -133,27 +133,22 @@ const LeafProcessing = ({
               </button>
             </div>
           </div>
-
           {showHelpPopup && (
-            <div className="fixed inset-0 bg-gray-700 bg-opacity-40 flex justify-center items-center z-50">
-              <div className="bg-white rounded-lg p-6 shadow-xl w-full max-w-md mx-4">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-xl font-bold text-gray-800">
+            <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+              <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6 max-h-[80vh] overflow-y-auto">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-3xl font-semibold text-blue-600">
                     Help Information
-                  </h3>
-                  <button
-                    className="bg-gray-200 rounded-full w-8 h-8 flex items-center justify-center hover:bg-gray-300"
-                    onClick={() => setShowHelpPopup(null)}
-                  >
-                    ✕
-                  </button>
+                  </h2>
                 </div>
-                <p className="text-gray-700 text-lg">
-                  {helpContent[showHelpPopup]}
-                </p>
-                <div className="mt-6 flex justify-end">
+                <div className="mb-6">
+                  <p className="text-gray-800 text-lg">
+                    {helpContent[showHelpPopup]}
+                  </p>
+                </div>
+                <div className="flex justify-end">
                   <button
-                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                    className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-2 px-6 rounded transition-all duration-300"
                     onClick={() => setShowHelpPopup(null)}
                   >
                     Close

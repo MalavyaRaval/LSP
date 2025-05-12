@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import axiosInstance from "../utils/axiosInstance";
+import HelpModal from "../HelpModal";
 
 const Navbar = () => {
   const [burger_class, setBurgerClass] = useState("burger-bar unclicked");
@@ -8,6 +9,7 @@ const Navbar = () => {
   const [isMenuClicked, setIsMenuClicked] = useState(false);
   const [currentPage, setCurrentPage] = useState("Home");
   const [projectDisplayName, setProjectDisplayName] = useState("");
+  const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { projectname } = useParams();
@@ -35,12 +37,17 @@ const Navbar = () => {
       } else if (path.includes("/Queryresults")) {
         setCurrentPage("Query Results");
       } else {
-        setCurrentPage("Queries");
+        // When on queries page, we'll display the project name in the center
+        if (projectname) {
+          setCurrentPage(""); // Clear current page name so only project name shows
+        } else {
+          setCurrentPage("Queries");
+        }
       }
     } else if (path === "/") {
       setCurrentPage("Introduction");
     }
-  }, [location]);
+  }, [location, projectname]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -96,9 +103,13 @@ const Navbar = () => {
     navigate("/login");
   };
 
+  const toggleHelpModal = () => {
+    setIsHelpModalOpen(!isHelpModalOpen);
+  };
+
   return (
     <div className="navbar-container relative">
-      <nav className="w-full h-20 bg-gradient-to-r from-indigo-600 via-blue-500 to-purple-500 grid grid-cols-3 items-center px-6 shadow-lg mb-2">
+      <nav className="w-full h-20 bg-gradient-to-r from-indigo-600 via-blue-500 to-purple-500 grid grid-cols-3 items-center px-6 shadow-lg mb-2 relative z-20">
         {/* Left section with burger menu and LSPrec */}
         <div className="flex items-center">
           <div
@@ -119,20 +130,30 @@ const Navbar = () => {
           <h1 className="text-white font-extrabold !text-5xl">LSPrec</h1>
         </div>
 
-        {/* Current Page Title in Center */}
+        {/* Center section with Current Page Title or Project Name */}
         <div className="text-center">
-          <h2 className="text-white font-bold !text-5xl whitespace-nowrap !-mt-16">
-            {currentPage}
-          </h2>
+          {currentPage && (
+            <h2 className="text-white font-bold !text-5xl whitespace-nowrap !-mt-16">
+              {currentPage}
+            </h2>
+          )}
+          {projectDisplayName && !currentPage && (
+            <h2 className="text-white font-bold !text-5xl whitespace-nowrap !-mt-16">
+              {projectDisplayName}
+            </h2>
+          )}
         </div>
 
-        {/* Project Name on the Right if on project page */}
-        <div className="flex justify-end">
-          {projectDisplayName && (
-            <span className="text-white font-bold !text-5xl whitespace-nowrap !-mt-14">
-              {projectDisplayName}
-            </span>
-          )}
+        {/* Right section with Help button only */}
+        <div className="flex justify-end items-center relative">
+          <button
+            onClick={toggleHelpModal}
+            className="text-white font-semibold text-2xl bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded-lg shadow-md transition-all duration-300 !-mt-16 relative z-30 transform scale-110 origin-center"
+            aria-label="Help"
+            style={{ pointerEvents: "auto", fontSize: "1.5rem", lineHeight: 1 }}
+          >
+            Help
+          </button>
         </div>
       </nav>
 
@@ -152,47 +173,23 @@ const Navbar = () => {
           </li>
           <li>
             <a
-              href="/login"
-              className="block px-6 py-3 rounded-xl bg-gray-200 shadow hover:bg-blue-200 transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 !text-2xl font-semibold"
-            >
-              Login
-            </a>
-          </li>
-          <li>
-            <a
-              href="/signup"
-              className="block px-6 py-3 rounded-xl bg-gray-200 shadow hover:bg-blue-200 transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 !text-2xl font-semibold"
-            >
-              Sign Up
-            </a>
-          </li>
-          <li>
-            <a
               href="/aboutus"
               className="block px-6 py-3 rounded-xl bg-gray-200 shadow hover:bg-blue-200 transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 !text-2xl font-semibold"
             >
               About Us
             </a>
           </li>
-          <li>
-            <a
-              href="/myprofile"
-              className="block px-6 py-3 rounded-xl bg-gray-200 shadow hover:bg-blue-200 transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 !text-2xl font-semibold"
-            >
-              My Profile
-            </a>
-          </li>
-          <li>
-            <a
-              href="#"
-              onClick={handleSignOut}
-              className="block px-6 py-3 rounded-xl bg-gray-200 shadow hover:bg-blue-200 transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 !text-2xl font-semibold"
-            >
-              Sign Out
-            </a>
-          </li>
         </ul>
       </div>
+
+      {/* Help Modal */}
+      <HelpModal
+        isOpen={isHelpModalOpen}
+        onClose={() => setIsHelpModalOpen(false)}
+        currentPage={
+          currentPage || (projectDisplayName ? projectDisplayName : "General")
+        }
+      />
     </div>
   );
 };

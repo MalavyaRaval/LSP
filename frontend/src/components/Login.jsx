@@ -2,7 +2,6 @@ import axiosInstance from "./utils/axiosInstance";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "./Nav/Navbar";
-import Footer from "./Footer";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -82,7 +81,6 @@ const Login = () => {
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
-
             <div className="mb-6">
               <label
                 htmlFor="inputPassword"
@@ -99,7 +97,6 @@ const Login = () => {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
-
             <div className="flex justify-between items-center">
               <button
                 type="submit"
@@ -108,7 +105,6 @@ const Login = () => {
                 Login
               </button>
             </div>
-
             <p className="text-center text-sm text-gray-600 mt-4">
               Not registered yet?{" "}
               <Link
@@ -117,11 +113,10 @@ const Login = () => {
               >
                 Create an Account
               </Link>
-            </p>
+            </p>{" "}
           </form>
         </div>
       </div>
-      <Footer />
     </>
   );
 };

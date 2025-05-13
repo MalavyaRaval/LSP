@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "./Nav/Navbar";
-import Footer from "./Footer";
 import axiosInstance from "./utils/axiosInstance";
 
 const states = [
@@ -147,7 +146,6 @@ const SignUp = () => {
                 className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
               />
             </div>
-
             <div className="mb-4">
               <label
                 htmlFor="email"
@@ -165,7 +163,6 @@ const SignUp = () => {
                 className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
               />
             </div>
-
             <div className="mb-4">
               <label
                 htmlFor="password"
@@ -183,7 +180,6 @@ const SignUp = () => {
                 className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
               />
             </div>
-
             <div className="mb-4">
               <label
                 htmlFor="address"
@@ -201,7 +197,6 @@ const SignUp = () => {
                 className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
               />
             </div>
-
             <div className="flex space-x-4 mb-4">
               <div className="w-1/2">
                 <label
@@ -244,7 +239,6 @@ const SignUp = () => {
                 </select>
               </div>
             </div>
-
             <div className="mb-4">
               <label
                 htmlFor="zip"
@@ -262,7 +256,6 @@ const SignUp = () => {
                 className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
               />
             </div>
-
             <div className="mb-4">
               <button
                 type="submit"
@@ -271,7 +264,6 @@ const SignUp = () => {
                 Sign Up
               </button>
             </div>
-
             <p className="text-center text-sm text-gray-600 mt-4">
               Already have an account?{" "}
               <a
@@ -280,11 +272,10 @@ const SignUp = () => {
               >
                 Login
               </a>
-            </p>
+            </p>{" "}
           </form>
         </div>
       </div>
-      <Footer />
     </>
   );
 };

@@ -4,7 +4,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLinkedin, faGithub } from "@fortawesome/free-brands-svg-icons";
 import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import Navbar from "./Nav/Navbar";
-import Footer from "./Footer";
 
 const AboutUs = () => {
   return (
@@ -61,7 +60,6 @@ const AboutUs = () => {
           {/* You can add more information here, like projects, skills, etc. */}
         </div>
       </div>
-      <Footer />
     </div>
   );
 };

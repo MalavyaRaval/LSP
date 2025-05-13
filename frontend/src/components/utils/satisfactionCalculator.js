@@ -6,14 +6,50 @@ const DEFAULT_DOMAIN_MAX = 100;
 export function scoreIncreasing(
   value,
   minVal = DEFAULT_DOMAIN_MIN,
-  maxVal = DEFAULT_DOMAIN_MAX
+  maxVal = DEFAULT_DOMAIN_MAX,
+  specificPoints = []
 ) {
   value = Number(value);
   minVal = Number(minVal);
   maxVal = Number(maxVal);
+  
   if (isNaN(value)) return 0;
   if (value <= minVal) return 0;
   if (value >= maxVal) return 1;
+    // If there are specific points defined between min and max
+  if (specificPoints && specificPoints.length > 0) {
+    // Ensure points are in the right format (with value and satisfaction properties)
+    const validPoints = specificPoints.filter(pt => 
+      pt && typeof pt.value !== 'undefined' && typeof pt.satisfaction !== 'undefined'
+    );
+    
+    console.log('Using specific points in calculation:', validPoints);
+    
+    // Add boundary points to the array for interpolation
+    const allPoints = [
+      { value: minVal, satisfaction: 0 },
+      ...validPoints.filter(pt => pt.value > minVal && pt.value < maxVal),
+      { value: maxVal, satisfaction: 1 }
+    ];
+    
+    // Sort points by value (ascending)
+    allPoints.sort((a, b) => a.value - b.value);
+    
+    // Find the segment where our value falls
+    for (let i = 0; i < allPoints.length - 1; i++) {
+      const point1 = allPoints[i];
+      const point2 = allPoints[i + 1];
+      
+      if (value >= point1.value && value <= point2.value) {
+        // Linear interpolation between the two points
+        return point1.satisfaction + 
+          ((value - point1.value) / (point2.value - point1.value)) * 
+          (point2.satisfaction - point1.satisfaction);
+      }
+    }
+  }
+  
+  // Default linear interpolation between min and max
   return (value - minVal) / (maxVal - minVal);
 }
 
@@ -21,14 +57,51 @@ export function scoreIncreasing(
 export function scoreDecreasing(
   value,
   minVal = DEFAULT_DOMAIN_MIN,
-  maxVal = DEFAULT_DOMAIN_MAX
+  maxVal = DEFAULT_DOMAIN_MAX,
+  specificPoints = []
 ) {
   value = Number(value);
   minVal = Number(minVal);
   maxVal = Number(maxVal);
+  
   if (isNaN(value)) return 0;
   if (value <= minVal) return 1;
   if (value >= maxVal) return 0;
+  
+  // If there are specific points defined between min and max
+  if (specificPoints && specificPoints.length > 0) {
+    // Ensure points are in the right format (with value and satisfaction properties)
+    const validPoints = specificPoints.filter(pt => 
+      pt && typeof pt.value !== 'undefined' && typeof pt.satisfaction !== 'undefined'
+    );
+    
+    console.log('Using specific points in decreasing calculation:', validPoints);
+    
+    // Add boundary points to the array for interpolation
+    const allPoints = [
+      { value: minVal, satisfaction: 1 },
+      ...validPoints.filter(pt => pt.value > minVal && pt.value < maxVal),
+      { value: maxVal, satisfaction: 0 }
+    ];
+    
+    // Sort points by value (ascending)
+    allPoints.sort((a, b) => a.value - b.value);
+    
+    // Find the segment where our value falls
+    for (let i = 0; i < allPoints.length - 1; i++) {
+      const point1 = allPoints[i];
+      const point2 = allPoints[i + 1];
+      
+      if (value >= point1.value && value <= point2.value) {
+        // Linear interpolation between the two points
+        return point1.satisfaction + 
+          ((value - point1.value) / (point2.value - point1.value)) * 
+          (point2.satisfaction - point1.satisfaction);
+      }
+    }
+  }
+  
+  // Default linear interpolation between min and max
   return (maxVal - value) / (maxVal - minVal);
 }
 
@@ -65,31 +138,6 @@ export function scoreInRange(
   }
 
   if (value >= D) return 0;
-
-  return 0;
-}
-
-// (Q7) Scoring given list of values and range of points
-export function scoreBasedOnRange(value, range) {
-  range.sort((a, b) => a.value - b.value);
-
-  if (value <= range[0].value) return range[0].percentage;
-
-  if (value >= range[range.length - 1].value)
-    return range[range.length - 1].percentage;
-
-  for (let i = 0; i < range.length - 1; i++) {
-    const point1 = range[i];
-    const point2 = range[i + 1];
-
-    if (value >= point1.value && value <= point2.value) {
-      const percentage =
-        point1.percentage +
-        ((value - point1.value) / (point2.value - point1.value)) *
-          (point2.percentage - point1.percentage);
-      return percentage;
-    }
-  }
 
   return 0;
 }

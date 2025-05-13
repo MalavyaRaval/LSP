@@ -5,7 +5,6 @@ import {
   scoreIncreasing,
   scoreDecreasing,
   scoreInRange,
-  scoreBasedOnRange,
 } from "./utils/satisfactionCalculator";
 import Navbar from "./Nav/Navbar";
 
@@ -167,17 +166,24 @@ const DisplayEvaluations = () => {
 
     const values = queryInfo.values;
     if (!values) return "-";
-
     if (queryInfo.queryType === "q4") {
-      return `Prefer high values: ${values.from} to ${values.to}`;
+      const hasSpecificPoints =
+        values.specificPoints && values.specificPoints.length > 0;
+      return `Prefer high values: ${values.from} to ${values.to}${
+        hasSpecificPoints
+          ? ` (${values.specificPoints.length} custom points)`
+          : ""
+      }`;
     } else if (queryInfo.queryType === "q5") {
-      return `Prefer low values: ${values.from} to ${values.to}`;
+      const hasSpecificPoints =
+        values.specificPoints && values.specificPoints.length > 0;
+      return `Prefer low values: ${values.from} to ${values.to}${
+        hasSpecificPoints
+          ? ` (${values.specificPoints.length} custom points)`
+          : ""
+      }`;
     } else if (queryInfo.queryType === "q6") {
       return `Acceptance range: A=${values.A}, B=${values.B}, C=${values.C}, D=${values.D}`;
-    } else if (queryInfo.queryType === "q7") {
-      return `${values.points.length} points from ${values.from} to ${values.to}`;
-    } else if (queryInfo.queryType === "q13") {
-      return `Suitability: ${values.suitabilityLabel} (${values.suitabilityValue}%)`;
     }
     return JSON.stringify(values);
   };
@@ -196,25 +202,34 @@ const DisplayEvaluations = () => {
       const numValue = Number(value);
 
       if (isNaN(numValue)) return null;
-
       if (queryType === "q4") {
         const min = Number(values.from);
         const max = Number(values.to);
-        satisfaction = scoreIncreasing(numValue, min, max);
+        const specificPoints = values.specificPoints || [];
+        console.log("Q4 calculation with specific points:", {
+          value: numValue,
+          min,
+          max,
+          specificPoints,
+        });
+        satisfaction = scoreIncreasing(numValue, min, max, specificPoints);
       } else if (queryType === "q5") {
         const min = Number(values.from);
         const max = Number(values.to);
-        satisfaction = scoreDecreasing(numValue, min, max);
+        const specificPoints = values.specificPoints || [];
+        console.log("Q5 calculation with specific points:", {
+          value: numValue,
+          min,
+          max,
+          specificPoints,
+        });
+        satisfaction = scoreDecreasing(numValue, min, max, specificPoints);
       } else if (queryType === "q6") {
         const A = Number(values.A);
         const B = Number(values.B);
         const C = Number(values.C);
         const D = Number(values.D);
         satisfaction = scoreInRange(numValue, A, B, C, D);
-      } else if (queryType === "q7") {
-        satisfaction = scoreBasedOnRange(numValue, values.points);
-      } else if (queryType === "q13") {
-        satisfaction = numValue / 100;
       }
 
       satisfaction = Math.max(0, Math.min(1, satisfaction));

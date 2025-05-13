@@ -3,8 +3,6 @@ import { useParams } from "react-router-dom";
 import Query4 from "./Query/Query4.jsx";
 import Query5 from "./Query/Query5.jsx";
 import Query6 from "./Query/Query6.jsx";
-import Query7 from "./Query/Query7.jsx";
-import Query13 from "./Query/Query13.jsx";
 
 const LeafProcessing = ({
   leafNodes,
@@ -27,13 +25,10 @@ const LeafProcessing = ({
     setComposition("");
     onNextLeaf();
   };
-
   const helpContent = {
     q4: "Choose this option when you prefer higher values for this attribute. For example, if evaluating car fuel efficiency, you'd prefer more miles per gallon.",
     q5: "Choose this option when you prefer lower values for this attribute. For example, if evaluating noise level, you'd prefer lower decibels.",
     q6: "Choose this option when you want a specific range of values, with declining suitability outside that range. For example, if room temperature should be between 68-72°F.",
-    q7: "Choose this option to create a custom table that maps specific values to suitability percentages. Useful for attributes with multiple thresholds.",
-    q13: "Choose this option to select from a pre-defined table of suitability values based on ranges. This is helpful when you have standard preference criteria.",
   };
 
   const toggleHelpPopup = (queryType) => {
@@ -72,7 +67,6 @@ const LeafProcessing = ({
                 ?
               </button>
             </div>
-
             <div className="flex items-center">
               <button
                 className="bg-gray-200 text-black px-6 py-2 rounded-lg shadow-sm hover:bg-gray-300 hover:shadow-md transition-all flex-grow"
@@ -86,8 +80,7 @@ const LeafProcessing = ({
               >
                 ?
               </button>
-            </div>
-
+            </div>{" "}
             <div className="flex items-center">
               <button
                 className="bg-gray-200 text-black px-6 py-2 rounded-lg shadow-sm hover:bg-gray-300 hover:shadow-md transition-all flex-grow"
@@ -98,36 +91,6 @@ const LeafProcessing = ({
               <button
                 className="ml-2 bg-blue-500 text-white rounded-full w-12 h-12 flex items-center justify-center hover:bg-blue-600 text-xl font-bold"
                 onClick={() => toggleHelpPopup("q6")}
-              >
-                ?
-              </button>
-            </div>
-
-            <div className="flex items-center">
-              <button
-                className="bg-gray-200 text-black px-6 py-2 rounded-lg shadow-sm hover:bg-gray-300 hover:shadow-md transition-all flex-grow"
-                onClick={() => handleSelectComposition("q7")}
-              >
-                I will specify a table of requirements
-              </button>
-              <button
-                className="ml-2 bg-blue-500 text-white rounded-full w-12 h-12 flex items-center justify-center hover:bg-blue-600 text-xl font-bold"
-                onClick={() => toggleHelpPopup("q7")}
-              >
-                ?
-              </button>
-            </div>
-
-            <div className="flex items-center">
-              <button
-                className="bg-gray-200 text-black px-6 py-2 rounded-lg shadow-sm hover:bg-gray-300 hover:shadow-md transition-all flex-grow"
-                onClick={() => handleSelectComposition("q13")}
-              >
-                I will select suitability from your table
-              </button>
-              <button
-                className="ml-2 bg-blue-500 text-white rounded-full w-12 h-12 flex items-center justify-center hover:bg-blue-600 text-xl font-bold"
-                onClick={() => toggleHelpPopup("q13")}
               >
                 ?
               </button>
@@ -175,25 +138,9 @@ const LeafProcessing = ({
               projectId={projectname}
               nodeName={currentLeaf.name}
             />
-          )}
+          )}{" "}
           {composition === "q6" && (
             <Query6
-              onSave={handleSaveAndNext}
-              nodeId={currentLeaf.id}
-              projectId={projectname}
-              nodeName={currentLeaf.name}
-            />
-          )}
-          {composition === "q7" && (
-            <Query7
-              onSave={handleSaveAndNext}
-              nodeId={currentLeaf.id}
-              projectId={projectname}
-              nodeName={currentLeaf.name}
-            />
-          )}
-          {composition === "q13" && (
-            <Query13
               onSave={handleSaveAndNext}
               nodeId={currentLeaf.id}
               projectId={projectname}

@@ -13,7 +13,6 @@ import DemaChat from "./components/DemaChat";
 import Query4 from "./components/Query/Query4.jsx";
 import Query5 from "./components/Query/Query5.jsx";
 import Query6 from "./components/Query/Query6.jsx";
-import Query7 from "./components/Query/Query7.jsx";
 import QueryResultsDisplay from "./components/QueryResultsDisplay";
 import DisplayEvaluations from "./components/DisplayEvaluations";
 
@@ -39,11 +38,10 @@ const App = () => {
         <Route
           path="/user/:username/project/:projectname/dema-chat"
           element={<DemaChat />}
-        />
+        />{" "}
         <Route path="/q4" element={<Query4 />} />
         <Route path="/q5" element={<Query5 />} />
         <Route path="/q6" element={<Query6 />} />
-        <Route path="/q7" element={<Query7 />} />
         <Route
           path="/user/:username/project/:projectname/Queryresults"
           element={<QueryResultsDisplay />}

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "./Nav/Navbar";
-import Footer from "./Footer";
 import axiosInstance from "./utils/axiosInstance";
 
 const states = [
@@ -313,12 +312,11 @@ const MyProfile = () => {
                     </button>
                   </div>
                 </div>
-              )}
+              )}{" "}
             </div>
           </div>
         </div>
       </div>
-      <Footer />
     </div>
   );
 };

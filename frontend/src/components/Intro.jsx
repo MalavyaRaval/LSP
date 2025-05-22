@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "./Nav/Navbar";
-import Footer from "./Footer";
 import axiosInstance from "../utils/axiosInstance";
 
 const Intro = () => {
@@ -98,12 +97,10 @@ const Intro = () => {
                 >
                   Close
                 </button>
-              </div>
+              </div>{" "}
             </div>
           </div>
         )}
-
-        <Footer />
       </div>
     </>
   );

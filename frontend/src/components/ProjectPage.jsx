@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axiosInstance from "./utils/axiosInstance";
 import Navbar from "./Nav/Navbar";
-import Footer from "./Footer";
 import ProjectTree from "./ProjectTree";
 import DemaChat from "./DemaChat.jsx";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
@@ -183,12 +182,10 @@ const ProjectPage = () => {
                   </>
                 )}
               </TransformWrapper>
-            </div>
+            </div>{" "}
           </Resizable>
         )}
       </main>
-
-      <Footer />
     </div>
   );
 };

@@ -57,7 +57,7 @@ const TreeNode = ({
       {/* Node Content Container */}
       <div className="relative" ref={nodeRef}>
         <div
-          className={`p-4 rounded-lg shadow-lg hover:shadow-2xl transition-shadow cursor-pointer group border-2 mb-4 ${currentColor}`}
+          className={`p-4 rounded-lg shadow-lg hover:shadow-2xl transition-shadow cursor-pointer group border-2 mb-4 ${currentColor} min-w-[400px] whitespace-nowrap`}
           onClick={() => setShowOptions(!showOptions)}
         >
           {editing ? (

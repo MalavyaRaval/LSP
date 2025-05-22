@@ -2,24 +2,102 @@ import React, { useState } from "react";
 import axiosInstance from "../utils/axiosInstance";
 
 const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
-  const [values, setValues] = useState({ from: "", to: "" });
+  const [values, setValues] = useState({
+    from: "",
+    to: "",
+  });
+  const [specificValues, setSpecificValues] = useState([]);
   const [error, setError] = useState("");
+  const [showSpecificValue, setShowSpecificValue] = useState(false);
 
   const handleChange = (e) => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
 
+  const handleSpecificValueChange = (index, field, value) => {
+    const newSpecificValues = [...specificValues];
+    newSpecificValues[index][field] = value;
+    setSpecificValues(newSpecificValues);
+  };
+
+  const addSpecificValue = () => {
+    setSpecificValues([...specificValues, { value: "", satisfaction: "" }]);
+    // If this is the first specific value, show the section
+    if (specificValues.length === 0) {
+      setShowSpecificValue(true);
+    }
+  };
+
+  const removeSpecificValue = (index) => {
+    const newSpecificValues = [...specificValues];
+    newSpecificValues.splice(index, 1);
+    setSpecificValues(newSpecificValues);
+    // Hide the section if no more specific values
+    if (newSpecificValues.length === 0) {
+      setShowSpecificValue(false);
+    }
+  };
+
   const validate = () => {
-    const firstNum = parseFloat(values.from);
-    const secondNum = parseFloat(values.to);
-    if (isNaN(firstNum) || isNaN(secondNum)) {
-      setError("Please enter valid numbers.");
+    const minValue = parseFloat(values.from);
+    const maxValue = parseFloat(values.to);
+
+    // Validate the min and max values
+    if (isNaN(minValue) || isNaN(maxValue)) {
+      setError("Please enter valid numbers for minimum and maximum values.");
       return false;
     }
-    if (firstNum >= secondNum) {
-      setError("First value must be less than second value.");
+
+    if (minValue >= maxValue) {
+      setError("The minimum value must be less than the maximum value.");
       return false;
     }
+
+    // Validate specific values if they exist
+    if (specificValues.length > 0) {
+      for (let i = 0; i < specificValues.length; i++) {
+        const specificVal = parseFloat(specificValues[i].value);
+        const satisfactionPct = parseFloat(specificValues[i].satisfaction);
+
+        if (isNaN(specificVal)) {
+          setError(`Please enter a valid number for specific value #${i + 1}.`);
+          return false;
+        }
+
+        // Check if the specific value is between min and max
+        if (specificVal <= minValue || specificVal >= maxValue) {
+          setError(
+            `Specific value #${
+              i + 1
+            } must be between ${minValue} and ${maxValue}.`
+          );
+          return false;
+        }
+
+        if (
+          isNaN(satisfactionPct) ||
+          satisfactionPct < 0 ||
+          satisfactionPct > 100
+        ) {
+          setError(
+            `Please enter a valid satisfaction percentage (0-100) for specific value #${
+              i + 1
+            }.`
+          );
+          return false;
+        }
+      }
+
+      // Check if specific values are unique
+      const uniqueValues = new Set(
+        specificValues.map((v) => parseFloat(v.value))
+      );
+      if (uniqueValues.size !== specificValues.length) {
+        setError("Each specific value must be unique.");
+        return false;
+      }
+    }
+
     setError("");
     return true;
   };
@@ -27,12 +105,22 @@ const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
   const handleSaveQuery = async () => {
     if (!validate()) return;
     try {
-      // Build payload including nodeName
+      // Process specific values to match the format expected by scoreIncreasing
+      const processedSpecificValues = specificValues.map((item) => ({
+        value: parseFloat(item.value),
+        satisfaction: parseFloat(item.satisfaction) / 100, // Convert to decimal for calculator
+      }));
+
+      // Build payload including nodeName and specific values
       const payload = {
         nodeId,
-        nodeName, // include nodeName here
+        nodeName,
         queryType: "q4",
-        values,
+        values: {
+          from: values.from,
+          to: values.to,
+          specificPoints: processedSpecificValues,
+        },
         projectId,
       };
       await axiosInstance.post("/api/query-results", payload);
@@ -73,7 +161,7 @@ const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
                 onChange={handleChange}
                 onBlur={validate}
                 className="w-full border rounded px-2 py-1"
-                style={{ fontSize: "1.75rem" }} // Inline style to enforce larger font size
+                style={{ fontSize: "1.75rem" }}
               />
             </td>
           </tr>
@@ -89,23 +177,133 @@ const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
                 onChange={handleChange}
                 onBlur={validate}
                 className="w-full border rounded px-2 py-1"
-                style={{ fontSize: "1.75rem" }} // Inline style to enforce larger font size
+                style={{ fontSize: "1.75rem" }}
               />
             </td>
           </tr>
+
+          {/* Button for adding specific values */}
+          <tr className="bg-gray-50 hover:bg-gray-100">
+            <td colSpan="2" className="border border-gray-400 p-2">
+              <div className="flex justify-between items-center">
+                <div>
+                  <button
+                    className="text-xl font-bold bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600 transition-all"
+                    onClick={() => setShowSpecificValue(!showSpecificValue)}
+                  >
+                    {showSpecificValue
+                      ? "Hide Specific Values"
+                      : "Show Specific Values"}
+                  </button>
+                  <span className="text-lg text-gray-600 ml-3">
+                    Add specific values between min and max with their
+                    satisfaction levels
+                  </span>
+                </div>
+                <button
+                  className="text-xl font-bold bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition-all"
+                  onClick={addSpecificValue}
+                  disabled={!values.from || !values.to}
+                  title={
+                    !values.from || !values.to
+                      ? "Please enter min and max values first"
+                      : ""
+                  }
+                >
+                  + Add Value
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          {/* Specific values section */}
+          {showSpecificValue &&
+            specificValues.map((item, index) => (
+              <React.Fragment key={index}>
+                <tr className="hover:bg-gray-100 bg-blue-50">
+                  <td className="text-2xl border border-gray-400 p-2 flex justify-between items-center">
+                    <span>If the analyzed item has this value:</span>
+                    <button
+                      onClick={() => removeSpecificValue(index)}
+                      className="text-red-500 hover:text-red-700 text-xl"
+                      title="Remove this value"
+                    >
+                      ✕
+                    </button>
+                  </td>
+                  <td className="border border-gray-400 p-2">
+                    <input
+                      type="number"
+                      value={item.value}
+                      onChange={(e) =>
+                        handleSpecificValueChange(
+                          index,
+                          "value",
+                          e.target.value
+                        )
+                      }
+                      onBlur={validate}
+                      className="w-full border rounded px-2 py-1"
+                      style={{ fontSize: "1.75rem" }}
+                      min={values.from ? parseFloat(values.from) + 0.01 : ""}
+                      max={values.to ? parseFloat(values.to) - 0.01 : ""}
+                      placeholder={
+                        values.from && values.to
+                          ? `Between ${values.from} and ${values.to}`
+                          : "Enter value"
+                      }
+                    />
+                  </td>
+                </tr>
+                <tr className="hover:bg-gray-100 bg-blue-50">
+                  <td className="text-2xl border border-gray-400 p-2">
+                    Then my satisfaction degree is (%):
+                  </td>
+                  <td className="border border-gray-400 p-2">
+                    <input
+                      type="number"
+                      value={item.satisfaction}
+                      onChange={(e) =>
+                        handleSpecificValueChange(
+                          index,
+                          "satisfaction",
+                          e.target.value
+                        )
+                      }
+                      onBlur={validate}
+                      min="0"
+                      max="100"
+                      className="w-full border rounded px-2 py-1"
+                      style={{ fontSize: "1.75rem" }}
+                    />
+                  </td>
+                </tr>
+              </React.Fragment>
+            ))}
+
+          {/* Show a message if specific values section is visible but empty */}
+          {showSpecificValue && specificValues.length === 0 && (
+            <tr className="bg-blue-50">
+              <td
+                colSpan="2"
+                className="border border-gray-400 p-2 text-center text-gray-500"
+              >
+                Click the "+ Add Value" button to add specific values between
+                your min and max values
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
-      {error && <p className="text-red-500">{error}</p>}
+      {error && <p className="text-red-500 text-xl">{error}</p>}
       <div className="flex justify-end mt-4">
-        <div className="flex justify-end mt-4">
-          <button
-            className="text-3xl font-extrabold bg-gradient-to-r from-green-500 to-green-700 text-white px-6 py-2 rounded-xl hover:from-green-600 hover:to-green-800 transition-all duration-300 shadow-xl transform hover:scale-105 min-w-[250px] flex items-center justify-center"
-            onClick={handleSaveQuery}
-            style={{ fontSize: "2rem" }} // Force large font size with inline style
-          >
-            Continue
-          </button>
-        </div>
+        <button
+          className="text-3xl font-extrabold bg-gradient-to-r from-green-500 to-green-700 text-white px-6 py-2 rounded-xl hover:from-green-600 hover:to-green-800 transition-all duration-300 shadow-xl transform hover:scale-105 min-w-[250px] flex items-center justify-center"
+          onClick={handleSaveQuery}
+          style={{ fontSize: "2rem" }}
+        >
+          Continue
+        </button>
       </div>
     </div>
   );

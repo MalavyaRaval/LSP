@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import axiosInstance from "./utils/axiosInstance";
 import { useParams } from "react-router-dom";
 import Navbar from "./Nav/Navbar";
-import Footer from "./Footer";
 
 const QueryResultsDisplay = () => {
   const [results, setResults] = useState([]);
@@ -112,7 +111,6 @@ const QueryResultsDisplay = () => {
           </table>
         )}
       </div>
-      <Footer />
     </div>
   );
 };

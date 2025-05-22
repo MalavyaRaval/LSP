@@ -19,12 +19,17 @@ const Query5 = ({ onSave, nodeId, projectId, nodeName }) => {
     newSpecificValues[index][field] = value;
     setSpecificValues(newSpecificValues);
   };
-
   const addSpecificValue = () => {
-    setSpecificValues([...specificValues, { value: "", satisfaction: "" }]);
-    // If this is the first specific value, show the section
-    if (specificValues.length === 0) {
+    if (!showSpecificValue) {
+      // Only add a new value if there are no existing specific values
+      if (specificValues.length === 0) {
+        setSpecificValues([{ value: "", satisfaction: "" }]);
+      }
       setShowSpecificValue(true);
+    } else {
+      // Hide the section and clear values when toggling off
+      setShowSpecificValue(false);
+      setSpecificValues([]);
     }
   };
 
@@ -180,58 +185,55 @@ const Query5 = ({ onSave, nodeId, projectId, nodeName }) => {
                 style={{ fontSize: "1.75rem" }}
               />
             </td>
-          </tr>
-
+          </tr>{" "}
           {/* Button for adding specific values */}
           <tr className="bg-gray-50 hover:bg-gray-100">
             <td colSpan="2" className="border border-gray-400 p-2">
               <div className="flex justify-between items-center">
-                <div>
-                  <button
-                    className="text-xl font-bold bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600 transition-all"
-                    onClick={() => setShowSpecificValue(!showSpecificValue)}
-                  >
-                    {showSpecificValue
-                      ? "Hide Specific Values"
-                      : "Show Specific Values"}
-                  </button>
-                  <span className="text-lg text-gray-600 ml-3">
-                    Add specific values between min and max with their
-                    satisfaction levels
-                  </span>
-                </div>
                 <button
-                  className="text-xl font-bold bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition-all"
+                  className={`text-xl font-bold ${
+                    showSpecificValue
+                      ? "bg-red-500 hover:bg-red-600"
+                      : "bg-blue-500 hover:bg-blue-600"
+                  } text-white px-4 py-1 rounded transition-all w-full`}
                   onClick={addSpecificValue}
                   disabled={!values.from || !values.to}
                   title={
                     !values.from || !values.to
                       ? "Please enter min and max values first"
-                      : ""
+                      : showSpecificValue
+                      ? "Click to remove specific value"
+                      : "Add specific values between min and max with their satisfaction levels"
                   }
                 >
-                  + Add Value
+                  {showSpecificValue
+                    ? "Remove Optional Condition"
+                    : "Optional Condition to Increase Precision"}
                 </button>
               </div>
             </td>
           </tr>
-
           {/* Specific values section */}
           {showSpecificValue &&
             specificValues.map((item, index) => (
               <React.Fragment key={index}>
-                <tr className="hover:bg-gray-100 bg-blue-50">
-                  <td className="text-2xl border border-gray-400 p-2 flex justify-between items-center">
-                    <span>If the analyzed item has this value:</span>
-                    <button
-                      onClick={() => removeSpecificValue(index)}
-                      className="text-red-500 hover:text-red-700 text-xl"
-                      title="Remove this value"
-                    >
-                      ✕
-                    </button>
+                {" "}
+                <tr className="bg-blue-50">
+                  <td className="text-2xl border border-gray-400 p-4">
+                    <div className="flex justify-between items-center">
+                      <div className="flex-grow">
+                        If the analyzed item has this value:
+                      </div>
+                      <button
+                        onClick={() => removeSpecificValue(index)}
+                        className="text-red-500 hover:text-red-700 text-xl ml-4"
+                        title="Remove this value"
+                      >
+                        ✕
+                      </button>
+                    </div>
                   </td>
-                  <td className="border border-gray-400 p-2">
+                  <td className="border border-gray-400 p-4">
                     <input
                       type="number"
                       value={item.value}
@@ -243,7 +245,7 @@ const Query5 = ({ onSave, nodeId, projectId, nodeName }) => {
                         )
                       }
                       onBlur={validate}
-                      className="w-full border rounded px-2 py-1"
+                      className="w-full border rounded px-3 py-2"
                       style={{ fontSize: "1.75rem" }}
                       min={values.from ? parseFloat(values.from) + 0.01 : ""}
                       max={values.to ? parseFloat(values.to) - 0.01 : ""}
@@ -255,11 +257,11 @@ const Query5 = ({ onSave, nodeId, projectId, nodeName }) => {
                     />
                   </td>
                 </tr>
-                <tr className="hover:bg-gray-100 bg-blue-50">
-                  <td className="text-2xl border border-gray-400 p-2">
+                <tr className="bg-blue-50 border-t-0">
+                  <td className="text-2xl border border-gray-400 p-4">
                     Then my satisfaction degree is (%):
                   </td>
-                  <td className="border border-gray-400 p-2">
+                  <td className="border border-gray-400 p-4">
                     <input
                       type="number"
                       value={item.satisfaction}
@@ -273,14 +275,13 @@ const Query5 = ({ onSave, nodeId, projectId, nodeName }) => {
                       onBlur={validate}
                       min="0"
                       max="100"
-                      className="w-full border rounded px-2 py-1"
+                      className="w-full border rounded px-3 py-2"
                       style={{ fontSize: "1.75rem" }}
                     />
                   </td>
                 </tr>
               </React.Fragment>
             ))}
-
           {/* Show a message if specific values section is visible but empty */}
           {showSpecificValue && specificValues.length === 0 && (
             <tr className="bg-blue-50">

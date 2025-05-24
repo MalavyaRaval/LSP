@@ -186,16 +186,12 @@ const Query5 = ({ onSave, nodeId, projectId, nodeName }) => {
               />
             </td>
           </tr>{" "}
-          {/* Button for adding specific values */}
+          {/* Button for adding specific values */}{" "}
           <tr className="bg-gray-50 hover:bg-gray-100">
             <td colSpan="2" className="border border-gray-400 p-2">
               <div className="flex justify-between items-center">
                 <button
-                  className={`text-xl font-bold ${
-                    showSpecificValue
-                      ? "bg-red-500 hover:bg-red-600"
-                      : "bg-blue-500 hover:bg-blue-600"
-                  } text-white px-4 py-1 rounded transition-all w-full`}
+                  className="text-xl font-bold bg-blue-500 hover:bg-blue-600 text-white px-4 py-1 rounded transition-all w-full"
                   onClick={addSpecificValue}
                   disabled={!values.from || !values.to}
                   title={
@@ -207,7 +203,7 @@ const Query5 = ({ onSave, nodeId, projectId, nodeName }) => {
                   }
                 >
                   {showSpecificValue
-                    ? "Remove Optional Condition"
+                    ? "Optional Condition to Increase Precision"
                     : "Optional Condition to Increase Precision"}
                 </button>
               </div>

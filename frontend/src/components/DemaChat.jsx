@@ -607,10 +607,10 @@ const DemaChat = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-1 py-0 text-left text-lg font-medium text-gray-700 uppercase">
+                <th className="px-1 py-0 text-left text-2xl font-bold text-gray-700 uppercase">
                   Component Name
                 </th>
-                <th className="px-1 py-0 text-center text-lg font-medium text-gray-700 uppercase">
+                <th className="px-1 py-0 text-center text-2xl font-bold text-gray-700 uppercase">
                   Further decompose?
                 </th>
               </tr>
@@ -626,8 +626,8 @@ const DemaChat = () => {
                       onChange={(e) =>
                         handleDetailChange(index, "name", e.target.value)
                       }
-                      className="border border-gray-300 rounded-lg py-2 px-3 w-full text-lg"
-                      style={{ fontSize: "1.2rem", width: "100%" }}
+                      className="border border-gray-300 rounded-lg py-2 px-3 w-full text-xl font-semibold"
+                      style={{ fontSize: "1.5rem", width: "100%" }}
                     />
                   </td>
                   <td className="px-2 py-1 text-center">
@@ -642,16 +642,16 @@ const DemaChat = () => {
                       onChange={(e) =>
                         handleDetailChange(index, "decompose", e.target.value)
                       }
-                      className="border border-gray-300 rounded-lg py-2 px-3 text-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      style={{ fontSize: "1.2rem" }}
+                      className="border border-gray-300 rounded-lg py-2 px-3 text-xl font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      style={{ fontSize: "1.5rem" }}
                     >
-                      <option value="" style={{ fontSize: "1.2rem" }}>
+                      <option value="" style={{ fontSize: "1.5rem" }}>
                         Select
                       </option>
-                      <option value="true" style={{ fontSize: "1.2rem" }}>
+                      <option value="true" style={{ fontSize: "1.5rem" }}>
                         Yes
                       </option>
-                      <option value="false" style={{ fontSize: "1.2rem" }}>
+                      <option value="false" style={{ fontSize: "1.5rem" }}>
                         No
                       </option>
                     </select>
@@ -660,18 +660,20 @@ const DemaChat = () => {
               ))}
             </tbody>
           </table>
-        </div>
-        <div className="flex justify-between items-center mt-4 space-x-4">
+        </div>{" "}
+        <div className="flex items-center mt-4 space-x-4">
           <button
             onClick={handleBack}
             className="text-lg font-extrabold bg-gradient-to-r from-gray-500 to-gray-700 text-white px-6 py-2 rounded-lg hover:from-gray-600 hover:to-gray-800 transition-all duration-300 shadow-lg transform hover:scale-105 disabled:opacity-70 disabled:cursor-not-allowed min-w-[200px] flex items-center justify-center"
           >
             <span style={{ fontSize: "2rem" }}>Back</span>
           </button>
+          <div className="flex-grow"></div>
           <button
             onClick={handleNextStep}
             className="text-lg font-extrabold bg-gradient-to-r from-green-500 to-green-700 text-white px-6 py-2 rounded-lg hover:from-green-600 hover:to-green-800 transition-all duration-300 shadow-lg transform hover:scale-105 disabled:opacity-70 disabled:cursor-not-allowed min-w-[200px] flex items-center justify-center"
             disabled={processing}
+            style={{ marginRight: "130px" }}
           >
             {processing ? (
               <span className="flex items-center">

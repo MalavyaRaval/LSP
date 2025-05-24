@@ -22,8 +22,6 @@ const ProjectEvaluation = () => {
   const [leafNodes, setLeafNodes] = useState([]);
   const [alternativeValues, setAlternativeValues] = useState({});
   const [queryResults, setQueryResults] = useState([]);
-  // New state to show inline confirmation UI
-  const [showAlternativeConfirm, setShowAlternativeConfirm] = useState(false);
 
   // In step 2, fetch the project tree and query results.
   useEffect(() => {
@@ -82,8 +80,7 @@ const ProjectEvaluation = () => {
       [leafId]: value,
     }));
   };
-
-  const handleSubmitEvaluation = async () => {
+  const handleSubmitAndNext = async () => {
     const emptyLeaf = leafNodes.find(
       (leaf) => !alternativeValues[leaf.id]?.toString().trim()
     );
@@ -101,20 +98,43 @@ const ProjectEvaluation = () => {
         alternativeValues, // object mapping each leaf id to a number
       };
       await axiosInstance.post("/api/evaluations", payload);
-      setShowAlternativeConfirm(true);
+      handleConfirmYes();
     } catch (err) {
       console.error("Error submitting evaluation:", err);
       setError("Failed to submit evaluation.");
     }
   };
 
+  const handleSubmitAndEvaluate = async () => {
+    const emptyLeaf = leafNodes.find(
+      (leaf) => !alternativeValues[leaf.id]?.toString().trim()
+    );
+    if (emptyLeaf) {
+      setError("Please fill in a value for all components.");
+      return;
+    }
+    setError("");
+    try {
+      const payload = {
+        projectId: projectname, // using projectname as project id
+        user: username, // Use the username from useParams
+        alternativeName,
+        alternativeCost: parseFloat(alternativeCost),
+        alternativeValues, // object mapping each leaf id to a number
+      };
+      await axiosInstance.post("/api/evaluations", payload);
+      handleConfirmNo();
+    } catch (err) {
+      console.error("Error submitting evaluation:", err);
+      setError("Failed to submit evaluation.");
+    }
+  };
   const handleConfirmYes = () => {
     // Reset the form for a new alternative entry.
     setAlternativeName("");
     setAlternativeCost("");
     setAlternativeValues({});
     setEvaluationStep(1);
-    setShowAlternativeConfirm(false);
   };
 
   const handleConfirmNo = () => {
@@ -135,16 +155,21 @@ const ProjectEvaluation = () => {
         </p>
       </div>
       <p className="text-red-700 m-0 leading-tight">
-        Please fill in the alternative values
+        Please enter the values of alternative
       </p>
       {error && <p className="text-red-500">{error}</p>}
       <div className="overflow-x-auto mt-4">
+        {" "}
         <table className="min-w-full border-collapse border border-gray-300">
           <thead className="bg-gray-200">
             <tr>
-              <th className="border border-gray-300 p-2">Component Name</th>
-              <th className="border border-gray-300 p-2">Your range of </th>
-              <th className="border border-gray-300 p-2">
+              <th className="border border-gray-300 p-2 text-center">
+                Attribute Name
+              </th>
+              <th className="border border-gray-300 p-2 text-center">
+                The range of{" "}
+              </th>
+              <th className="border border-gray-300 p-2 text-center">
                 Values for {alternativeName}
               </th>
             </tr>
@@ -191,39 +216,24 @@ const ProjectEvaluation = () => {
                   </td>
                 </tr>
               );
-            })}
+            })}{" "}
           </tbody>
         </table>
       </div>
-      {showAlternativeConfirm ? (
-        <div className="mt-6 p-4 border border-gray-300 rounded bg-gray-50">
-          <p className="mb-4">
-            Evaluation submitted successfully! Do you have more alternatives to
-            evaluate?
-          </p>
-          <div className="flex gap-4">
-            <button
-              onClick={handleConfirmYes}
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-            >
-              Yes
-            </button>
-            <button
-              onClick={handleConfirmNo}
-              className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-            >
-              No
-            </button>
-          </div>
-        </div>
-      ) : (
+      <div className="flex gap-4 mt-6">
         <button
-          onClick={handleSubmitEvaluation}
-          className="mt-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+          onClick={handleSubmitAndNext}
+          className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 font-medium"
         >
-          Submit Evaluation
+          Next Competitor
         </button>
-      )}
+        <button
+          onClick={handleSubmitAndEvaluate}
+          className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 font-medium"
+        >
+          Perform Evaluation
+        </button>
+      </div>
     </div>
   );
 

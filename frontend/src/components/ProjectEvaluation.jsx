@@ -218,18 +218,19 @@ const ProjectEvaluation = () => {
               );
             })}{" "}
           </tbody>
-        </table>
-      </div>
-      <div className="flex gap-4 mt-6">
+        </table>      </div>
+      <div className="flex justify-end gap-4 mt-6">
         <button
           onClick={handleSubmitAndNext}
-          className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 font-medium"
+          className="text-3xl font-extrabold bg-gradient-to-r from-blue-500 to-blue-700 text-white px-6 py-2 rounded-xl hover:from-blue-600 hover:to-blue-800 transition-all duration-300 shadow-xl transform hover:scale-105 min-w-[250px] flex items-center justify-center"
+          style={{ fontSize: "2rem" }}
         >
           Next Competitor
         </button>
         <button
           onClick={handleSubmitAndEvaluate}
-          className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 font-medium"
+          className="text-3xl font-extrabold bg-gradient-to-r from-green-500 to-green-700 text-white px-6 py-2 rounded-xl hover:from-green-600 hover:to-green-800 transition-all duration-300 shadow-xl transform hover:scale-105 min-w-[250px] flex items-center justify-center"
+          style={{ fontSize: "2rem" }}
         >
           Perform Evaluation
         </button>

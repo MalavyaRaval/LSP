@@ -217,14 +217,12 @@ const ProjectEvaluation = () => {
           </div>
         </div>
       ) : (
-        <div className="mt-2 flex justify-end">
-          <button
-            onClick={handleSubmitEvaluation}
-            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
-          >
-            Submit Evaluation
-          </button>
-        </div>
+        <button
+          onClick={handleSubmitEvaluation}
+          className="mt-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+        >
+          Submit Evaluation
+        </button>
       )}
     </div>
   );

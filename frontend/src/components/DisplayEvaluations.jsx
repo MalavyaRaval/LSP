@@ -290,10 +290,12 @@ const DisplayEvaluations = () => {
               <tr>
                 <th className="border border-gray-300 p-2">Node #</th>
                 <th className="border border-gray-300 p-2">Node Name</th>
+                {/*
                 <th className="border border-gray-300 p-2">Importance</th>
                 <th className="border border-gray-300 p-2">Connection</th>
                 <th className="border border-gray-300 p-2">Query Type</th>
                 <th className="border border-gray-300 p-2">Criteria</th>
+                */}
                 {evaluations.map((evalItem) => (
                   <th key={evalItem._id} className="border border-gray-300 p-2">
                     {evalItem.alternativeName}
@@ -305,6 +307,7 @@ const DisplayEvaluations = () => {
               {/* Cost Row */}
               <tr className="hover:bg-gray-100">
                 <td className="border border-gray-300 p-2">-</td>
+                {/*
                 <td className="border border-gray-300 p-2 font-medium">Cost</td>
                 <td className="border border-gray-300 p-2">-</td>
                 <td className="border border-gray-300 p-2">-</td>
@@ -315,6 +318,7 @@ const DisplayEvaluations = () => {
                     {evalItem.alternativeCost}
                   </td>
                 ))}
+                    */}
               </tr>
 
               {/* All Nodes Rows */}
@@ -328,18 +332,12 @@ const DisplayEvaluations = () => {
                       {node.nodeNumber}
                     </td>
                     <td className="border border-gray-300 p-2">{node.name}</td>
-                    <td className="border border-gray-300 p-2">
-                      {node.importance || "-"}
-                    </td>
-                    <td className="border border-gray-300 p-2">
-                      {getConnectionLabel(node.connection)}
-                    </td>
-                    <td className="border border-gray-300 p-2">
-                      {isLeaf && query ? query.queryType.toUpperCase() : "-"}
-                    </td>
-                    <td className="border border-gray-300 p-2">
-                      {isLeaf ? getQueryValuesDisplay(node.id.toString()) : "-"}
-                    </td>
+                    {/*
+                    <td className="border border-gray-300 p-2">{node.importance || "-"}</td>
+                    <td className="border border-gray-300 p-2">{getConnectionLabel(node.connection)}</td>
+                    <td className="border border-gray-300 p-2">{isLeaf && query ? query.queryType.toUpperCase() : "-"}</td>
+                    <td className="border border-gray-300 p-2">{isLeaf ? getQueryValuesDisplay(node.id.toString()) : "-"}</td>
+                    */}
                     {evaluations.map((evalItem) => (
                       <td
                         key={evalItem._id}
@@ -351,6 +349,7 @@ const DisplayEvaluations = () => {
                             evalItem.alternativeValues[node.id] !== undefined
                               ? evalItem.alternativeValues[node.id]
                               : "-"}
+                            {/*
                             <SatisfactionBar
                               percentage={calculateSatisfaction(
                                 node.id.toString(),
@@ -359,6 +358,7 @@ const DisplayEvaluations = () => {
                                   : "-"
                               )}
                             />
+                            */}
                           </>
                         ) : (
                           "-"

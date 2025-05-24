@@ -239,7 +239,7 @@ const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
                 </tr>
                 <tr className="bg-blue-50 border-t-0">
                   <td className="text-2xl border border-gray-400 p-4">
-                    Then my satisfaction degree is (%):
+                    ... then my satisfaction degree  is (%):
                   </td>
                   <td className="border border-gray-400 p-2">
                     <input

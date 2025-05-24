@@ -155,7 +155,7 @@ const ProjectEvaluation = () => {
         </p>
       </div>
       <p className="text-red-700 m-0 leading-tight">
-        Please enter the values of alternative
+        PLEASE ENTER THE VALUES OF ATTRIBUTES
       </p>
       {error && <p className="text-red-500">{error}</p>}
       <div className="overflow-x-auto mt-4">
@@ -163,13 +163,11 @@ const ProjectEvaluation = () => {
         <table className="min-w-full border-collapse border border-gray-300">
           <thead className="bg-gray-200">
             <tr>
-              <th className="border border-gray-300 p-2 text-center">
-                Attribute Name
+              <th className="border border-gray-300 p-2">Attribute Name</th>
+              <th className="border border-gray-300 p-2">
+                The range of values{" "}
               </th>
-              <th className="border border-gray-300 p-2 text-center">
-                The range of{" "}
-              </th>
-              <th className="border border-gray-300 p-2 text-center">
+              <th className="border border-gray-300 p-2">
                 Values for {alternativeName}
               </th>
             </tr>
@@ -218,7 +216,8 @@ const ProjectEvaluation = () => {
               );
             })}{" "}
           </tbody>
-        </table>      </div>
+        </table>{" "}
+      </div>
       <div className="flex justify-end gap-4 mt-6">
         <button
           onClick={handleSubmitAndNext}

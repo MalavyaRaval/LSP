@@ -180,9 +180,8 @@ const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
           <tr className="bg-gray-50 hover:bg-gray-100">
             <td colSpan="2" className="border border-gray-400 p-2">
               <div className="flex justify-between items-center">
-                {" "}
-                <button
-                  className="text-xl font-bold bg-blue-500 hover:bg-blue-600 text-white px-4 py-1 rounded transition-all w-full"
+                {" "}                <button
+                  className="text-2xl font-bold bg-blue-500 hover:bg-blue-600 text-white px-4 py-1 rounded transition-all w-full"
                   onClick={addSpecificValue}
                   disabled={!values.from || !values.to}
                   title={

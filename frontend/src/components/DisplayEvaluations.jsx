@@ -290,15 +290,21 @@ const DisplayEvaluations = () => {
               <tr>
                 <th className="border border-gray-300 p-2">Node #</th>
                 <th className="border border-gray-300 p-2">Node Name</th>
-
                 <th className="border border-gray-300 p-2">Importance</th>
                 <th className="border border-gray-300 p-2">Connection</th>
                 <th className="border border-gray-300 p-2">Query Type</th>
-                <th className="border border-gray-300 p-2">Criteria</th>
-
+                <th className="border border-gray-300 p-2">Criteria</th>{" "}
                 {evaluations.map((evalItem) => (
                   <th key={evalItem._id} className="border border-gray-300 p-2">
                     {evalItem.alternativeName}
+                  </th>
+                ))}
+                {evaluations.map((evalItem) => (
+                  <th
+                    key={`${evalItem._id}-satisfaction`}
+                    className="border border-gray-300 p-2 bg-blue-50"
+                  >
+                    {evalItem.alternativeName} Satisfaction
                   </th>
                 ))}
               </tr>
@@ -307,15 +313,22 @@ const DisplayEvaluations = () => {
               {/* Cost Row */}
               <tr className="hover:bg-gray-100">
                 <td className="border border-gray-300 p-2">-</td>
-
                 <td className="border border-gray-300 p-2 font-medium">Cost</td>
                 <td className="border border-gray-300 p-2">-</td>
                 <td className="border border-gray-300 p-2">-</td>
                 <td className="border border-gray-300 p-2">-</td>
-                <td className="border border-gray-300 p-2">-</td>
+                <td className="border border-gray-300 p-2">-</td>{" "}
                 {evaluations.map((evalItem) => (
                   <td key={evalItem._id} className="border border-gray-300 p-2">
                     {evalItem.alternativeCost}
+                  </td>
+                ))}
+                {evaluations.map((evalItem) => (
+                  <td
+                    key={`${evalItem._id}-satisfaction`}
+                    className="border border-gray-300 p-2 bg-blue-50"
+                  >
+                    -
                   </td>
                 ))}
               </tr>
@@ -331,7 +344,6 @@ const DisplayEvaluations = () => {
                       {node.nodeNumber}
                     </td>
                     <td className="border border-gray-300 p-2">{node.name}</td>
-
                     <td className="border border-gray-300 p-2">
                       {node.importance || "-"}
                     </td>
@@ -343,32 +355,43 @@ const DisplayEvaluations = () => {
                     </td>
                     <td className="border border-gray-300 p-2">
                       {isLeaf ? getQueryValuesDisplay(node.id.toString()) : "-"}
-                    </td>
-
+                    </td>{" "}
                     {evaluations.map((evalItem) => (
                       <td
                         key={evalItem._id}
                         className="border border-gray-300 p-2"
                       >
-                        {isLeaf ? (
-                          <>
-                            {evalItem.alternativeValues &&
+                        {isLeaf
+                          ? evalItem.alternativeValues &&
                             evalItem.alternativeValues[node.id] !== undefined
-                              ? evalItem.alternativeValues[node.id]
-                              : "-"}
-
-                            <SatisfactionBar
-                              percentage={calculateSatisfaction(
+                            ? evalItem.alternativeValues[node.id]
+                            : "-"
+                          : "-"}
+                      </td>
+                    ))}{" "}
+                    {evaluations.map((evalItem) => (
+                      <td
+                        key={`${evalItem._id}-satisfaction`}
+                        className="border border-gray-300 p-2 bg-blue-50"
+                      >
+                        {isLeaf
+                          ? (() => {
+                              const satisfaction = calculateSatisfaction(
                                 node.id.toString(),
                                 evalItem.alternativeValues
                                   ? evalItem.alternativeValues[node.id]
                                   : "-"
-                              )}
-                            />
-                          </>
-                        ) : (
-                          "-"
-                        )}
+                              );
+                              return satisfaction !== null ? (
+                                <>
+                                  {`${Math.round(satisfaction * 100)}%`}
+                                  <SatisfactionBar percentage={satisfaction} />
+                                </>
+                              ) : (
+                                "-"
+                              );
+                            })()
+                          : "-"}
                       </td>
                     ))}
                   </tr>

@@ -474,18 +474,25 @@ const DemaChat = () => {
       console.error("Error fetching tree after finalizing:", error);
     }
   };
-
-  // Parent processing functions remain unchanged...
+  // Parent processing functions - modified to include root processing
   const startParentProcessing = async () => {
     try {
       const res = await axiosInstance.get(`/api/projects/${projectId}`);
       const treeData = res.data;
       let initialParentIds = new Set();
+
+      // Add all parents of leaf nodes (excluding root for now)
       leafNodes.forEach((leaf) => {
         if (leaf.parent && leaf.parent.toString() !== treeData.id.toString()) {
           initialParentIds.add(leaf.parent.toString());
         }
       });
+
+      // Also add the root node if it has children (should be processed)
+      if (treeData && treeData.children && treeData.children.length > 0) {
+        initialParentIds.add(treeData.id.toString());
+      }
+
       const filteredParentIds = Array.from(initialParentIds).filter(
         (pid) => !processedParentIds.has(pid)
       );
@@ -509,17 +516,29 @@ const DemaChat = () => {
       console.error("Error starting parent processing:", err);
     }
   };
-
   const processNextParentLevel = async () => {
     try {
       const res = await axiosInstance.get(`/api/projects/${projectId}`);
       const treeData = res.data;
       let nextLevelParentIds = new Set();
+
+      // Add all parents of current parent nodes (excluding root for now)
       parentNodes.forEach((node) => {
         if (node.parent && node.parent.toString() !== treeData.id.toString()) {
           nextLevelParentIds.add(node.parent.toString());
         }
       });
+
+      // Also add the root node if it has children and hasn't been processed yet
+      if (
+        treeData &&
+        treeData.children &&
+        treeData.children.length > 0 &&
+        !processedParentIds.has(treeData.id.toString())
+      ) {
+        nextLevelParentIds.add(treeData.id.toString());
+      }
+
       const filteredNextIds = Array.from(nextLevelParentIds).filter(
         (pid) => !processedParentIds.has(pid)
       );

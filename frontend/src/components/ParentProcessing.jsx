@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axiosInstance from "./utils/axiosInstance";
 import ConnectionProcessing from "./ConnectionProcessing.jsx";
+import RelativeImportance from "./RelativeImportance.jsx";
 
 const ParentProcessing = ({
   parentNodes,
@@ -14,6 +15,9 @@ const ParentProcessing = ({
   }
   const currentParent = parentNodes[currentParentIndex];
 
+  // Check if current parent is the root (has no parent)
+  const isRoot = !currentParent.parent;
+
   const levelsImportance = [
     { value: 9, label: "Highest" },
     { value: 8, label: "Very high" },
@@ -25,41 +29,53 @@ const ParentProcessing = ({
     { value: 2, label: "Very low" },
     { value: 1, label: "Lowest" },
   ];
-
   const [step, setStep] = useState(1);
   const [values, setValues] = useState({
     importance: currentParent.attributes?.importance || "",
     connection: currentParent.attributes?.connection || "",
   });
   const [error, setError] = useState("");
-
   useEffect(() => {
-    setStep(1);
-    setValues({
-      importance: currentParent.attributes?.importance || "",
-      connection: currentParent.attributes?.connection || "",
-    });
+    // For root node, skip connection step and go directly to importance
+    if (isRoot) {
+      setStep(2);
+      setValues({
+        importance: currentParent.attributes?.importance || "",
+        connection: "", // Root doesn't need connection
+      });
+    } else {
+      setStep(1);
+      setValues({
+        importance: currentParent.attributes?.importance || "",
+        connection: currentParent.attributes?.connection || "",
+      });
+    }
     setError("");
-  }, [currentParent]);
+  }, [currentParent, isRoot]);
 
   const handleChange = (e) => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
-
-  const handleSave = async () => {
+  const handleSaveImportance = async () => {
     try {
       const imp = parseInt(values.importance, 10);
+
+      // For root nodes, don't send connection; for non-root nodes, include connection
+      const attributesToUpdate = isRoot
+        ? { importance: imp }
+        : { importance: imp, connection: values.connection };
+
       await axiosInstance.put(
         `/api/projects/${projectId}/nodes/${currentParent.id}`,
-        { attributes: { importance: imp, connection: values.connection } }
+        { attributes: attributesToUpdate }
       );
-      onNextParent();
+      // Move to step 3 (RelativeImportance) instead of finishing
+      setStep(3);
     } catch (err) {
       console.error("Failed to update parent node:", err);
       setError("Failed to update node. Please try again.");
     }
   };
-
   return (
     <div className="p-6 bg-white rounded-lg shadow-md mx-4">
       <h2 className="text-xl font-semibold mb-4">
@@ -72,7 +88,7 @@ const ParentProcessing = ({
             setStep(2);
           }}
         />
-      ) : (
+      ) : step === 2 ? (
         <>
           <div className="mb-4">
             <label className="block text-lg font-medium text-gray-700 mb-2">
@@ -103,12 +119,19 @@ const ParentProcessing = ({
             </button>
             <button
               className="text-xl bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-              onClick={handleSave}
+              onClick={handleSaveImportance}
             >
               Continue
             </button>
           </div>
         </>
+      ) : (
+        <RelativeImportance
+          currentParent={currentParent}
+          projectId={projectId}
+          onComplete={onNextParent}
+          onBack={() => setStep(2)}
+        />
       )}
     </div>
   );

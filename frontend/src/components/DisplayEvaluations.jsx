@@ -381,7 +381,8 @@ const DisplayEvaluations = () => {
                                 evalItem.alternativeValues
                                   ? evalItem.alternativeValues[node.id]
                                   : "-"
-                              );                              return satisfaction !== null ? (
+                              );
+                              return satisfaction !== null ? (
                                 <>
                                   {`${(satisfaction * 100).toFixed(2)}%`}
                                   <SatisfactionBar percentage={satisfaction} />

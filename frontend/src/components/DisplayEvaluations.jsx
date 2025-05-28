@@ -381,10 +381,9 @@ const DisplayEvaluations = () => {
                                 evalItem.alternativeValues
                                   ? evalItem.alternativeValues[node.id]
                                   : "-"
-                              );
-                              return satisfaction !== null ? (
+                              );                              return satisfaction !== null ? (
                                 <>
-                                  {`${Math.round(satisfaction * 100)}%`}
+                                  {`${(satisfaction * 100).toFixed(2)}%`}
                                   <SatisfactionBar percentage={satisfaction} />
                                 </>
                               ) : (

@@ -1,79 +1,102 @@
-// Helper function to identify children of a parent based on node numbers
-const getChildrenNodeNumbers = (parentNodeNumber, allNodes) => {
-  if (!parentNodeNumber || parentNodeNumber === "-") return [];
+/**
+ * Parent Satisfaction Calculation Utilities
+ * Calculates parent node satisfaction based on children's satisfaction percentages
+ */
+
+/**
+ * Build a map of parent-children relationships from the project tree
+ * @param {Object} treeData - The project tree data
+ * @returns {Object} Map where keys are parent node IDs and values are arrays of child node IDs
+ */
+export const buildParentChildrenMap = (treeData) => {
+  const parentChildrenMap = {};
   
-  const children = [];
+  const traverse = (node) => {
+    if (node.children && node.children.length > 0) {
+      // This node is a parent
+      parentChildrenMap[node.id.toString()] = node.children.map(child => child.id.toString());
+      
+      // Recursively traverse children
+      node.children.forEach(child => traverse(child));
+    }
+  };
+  
+  traverse(treeData);
+  return parentChildrenMap;
+};
+
+/**
+ * Calculate satisfaction for all parent nodes based on children's satisfaction
+ * @param {Object} leafSatisfactionMap - Map of leaf node satisfactions {nodeId: satisfactionPercentage}
+ * @param {Object} parentChildrenMap - Map of parent-children relationships
+ * @param {Array} allNodes - All nodes in the tree (in order)
+ * @returns {Object} Map of all node satisfactions including calculated parent satisfactions
+ */
+export const calculateParentSatisfactions = (leafSatisfactionMap, parentChildrenMap, allNodes) => {
+  const allSatisfactions = { ...leafSatisfactionMap };
+  
+  // Get all parent nodes sorted by depth (deepest first)
+  const parentNodes = allNodes.filter(node => 
+    parentChildrenMap[node.id.toString()]
+  ).reverse(); // Reverse to process deepest nodes first
+  
+  // Calculate satisfaction for each parent node
+  parentNodes.forEach(parentNode => {
+    const parentId = parentNode.id.toString();
+    const childrenIds = parentChildrenMap[parentId];
+    
+    if (childrenIds && childrenIds.length > 0) {
+      // Get satisfaction values for all children
+      const childrenSatisfactions = childrenIds
+        .map(childId => allSatisfactions[childId])
+        .filter(satisfaction => satisfaction !== null && satisfaction !== undefined);
+      
+      if (childrenSatisfactions.length > 0) {
+        // Calculate average satisfaction of children
+        const averageSatisfaction = childrenSatisfactions.reduce((sum, satisfaction) => sum + satisfaction, 0) / childrenSatisfactions.length;
+        allSatisfactions[parentId] = averageSatisfaction;
+      } else {
+        allSatisfactions[parentId] = null;
+      }
+    }
+  });
+  
+  return allSatisfactions;
+};
+
+/**
+ * Calculate satisfaction for a specific alternative across all nodes
+ * @param {Array} allNodes - All nodes in the tree
+ * @param {Object} alternativeValues - The alternative values for leaf nodes
+ * @param {Object} queryDetails - Query details for calculating leaf satisfactions
+ * @param {Function} calculateLeafSatisfaction - Function to calculate leaf satisfaction
+ * @param {Object} projectTree - The complete project tree
+ * @returns {Object} Map of node satisfactions for this alternative
+ */
+export const calculateAlternativeSatisfactions = (
+  allNodes, 
+  alternativeValues, 
+  queryDetails, 
+  calculateLeafSatisfaction, 
+  projectTree
+) => {
+  // First, calculate satisfaction for all leaf nodes
+  const leafSatisfactions = {};
   
   allNodes.forEach(node => {
-    const nodeNum = node.nodeNumber;
-    if (!nodeNum || nodeNum === "-" || nodeNum === parentNodeNumber) return;
-    
-    // Check if this node is a direct child of the parent
-    // A node is a child if it starts with parent's number and has exactly one more digit/level
-    if (nodeNum.startsWith(parentNodeNumber)) {
-      const remainingPart = nodeNum.substring(parentNodeNumber.length);
-      
-      // For direct children, remaining part should be a single digit or level
-      // Examples: 
-      // Parent "1" -> children "11", "12", "13", etc.
-      // Parent "11" -> children "111", "112", "113", etc.
-      // Parent "121" -> children "1211", "1212", "1213", etc.
-      
-      if (remainingPart.length === 1 && /^\d$/.test(remainingPart)) {
-        children.push(node);
-      } else if (remainingPart.length === 2 && /^\d{2}$/.test(remainingPart)) {
-        // Handle cases like 121 -> 1211, 1212
-        const expectedLength = parentNodeNumber.length + 1;
-        if (nodeNum.length === expectedLength + 1) {
-          children.push(node);
-        }
-      }
+    const nodeId = node.id.toString();
+    if (alternativeValues && alternativeValues[node.id] !== undefined) {
+      // This is a leaf node with a value
+      const satisfaction = calculateLeafSatisfaction(nodeId, alternativeValues[node.id]);
+      leafSatisfactions[nodeId] = satisfaction;
     }
   });
   
-  return children;
-};
-
-// Calculate parent satisfaction as average of children satisfactions
-export const calculateParentSatisfaction = (parentNode, allNodes, evaluations, calculateChildSatisfaction) => {
-  const children = getChildrenNodeNumbers(parentNode.nodeNumber, allNodes);
+  // Build parent-children map
+  const parentChildrenMap = buildParentChildrenMap(projectTree);
   
-  if (children.length === 0) {
-    return null; // No children, so no satisfaction to calculate
-  }
+  // Calculate parent satisfactions
+  const allSatisfactions = calculateParentSatisfactions(leafSatisfactions, parentChildrenMap, allNodes);
   
-  const parentSatisfactions = {};
-  
-  // Calculate satisfaction for each alternative
-  evaluations.forEach(evaluation => {
-    let totalSatisfaction = 0;
-    let validChildren = 0;
-    
-    children.forEach(child => {
-      const childSatisfaction = calculateChildSatisfaction(
-        child.id.toString(),
-        evaluation.alternativeValues ? evaluation.alternativeValues[child.id] : "-"
-      );
-      
-      if (childSatisfaction !== null && childSatisfaction !== undefined) {
-        totalSatisfaction += childSatisfaction;
-        validChildren++;
-      }
-    });
-    
-    // Calculate average satisfaction if we have valid children
-    if (validChildren > 0) {
-      parentSatisfactions[evaluation._id] = totalSatisfaction / validChildren;
-    } else {
-      parentSatisfactions[evaluation._id] = null;
-    }
-  });
-  
-  return parentSatisfactions;
-};
-
-// Helper function to check if a node is a parent (has children)
-export const isParentNode = (node, allNodes) => {
-  const children = getChildrenNodeNumbers(node.nodeNumber, allNodes);
-  return children.length > 0;
+  return allSatisfactions;
 };

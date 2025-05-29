@@ -363,7 +363,7 @@ const DisplayEvaluations = () => {
                     <td className="border border-gray-300 p-2">{node.name}</td>
                     <td className="border border-gray-300 p-2">
                       {node.importance || "-"}
-                    </td>{" "}
+                    </td>
                     <td className="border border-gray-300 p-2">
                       {getConnectionLabel(node.connection)}
                     </td>
@@ -383,7 +383,7 @@ const DisplayEvaluations = () => {
                             evalItem.alternativeValues[node.id] !== undefined
                             ? evalItem.alternativeValues[node.id]
                             : "-"
-                          : "-"}{" "}
+                          : "-"}
                       </td>
                     ))}
                     {evaluations.map((evalItem) => (

@@ -160,6 +160,87 @@ const scm = (values, weights) => {
 };
 
 /**
+ * Helper function to invert satisfaction values (for disjunction)
+ * @param {Array} values - Array of satisfaction values (0-1)
+ * @returns {Array} Array of inverted satisfaction values
+ */
+const invert = (values) => {
+  return values.map(value => 1 - value);
+};
+
+// Disjunction functions using inversion principle
+
+/**
+ * Soft Disjunction Plus (SD+) aggregation
+ * @param {Array} values - Array of satisfaction values (0-1)
+ * @param {Array} weights - Array of normalized weights
+ * @returns {number} SDP aggregation result
+ */
+const sdp = (values, weights) => {
+  return 1 - scp(invert(values), weights);
+};
+
+/**
+ * Soft Disjunction (SD) aggregation
+ * @param {Array} values - Array of satisfaction values (0-1)
+ * @param {Array} weights - Array of normalized weights
+ * @returns {number} SD aggregation result
+ */
+const sd = (values, weights) => {
+  return 1 - sc(invert(values), weights);
+};
+
+/**
+ * Soft Disjunction Minus (SD-) aggregation
+ * @param {Array} values - Array of satisfaction values (0-1)
+ * @param {Array} weights - Array of normalized weights
+ * @returns {number} SDM aggregation result
+ */
+const sdm = (values, weights) => {
+  return 1 - scm(invert(values), weights);
+};
+
+/**
+ * Hard Disjunction Plus (HD+) aggregation
+ * @param {Array} values - Array of satisfaction values (0-1)
+ * @param {Array} weights - Array of normalized weights
+ * @returns {number} HDP aggregation result
+ */
+const hdp = (values, weights) => {
+  return 1 - hcp(invert(values), weights);
+};
+
+/**
+ * Hard Disjunction (HD) aggregation
+ * @param {Array} values - Array of satisfaction values (0-1)
+ * @param {Array} weights - Array of normalized weights
+ * @returns {number} HD aggregation result
+ */
+const hd = (values, weights) => {
+  return 1 - hc(invert(values), weights);
+};
+
+/**
+ * Hard Disjunction Minus (HD-) aggregation
+ * @param {Array} values - Array of satisfaction values (0-1)
+ * @param {Array} weights - Array of normalized weights
+ * @returns {number} HDM aggregation result
+ */
+const hdm = (values, weights) => {
+  return 1 - hcm(invert(values), weights);
+};
+
+/**
+ * Hard Disjunction Plus Plus (HD++) aggregation
+ * @param {Array} values - Array of satisfaction values (0-1)
+ * @param {Array} weights - Array of normalized weights
+ * @returns {number} HDPP aggregation result
+ */
+const hdpp = (values, weights) => {
+  return 1 - hcp(invert(values), weights);
+};
+
+/**
  * Convert string connection values to numeric values
  * @param {string|number} connectionValue - Connection value (string or numeric)
  * @returns {number} Numeric connection value
@@ -200,8 +281,7 @@ const convertConnectionToNumeric = (connectionValue) => {
 const getAggregationFunction = (connectionValue) => {
   // Convert string connection to numeric first
   const numericConnection = convertConnectionToNumeric(connectionValue);
-  
-  const connectionMap = {
+    const connectionMap = {
     8: hcp,   // HC++
     7: hcp,   // HC+ (using HCP)
     6: hc,    // HC
@@ -209,14 +289,14 @@ const getAggregationFunction = (connectionValue) => {
     3: scp,   // SC+
     2: sc,    // SC
     1: scm,   // SC-
-    // Negative values for disjunctions (same functions but conceptually different)
-    [-1]: scm, // SD-
-    [-2]: sc,  // SD
-    [-3]: scp, // SD+
-    [-5]: hcm, // HD-
-    [-6]: hc,  // HD
-    [-7]: hcp, // HD+
-    [-8]: hcp, // HD++
+    // Negative values for disjunctions (using proper disjunction functions)
+    [-1]: sdm, // SD-
+    [-2]: sd,  // SD
+    [-3]: sdp, // SD+
+    [-5]: hdm, // HD-
+    [-6]: hd,  // HD
+    [-7]: hdp, // HD+
+    [-8]: hdpp, // HD++
   };
 
   // If connection type is found in the map, use the specific aggregation function

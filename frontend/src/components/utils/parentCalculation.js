@@ -6,15 +6,18 @@
 /**
  * Build a map of parent-children relationships from the project tree
  * @param {Object} treeData - The project tree data
- * @returns {Object} Map where keys are parent node IDs and values are arrays of child node IDs
+ * @returns {Object} Map where keys are parent node IDs and values are arrays of child objects with id and importance
  */
 export const buildParentChildrenMap = (treeData) => {
   const parentChildrenMap = {};
   
   const traverse = (node) => {
     if (node.children && node.children.length > 0) {
-      // This node is a parent
-      parentChildrenMap[node.id.toString()] = node.children.map(child => child.id.toString());
+      // This node is a parent - store children with their importance values
+      parentChildrenMap[node.id.toString()] = node.children.map(child => ({
+        id: child.id.toString(),
+        importance: child.attributes?.importance || 1 // Default importance to 1 if not specified
+      }));
       
       // Recursively traverse children
       node.children.forEach(child => traverse(child));
@@ -26,9 +29,51 @@ export const buildParentChildrenMap = (treeData) => {
 };
 
 /**
- * Calculate satisfaction for all parent nodes based on children's satisfaction
+ * Calculate normalized weights from importance values
+ * @param {Array} importanceValues - Array of importance values
+ * @returns {Array} Array of normalized weights that sum to 1
+ */
+export const calculateNormalizedWeights = (importanceValues) => {
+  // If no importance values or all are zero/null, use equal weights
+  const validImportance = importanceValues.filter(val => val && val > 0);
+  if (validImportance.length === 0) {
+    return importanceValues.map(() => 1 / importanceValues.length);
+  }
+  
+  // Calculate sum of all importance values
+  const sum = importanceValues.reduce((total, val) => total + (val || 0), 0);
+  
+  // Normalize: each weight = importance / sum
+  return importanceValues.map(val => (val || 0) / sum);
+};
+
+/**
+ * Calculate weighted mean of satisfaction values
+ * @param {Array} satisfactionValues - Array of satisfaction percentages (0-1)
+ * @param {Array} weights - Array of normalized weights (should sum to 1)
+ * @returns {number} Weighted mean satisfaction (0-1)
+ */
+export const calculateWeightedMean = (satisfactionValues, weights) => {
+  if (satisfactionValues.length !== weights.length) {
+    throw new Error('Satisfaction values and weights arrays must have the same length');
+  }
+  
+  if (satisfactionValues.length === 0) {
+    return null;
+  }
+  
+  // Calculate weighted sum: Σ(satisfaction_i * weight_i)
+  const weightedSum = satisfactionValues.reduce((sum, satisfaction, index) => {
+    return sum + (satisfaction * weights[index]);
+  }, 0);
+  
+  return weightedSum;
+};
+
+/**
+ * Calculate satisfaction for all parent nodes based on children's satisfaction using weighted mean
  * @param {Object} leafSatisfactionMap - Map of leaf node satisfactions {nodeId: satisfactionPercentage}
- * @param {Object} parentChildrenMap - Map of parent-children relationships
+ * @param {Object} parentChildrenMap - Map of parent-children relationships with importance
  * @param {Array} allNodes - All nodes in the tree (in order)
  * @returns {Object} Map of all node satisfactions including calculated parent satisfactions
  */
@@ -40,21 +85,31 @@ export const calculateParentSatisfactions = (leafSatisfactionMap, parentChildren
     parentChildrenMap[node.id.toString()]
   ).reverse(); // Reverse to process deepest nodes first
   
-  // Calculate satisfaction for each parent node
+  // Calculate satisfaction for each parent node using weighted mean
   parentNodes.forEach(parentNode => {
     const parentId = parentNode.id.toString();
-    const childrenIds = parentChildrenMap[parentId];
+    const childrenInfo = parentChildrenMap[parentId];
     
-    if (childrenIds && childrenIds.length > 0) {
-      // Get satisfaction values for all children
-      const childrenSatisfactions = childrenIds
-        .map(childId => allSatisfactions[childId])
-        .filter(satisfaction => satisfaction !== null && satisfaction !== undefined);
+    if (childrenInfo && childrenInfo.length > 0) {
+      // Get satisfaction values and importance weights for all children
+      const childrenData = childrenInfo
+        .map(childInfo => ({
+          satisfaction: allSatisfactions[childInfo.id],
+          importance: childInfo.importance
+        }))
+        .filter(child => child.satisfaction !== null && child.satisfaction !== undefined);
       
-      if (childrenSatisfactions.length > 0) {
-        // Calculate average satisfaction of children
-        const averageSatisfaction = childrenSatisfactions.reduce((sum, satisfaction) => sum + satisfaction, 0) / childrenSatisfactions.length;
-        allSatisfactions[parentId] = averageSatisfaction;
+      if (childrenData.length > 0) {
+        // Extract satisfaction values and importance weights
+        const satisfactionValues = childrenData.map(child => child.satisfaction);
+        const importanceValues = childrenData.map(child => child.importance);
+        
+        // Calculate normalized weights
+        const normalizedWeights = calculateNormalizedWeights(importanceValues);
+        
+        // Calculate weighted mean satisfaction
+        const weightedSatisfaction = calculateWeightedMean(satisfactionValues, normalizedWeights);
+        allSatisfactions[parentId] = weightedSatisfaction;
       } else {
         allSatisfactions[parentId] = null;
       }

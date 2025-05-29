@@ -22,9 +22,7 @@ export function scoreIncreasing(
     const validPoints = specificPoints.filter(pt => 
       pt && typeof pt.value !== 'undefined' && typeof pt.satisfaction !== 'undefined'
     );
-    
-    console.log('Using specific points in calculation:', validPoints);
-    
+        
     // Add boundary points to the array for interpolation
     const allPoints = [
       { value: minVal, satisfaction: 0 },
@@ -74,9 +72,7 @@ export function scoreDecreasing(
     const validPoints = specificPoints.filter(pt => 
       pt && typeof pt.value !== 'undefined' && typeof pt.satisfaction !== 'undefined'
     );
-    
-    console.log('Using specific points in decreasing calculation:', validPoints);
-    
+        
     // Add boundary points to the array for interpolation
     const allPoints = [
       { value: minVal, satisfaction: 1 },

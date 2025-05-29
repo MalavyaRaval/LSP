@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axiosInstance from "./utils/axiosInstance";
 import { useParams } from "react-router-dom";
 import {
@@ -6,6 +6,7 @@ import {
   scoreDecreasing,
   scoreInRange,
 } from "./utils/satisfactionCalculator";
+import { calculateAlternativeSatisfactions } from "./utils/parentCalculation";
 import Navbar from "./Nav/Navbar";
 
 // Helper: recursively get all nodes in tree order
@@ -70,6 +71,7 @@ const DisplayEvaluations = () => {
   const [queryDetails, setQueryDetails] = useState({});
   const [nodeDetails, setNodeDetails] = useState({});
   const [allNodes, setAllNodes] = useState([]);
+  const [allSatisfactions, setAllSatisfactions] = useState({}); // Store satisfactions for all alternatives
 
   // Fetch evaluations.
   useEffect(() => {
@@ -159,6 +161,31 @@ const DisplayEvaluations = () => {
     fetchQueryResultsMapping();
   }, [projectname]);
 
+  // Calculate all satisfactions when data is ready
+  useEffect(() => {
+    if (
+      evaluations.length > 0 &&
+      projectTree &&
+      Object.keys(queryDetails).length > 0 &&
+      allNodes.length > 0
+    ) {
+      const satisfactionsMap = {};
+
+      evaluations.forEach((evalItem) => {
+        const alternativeSatisfactions = calculateAlternativeSatisfactions(
+          allNodes,
+          evalItem.alternativeValues,
+          queryDetails,
+          calculateSatisfaction,
+          projectTree
+        );
+        satisfactionsMap[evalItem._id] = alternativeSatisfactions;
+      });
+
+      setAllSatisfactions(satisfactionsMap);
+    }
+  }, [evaluations, projectTree, queryDetails, allNodes]);
+
   // Format query values for display
   const getQueryValuesDisplay = (nodeId) => {
     const queryInfo = queryDetails[nodeId];
@@ -206,23 +233,13 @@ const DisplayEvaluations = () => {
         const min = Number(values.from);
         const max = Number(values.to);
         const specificPoints = values.specificPoints || [];
-        console.log("Q4 calculation with specific points:", {
-          value: numValue,
-          min,
-          max,
-          specificPoints,
-        });
+
         satisfaction = scoreIncreasing(numValue, min, max, specificPoints);
       } else if (queryType === "q5") {
         const min = Number(values.from);
         const max = Number(values.to);
         const specificPoints = values.specificPoints || [];
-        console.log("Q5 calculation with specific points:", {
-          value: numValue,
-          min,
-          max,
-          specificPoints,
-        });
+
         satisfaction = scoreDecreasing(numValue, min, max, specificPoints);
       } else if (queryType === "q6") {
         const A = Number(values.A);
@@ -293,7 +310,7 @@ const DisplayEvaluations = () => {
                 <th className="border border-gray-300 p-2">Importance</th>
                 <th className="border border-gray-300 p-2">Connection</th>
                 <th className="border border-gray-300 p-2">Query Type</th>
-                <th className="border border-gray-300 p-2">Criteria</th>{" "}
+                <th className="border border-gray-300 p-2">Criteria</th>
                 {evaluations.map((evalItem) => (
                   <th key={evalItem._id} className="border border-gray-300 p-2">
                     {evalItem.alternativeName}
@@ -317,7 +334,7 @@ const DisplayEvaluations = () => {
                 <td className="border border-gray-300 p-2">-</td>
                 <td className="border border-gray-300 p-2">-</td>
                 <td className="border border-gray-300 p-2">-</td>
-                <td className="border border-gray-300 p-2">-</td>{" "}
+                <td className="border border-gray-300 p-2">-</td>
                 {evaluations.map((evalItem) => (
                   <td key={evalItem._id} className="border border-gray-300 p-2">
                     {evalItem.alternativeCost}
@@ -349,13 +366,13 @@ const DisplayEvaluations = () => {
                     </td>
                     <td className="border border-gray-300 p-2">
                       {getConnectionLabel(node.connection)}
-                    </td>
+                    </td>{" "}
                     <td className="border border-gray-300 p-2">
                       {isLeaf && query ? query.queryType.toUpperCase() : "-"}
                     </td>
                     <td className="border border-gray-300 p-2">
                       {isLeaf ? getQueryValuesDisplay(node.id.toString()) : "-"}
-                    </td>{" "}
+                    </td>
                     {evaluations.map((evalItem) => (
                       <td
                         key={evalItem._id}
@@ -374,24 +391,21 @@ const DisplayEvaluations = () => {
                         key={`${evalItem._id}-satisfaction`}
                         className="border border-gray-300 p-2 bg-blue-50"
                       >
-                        {isLeaf
-                          ? (() => {
-                              const satisfaction = calculateSatisfaction(
-                                node.id.toString(),
-                                evalItem.alternativeValues
-                                  ? evalItem.alternativeValues[node.id]
-                                  : "-"
-                              );
-                              return satisfaction !== null ? (
-                                <>
-                                  {`${(satisfaction * 100).toFixed(2)}%`}
-                                  <SatisfactionBar percentage={satisfaction} />
-                                </>
-                              ) : (
-                                "-"
-                              );
-                            })()
-                          : "-"}
+                        {(() => {
+                          const satisfaction = allSatisfactions[evalItem._id]
+                            ? allSatisfactions[evalItem._id][node.id.toString()]
+                            : null;
+
+                          return satisfaction !== null &&
+                            satisfaction !== undefined ? (
+                            <>
+                              {`${(satisfaction * 100).toFixed(2)}%`}
+                              <SatisfactionBar percentage={satisfaction} />
+                            </>
+                          ) : (
+                            "-"
+                          );
+                        })()}
                       </td>
                     ))}
                   </tr>

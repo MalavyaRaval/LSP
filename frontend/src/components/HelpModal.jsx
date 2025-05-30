@@ -10,24 +10,9 @@ const HelpModal = ({ isOpen, onClose, currentPage }) => {
 
     Login:
       "This is the Login page help. Enter your registered email and password to access your account. If you forget your password, use the 'Forgot Password' option to reset it.",
-
     "Sign Up":
-      "This is the Sign Up page help. Fill in the required information to create a new account. Make sure to use a valid email address and create a strong password for security.",
-
-    "About Us":
-      "This is the About Us page help. Here you can learn about the team behind LSPrec, our mission, and the technology we use to provide our services.",
-
-    "My Profile":
-      "This is the My Profile page help. You can view and edit your profile information here. Use the update buttons to save any changes made to your profile.",
-
-    Queries:
+      "This is the Sign Up page help. Fill in the required information to create a new account. Make sure to use a valid email address and create a strong password for security.",    Queries:
       "This is the Queries page help. Here you can view and create new queries for your project. Each query has different parameters you can configure to get specific data.",
-
-    "Query Results":
-      "This is the Query Results page help. It displays the results of your queries. You can filter and sort the results using the options provided.",
-
-    "Project Validation":
-      "This is the Project Validation page help. Here you can validate your project configurations and settings before finalizing.",
 
     "Project Evaluation":
       "This is the Project Evaluation page help. It shows you metrics and performance data for your project. Use this information to improve your project settings.",

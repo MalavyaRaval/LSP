@@ -10,7 +10,6 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { projectname } = useParams();
-
   // Determine current page based on URL
   useEffect(() => {
     const path = location.pathname;
@@ -19,18 +18,9 @@ const Navbar = () => {
     } else if (path.includes("/login")) {
       setCurrentPage("Login");
     } else if (path.includes("/signup")) {
-      setCurrentPage("Sign Up");
-    } else if (path.includes("/aboutus")) {
-      setCurrentPage("About Us");
-    } else if (path.includes("/myprofile")) {
-      setCurrentPage("My Profile");
-    } else if (path.includes("/project")) {
-      if (path.includes("/validation")) {
-        setCurrentPage("Project Validation");
-      } else if (path.includes("/evaluate")) {
+      setCurrentPage("Sign Up");    } else if (path.includes("/project")) {
+      if (path.includes("/evaluate")) {
         setCurrentPage("Project Evaluation");
-      } else if (path.includes("/Queryresults")) {
-        setCurrentPage("Query Results");
       } else {
         // When on queries page, we'll display the project name in the center
         if (projectname) {

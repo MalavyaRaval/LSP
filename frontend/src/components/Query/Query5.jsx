@@ -185,8 +185,8 @@ const Query5 = ({ onSave, nodeId, projectId, nodeName }) => {
                 style={{ fontSize: "1.75rem" }}
               />
             </td>
-          </tr>{" "}
-          {/* Button for adding specific values */}{" "}
+          </tr>
+          {/* Button for adding specific values */}
           <tr className="bg-gray-50 hover:bg-gray-100">
             <td colSpan="2" className="border border-gray-400 p-2">
               <div className="flex justify-between items-center">
@@ -213,7 +213,6 @@ const Query5 = ({ onSave, nodeId, projectId, nodeName }) => {
           {showSpecificValue &&
             specificValues.map((item, index) => (
               <React.Fragment key={index}>
-                {" "}
                 <tr className="bg-blue-50">
                   <td className="text-2xl border border-gray-400 p-4">
                     <div className="flex justify-between items-center">

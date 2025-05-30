@@ -43,14 +43,9 @@ const ProjectPage = () => {
         });
     }
   }, [projectSlug, projectname]);
-
   const handleNav = (action) => {
     if (action === "projects") {
       navigate("/home");
-    } else if (action === "validation") {
-      navigate(`/user/${evaluatorName}/project/${projectSlug}/validation`);
-    } else if (action === "queryResults") {
-      navigate(`/user/${evaluatorName}/project/${projectSlug}/Queryresults`);
     } else if (action === "evaluate") {
       navigate(`/user/${evaluatorName}/project/${projectSlug}/evaluate`);
     } else if (action === "exit") {
@@ -67,8 +62,7 @@ const ProjectPage = () => {
       {/* Ultra-compact header with navigation buttons */}
       <header className="border-b border-gray-200 py-0.5 -mt-2">
         <div className="flex flex-wrap items-center justify-between px-3 gap-1">
-          <div className="flex flex-wrap gap-1">
-            <button
+          <div className="flex flex-wrap gap-1">            <button
               className="px-3 py-1 border border-gray-300 text-gray-700 rounded bg-gray-200 hover:bg-gray-300 text-2xl font-bold"
               onClick={() => handleNav("projects")}
             >
@@ -76,21 +70,9 @@ const ProjectPage = () => {
             </button>
             <button
               className="px-3 py-1 border border-gray-300 text-gray-700 rounded bg-gray-200 hover:bg-gray-300 text-2xl font-bold"
-              onClick={() => handleNav("validation")}
-            >
-              Validation
-            </button>
-            <button
-              className="px-3 py-1 border border-gray-300 text-gray-700 rounded bg-gray-200 hover:bg-gray-300 text-2xl font-bold"
               onClick={() => handleNav("evaluate")}
             >
               Evaluate
-            </button>
-            <button
-              className="px-3 py-1 border border-gray-300 text-gray-700 rounded bg-gray-200 hover:bg-gray-300 text-2xl font-bold"
-              onClick={() => handleNav("queryResults")}
-            >
-              Query Results
             </button>
             <button
               className={`px-3 py-1 border border-gray-300 rounded bg-gray-200 hover:bg-gray-300 text-2xl font-bold ${

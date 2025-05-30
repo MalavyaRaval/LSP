@@ -47,11 +47,8 @@ const ProjectPage = () => {
     if (action === "projects") {
       navigate("/home");
     } else if (action === "evaluate") {
-      navigate(`/user/${evaluatorName}/project/${projectSlug}/evaluate`);
-    } else if (action === "exit") {
+      navigate(`/user/${evaluatorName}/project/${projectSlug}/evaluate`);    } else if (action === "exit") {
       navigate("/");
-    } else {
-      console.log(`Navigate to ${action}`);
     }
   };
 

@@ -312,14 +312,10 @@ const DemaChat = () => {
         // Get the IDs of nodes created under this parent - these are the ones we'll delete
         const nodesToDelete = createdNodeIds[previousState.parentId] || [];
 
-        if (nodesToDelete.length > 0) {
-          // Delete specifically these nodes
+        if (nodesToDelete.length > 0) {          // Delete specifically these nodes
           await axiosInstance.delete(`/api/projects/${projectId}/nodes`, {
             data: { nodeIds: nodesToDelete },
           });
-          console.log(
-            `Successfully removed ${nodesToDelete.length} nodes created under ${previousState.parentId}`
-          );
 
           // Remove these IDs from our tracking state
           setCreatedNodeIds((prev) => {
@@ -454,11 +450,9 @@ const DemaChat = () => {
     setParentId(null);
     // Reset children details to five preset rows.
     setChildrenDetails(getInitialChildren());
-    try {
-      const res = await axiosInstance.get(`/api/projects/${projectId}`);
+    try {      const res = await axiosInstance.get(`/api/projects/${projectId}`);
       const treeData = res.data;
       const leaves = getLeafNodes(treeData);
-      console.log("Leaf nodes found:", leaves);
       setLeafNodes(leaves);
       setProcessingLeaves(true);
       setCurrentLeafIndex(0);

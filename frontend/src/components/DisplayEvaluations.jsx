@@ -12,13 +12,14 @@ import Navbar from "./Nav/Navbar";
 // Helper: recursively get all nodes in tree order
 const getAllNodesInOrder = (node, nodesList = []) => {
   if (!node) return nodesList;
-
   nodesList.push({
     id: node.id,
     name: node.name,
     nodeNumber: node.nodeNumber || "1",
     importance: node.attributes?.importance,
     connection: node.attributes?.connection,
+    partialabsorption: node.attributes?.partialabsorption,
+    penaltyreward: node.attributes?.penaltyreward,
   });
 
   if (node.children) {
@@ -26,6 +27,21 @@ const getAllNodesInOrder = (node, nodesList = []) => {
   }
 
   return nodesList;
+};
+
+// Helper function to convert penalty/reward values back to impact level
+const getImpactLevelFromValues = (penaltyreward) => {
+  if (!penaltyreward) return "Not Set";
+
+  const { penalty, reward } = penaltyreward;
+
+  // Match against predefined mappings
+  if (penalty <= 0.05 && reward <= 0.03) return "Low";
+  if (penalty <= 0.15 && reward <= 0.1) return "Medium";
+  if (penalty <= 0.3 && reward <= 0.2) return "High";
+
+  // For custom values, show the raw numbers
+  return `Custom (P:${penalty}, R:${reward})`;
 };
 
 // Helper: recursively extract leaf nodes (nodes with no children)
@@ -285,7 +301,11 @@ const DisplayEvaluations = () => {
                 <th className="border border-gray-300 p-2">Node #</th>
                 <th className="border border-gray-300 p-2">Node Name</th>
                 <th className="border border-gray-300 p-2">Importance</th>
-                <th className="border border-gray-300 p-2">Connection</th>
+                <th className="border border-gray-300 p-2">Connection</th>{" "}
+                <th className="border border-gray-300 p-2">
+                  Partial Absorption
+                </th>
+                <th className="border border-gray-300 p-2">Impact Level</th>
                 <th className="border border-gray-300 p-2">Query Type</th>
                 <th className="border border-gray-300 p-2">Criteria</th>
                 {evaluations.map((evalItem) => (
@@ -312,6 +332,7 @@ const DisplayEvaluations = () => {
                 <td className="border border-gray-300 p-2">-</td>
                 <td className="border border-gray-300 p-2">-</td>
                 <td className="border border-gray-300 p-2">-</td>
+                <td className="border border-gray-300 p-2">-</td>
                 {evaluations.map((evalItem) => (
                   <td key={evalItem._id} className="border border-gray-300 p-2">
                     {evalItem.alternativeCost}
@@ -326,7 +347,6 @@ const DisplayEvaluations = () => {
                   </td>
                 ))}
               </tr>
-
               {/* All Nodes Rows */}
               {allNodes.map((node) => {
                 const isLeaf = allLeafKeys.includes(node.id.toString());
@@ -340,9 +360,15 @@ const DisplayEvaluations = () => {
                     <td className="border border-gray-300 p-2">{node.name}</td>
                     <td className="border border-gray-300 p-2">
                       {node.importance || "-"}
-                    </td>{" "}
+                    </td>
                     <td className="border border-gray-300 p-2">
                       {node.connection || "-"}
+                    </td>{" "}
+                    <td className="border border-gray-300 p-2">
+                      {node.partialabsorption || "-"}
+                    </td>
+                    <td className="border border-gray-300 p-2">
+                      {getImpactLevelFromValues(node.penaltyreward)}
                     </td>
                     <td className="border border-gray-300 p-2">
                       {isLeaf && query ? query.queryType.toUpperCase() : "-"}

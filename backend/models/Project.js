@@ -25,6 +25,24 @@ const nodeAttributesSchema = new mongoose.Schema({
       "HD++",
       "CPA",
     ],
+  },  partialabsorption: {
+    type: String,
+    enum: ["Mandatory", "Optional"],
+    default: null,
+  },
+  penaltyreward: {
+    penalty: {
+      type: Number,
+      min: 0,
+      max: 1,
+      default: 0.15
+    },
+    reward: {
+      type: Number,
+      min: 0,
+      max: 1,
+      default: 0.1
+    }
   },
   created: { type: Date, default: Date.now },
   decisionProcess: String,
@@ -56,7 +74,7 @@ const projectSchema = new mongoose.Schema({
       id: Date.now(),
       name: "Root",
       nodeNumber: "1",
-      attributes: { importance: null, connection: null, created: Date.now() },
+      attributes: { importance: null, connection: null, partialabsorption: null, created: Date.now() },
       children: [],
       parent: null,
     }),

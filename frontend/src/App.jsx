@@ -12,20 +12,20 @@ import DisplayEvaluations from "./components/DisplayEvaluations";
 const App = () => {
   return (
     <Router>
-      {" "}
       <Routes>
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
         <Route path="/home" element={<Home />} />
         <Route path="/project/:projectId" element={<ProjectTree />} />
-        <Route path="/" element={<Intro />} />        <Route
+        <Route path="/" element={<Intro />} />{" "}
+        <Route
           path="/user/:username/project/:projectname"
           element={<ProjectPage />}
         />
         <Route
           path="/user/:username/project/:projectname/dema-chat"
           element={<DemaChat />}
-        />{" "}
+        />
         <Route
           path="/user/:username/project/:projectname/evaluate"
           element={<DisplayEvaluations />}

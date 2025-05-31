@@ -38,29 +38,6 @@ const getLeafNodes = (node) => {
   return leaves;
 };
 
-// Helper: Convert connection value to display label
-const getConnectionLabel = (value) => {
-  const connectionMap = {
-    4: "A",
-    1: "SC-",
-    2: "SC",
-    3: "SC+",
-    5: "HC-",
-    6: "HC",
-    7: "HC+",
-    8: "HC++",
-    "-1": "SD-",
-    "-2": "SD",
-    "-3": "SD+",
-    "-5": "HD-",
-    "-6": "HD",
-    "-7": "HD+",
-    "-8": "HD++",
-  };
-
-  return connectionMap[value?.toString()] || value || "-";
-};
-
 const DisplayEvaluations = () => {
   const { projectname } = useParams();
   const [evaluations, setEvaluations] = useState([]);
@@ -363,9 +340,9 @@ const DisplayEvaluations = () => {
                     <td className="border border-gray-300 p-2">{node.name}</td>
                     <td className="border border-gray-300 p-2">
                       {node.importance || "-"}
-                    </td>
+                    </td>{" "}
                     <td className="border border-gray-300 p-2">
-                      {getConnectionLabel(node.connection)}
+                      {node.connection || "-"}
                     </td>
                     <td className="border border-gray-300 p-2">
                       {isLeaf && query ? query.queryType.toUpperCase() : "-"}

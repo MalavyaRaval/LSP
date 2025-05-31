@@ -157,15 +157,14 @@ const ProjectEvaluation = () => {
       <p className="text-red-700 m-0 leading-tight">
         PLEASE ENTER THE VALUES OF ATTRIBUTES
       </p>
-      {error && <p className="text-red-500">{error}</p>}
+      {error && <p className="text-red-500">{error}</p>}{" "}
       <div className="overflow-x-auto mt-4">
-        {" "}
         <table className="min-w-full border-collapse border border-gray-300">
           <thead className="bg-gray-200">
             <tr>
               <th className="border border-gray-300 p-2">Attribute Name</th>
               <th className="border border-gray-300 p-2">
-                The range of values{" "}
+                The range of values
               </th>
               <th className="border border-gray-300 p-2">
                 Values for {alternativeName}
@@ -210,13 +209,13 @@ const ProjectEvaluation = () => {
                       }
                       className="w-full border rounded px-2 py-1"
                       placeholder="Enter value"
-                    />
+                    />{" "}
                   </td>
                 </tr>
               );
-            })}{" "}
+            })}
           </tbody>
-        </table>{" "}
+        </table>
       </div>
       <div className="flex justify-end gap-4 mt-6">
         <button

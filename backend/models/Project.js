@@ -5,8 +5,7 @@ const nodeAttributesSchema = new mongoose.Schema({
     type: Number,
     min: [1, "Minimum is 1"],
     max: [9, "Maximum is 9"],
-  },
-  connection: {
+  },  connection: {
     type: String,
     enum: [
       "A",
@@ -24,6 +23,7 @@ const nodeAttributesSchema = new mongoose.Schema({
       "HD",
       "HD+",
       "HD++",
+      "CPA",
     ],
   },
   created: { type: Date, default: Date.now },

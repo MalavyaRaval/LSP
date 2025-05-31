@@ -19,7 +19,7 @@ export const buildParentChildrenMap = (treeData) => {
           id: child.id.toString(),
           importance: child.attributes?.importance || 1 // Default importance to 1 if not specified
         })),
-        connection: node.attributes?.connection || 2 // Default to SC if no connection specified
+        connection: node.attributes?.connection || "SC" // Default to "SC" if no connection specified
       };
       
       // Recursively traverse children
@@ -241,70 +241,37 @@ const hdpp = (values, weights) => {
 };
 
 /**
- * Convert string connection values to numeric values
- * @param {string|number} connectionValue - Connection value (string or numeric)
- * @returns {number} Numeric connection value
- */
-const convertConnectionToNumeric = (connectionValue) => {
-  // If already numeric, return as is
-  if (typeof connectionValue === 'number') {
-    return connectionValue;
-  }
-  
-  // String to numeric mapping
-  const stringToNumericMap = {
-    "HC++": 8,
-    "HC+": 7,
-    "HC": 6,
-    "HC-": 5,
-    "A": 4,
-    "SC+": 3,
-    "SC": 2,
-    "SC-": 1,
-    "SD-": -1,
-    "SD": -2,
-    "SD+": -3,
-    "HD-": -5,
-    "HD": -6,
-    "HD+": -7,
-    "HD++": -8
-  };
-  
-  return stringToNumericMap[connectionValue] || 4; // Default to "A" (arithmetic mean)
-};
-
-/**
  * Get the appropriate aggregation function based on connection type
- * @param {number|string} connectionValue - Connection value from node attributes
+ * @param {string} connectionValue - Connection value from node attributes
  * @returns {Function} Aggregation function to use
  */
 const getAggregationFunction = (connectionValue) => {
-  // Convert string connection to numeric first
-  const numericConnection = convertConnectionToNumeric(connectionValue);
-    const connectionMap = {
-    8: hcp,   // HC++
-    7: hcp,   // HC+ (using HCP)
-    6: hc,    // HC
-    5: hcm,   // HC-
-    3: scp,   // SC+
-    2: sc,    // SC
-    1: scm,   // SC-
-    // Negative values for disjunctions (using proper disjunction functions)
-    [-1]: sdm, // SD-
-    [-2]: sd,  // SD
-    [-3]: sdp, // SD+
-    [-5]: hdm, // HD-
-    [-6]: hd,  // HD
-    [-7]: hdp, // HD+
-    [-8]: hdpp, // HD++
+  // Direct string to function mapping
+  const connectionMap = {
+    "HC++": hcp,   // HC++
+    "HC+": hcp,    // HC+ (using HCP)
+    "HC": hc,      // HC
+    "HC-": hcm,    // HC-
+    "A": arithmeticMean,  // Arithmetic mean
+    "SC+": scp,    // SC+
+    "SC": sc,      // SC
+    "SC-": scm,    // SC-
+    "SD-": sdm,    // SD-
+    "SD": sd,      // SD
+    "SD+": sdp,    // SD+
+    "HD-": hdm,    // HD-
+    "HD": hd,      // HD
+    "HD+": hdp,    // HD+
+    "HD++": hdpp,  // HD++
+    "CPA": arithmeticMean, // CPA (using arithmetic mean for now)
   };
 
   // If connection type is found in the map, use the specific aggregation function
-  if (connectionMap[numericConnection]) {
-    return connectionMap[numericConnection];
+  if (connectionMap[connectionValue]) {
+    return connectionMap[connectionValue];
   }
   
-  // For "A" (connection value 4) or any other unknown connection types, use arithmetic mean
+  // For any unknown connection types, use arithmetic mean
   return arithmeticMean;
 };
 
@@ -338,7 +305,7 @@ export const calculateAggregatedSatisfaction = (satisfactionValues, weights, con
  * @returns {number} Weighted mean satisfaction (0-1)
  */
 export const calculateWeightedMean = (satisfactionValues, weights) => {
-  return calculateAggregatedSatisfaction(satisfactionValues, weights, 2); // Default to SC
+  return calculateAggregatedSatisfaction(satisfactionValues, weights, "SC"); // Default to "SC"
 };
 
 /**

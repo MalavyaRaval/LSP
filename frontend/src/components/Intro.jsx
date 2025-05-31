@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "./Nav/Navbar";
 import axiosInstance from "../utils/axiosInstance";
@@ -8,6 +8,35 @@ const Intro = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalContent, setModalContent] = useState("");
   const [modalTitle, setModalTitle] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Pre-login on component mount
+  useEffect(() => {
+    const preLogin = async () => {
+      try {
+        const response = await axiosInstance.post("/login", {
+          email: "test@mymail.com",
+          password: "1",
+        });
+
+        if (response.data && response.data.accessToken) {
+          localStorage.setItem("token", response.data.accessToken);
+          if (response.data.fullName) {
+            localStorage.setItem("fullName", response.data.fullName);
+          }
+          setIsLoggedIn(true);
+        }
+      } catch (error) {
+        console.error("Pre-login failed:", error);
+        // If pre-login fails, user can still click Start and it will try again
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    preLogin();
+  }, []);
 
   const handleShowInfo = (content, title) => {
     setModalContent(content);
@@ -18,8 +47,14 @@ const Intro = () => {
   const handleCloseModal = () => {
     setShowModal(false);
   };
-
   const handleStartClick = async () => {
+    // If already logged in from pre-login, navigate immediately
+    if (isLoggedIn) {
+      navigate("/home");
+      return;
+    }
+
+    // If pre-login failed, try again
     try {
       const response = await axiosInstance.post("/login", {
         email: "test@mymail.com",
@@ -42,20 +77,6 @@ const Intro = () => {
     navigate("/login");
   };
 
-  // Information content for modals
-  const aboutContent = {
-    what: (
-      <p className="text-lg text-gray-700 leading-relaxed">
-        LSPrec is a decision-making tool that everybody can easily use without
-        any preparation. LSPrec is built on the Logic Scoring of Preference
-        (LSP) decision method, used by professionals for making complex
-        decisions based on multiple criteria and graded logic. Based in simple
-        queries, LSPrec is designed for nonprofessional users, making it easy to
-        use while still maintaining its accuracy.
-      </p>
-    ),
-  };
-
   return (
     <>
       <Navbar />
@@ -65,8 +86,7 @@ const Intro = () => {
             <h1 className="text-6xl font-bold">Welcome to LSPrec</h1>
             <p className="text-4xl text-gray-800 mb-12">
               Decision making and recommendation aid for everybody.
-            </p>
-
+            </p>{" "}
             {/* Center Start button */}
             <div className="flex justify-center mt-8">
               <button

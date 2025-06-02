@@ -23,7 +23,7 @@ const INITIAL_CHILDREN = Array.from({ length: 5 }, (_, id) => ({
 }));
 
 const DemaChat = () => {
-  const { username, projectname } = useParams();
+  const { projectname } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
   const query = new URLSearchParams(location.search);

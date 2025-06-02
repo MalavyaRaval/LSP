@@ -27,33 +27,34 @@ const Home = () => {
       [name]: value,
     });
   };
-
   const handleStartProject = (project) => {
     const projectSlug = project.projectId;
-    const storedFullName = localStorage.getItem("fullName")?.trim();
-
-    if (storedFullName && projectSlug) {
-      const formattedFullName = storedFullName
-        .replace(/\s+/g, "-")
-        .toLowerCase();
-      navigate(`/user/${formattedFullName}/project/${projectSlug}`);
-    } else {
-      showToast("Full name or project identifier is missing", "error");
-    }
-  };
-
-  const handleSubmit = async (e) => {
+    navigate(`/project/${projectSlug}`);
+  };  const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const projectResponse = await axiosInstance.post("/api/projects", {
+    
+    // Validation
+    if (!eventDetails.name.trim()) {
+      showToast("Project name is required", "error");
+      return;
+    }
+    
+    if (!eventDetails.description.trim()) {
+      showToast("Project description is required", "error");
+      return;
+    }
+      try {
+      const projectPayload = {
         projectName: eventDetails.name.trim(),
-      });
+      };
+      
+      const projectResponse = await axiosInstance.post("/api/projects", projectPayload);
 
       // Then set the event info via the new /api/projects/event endpoint.
       const eventPayload = {
         projectId: projectResponse.data.projectId,
-        name: eventDetails.name,
-        description: eventDetails.description,
+        name: eventDetails.name.trim(),
+        description: eventDetails.description.trim(),
       };
       const eventResponse = await axiosInstance.post(
         "/api/projects/event",

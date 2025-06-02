@@ -8,13 +8,12 @@ import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { Resizable } from "re-resizable";
 
 const ProjectPage = () => {
-  const { username, projectname } = useParams();
+  const { projectname } = useParams();
   const navigate = useNavigate();
 
   // Convert projectname to a slug for use as projectId.
   const projectSlug = projectname;
-  const storedFullName = localStorage.getItem("fullName")?.trim();
-  const evaluatorName = storedFullName || username || "defaultUser";
+  const evaluatorName = "testing";
 
   // State for project display name (from the project tree root's "name")
   const [projectDisplayName, setProjectDisplayName] = useState("");
@@ -42,12 +41,12 @@ const ProjectPage = () => {
           setProjectDisplayName(projectname);
         });
     }
-  }, [projectSlug, projectname]);
-  const handleNav = (action) => {
+  }, [projectSlug, projectname]);  const handleNav = (action) => {
     if (action === "projects") {
       navigate("/home");
     } else if (action === "evaluate") {
-      navigate(`/user/${evaluatorName}/project/${projectSlug}/evaluate`);    } else if (action === "exit") {
+      navigate(`/project/${projectSlug}/evaluate`);
+    } else if (action === "exit") {
       navigate("/");
     }
   };

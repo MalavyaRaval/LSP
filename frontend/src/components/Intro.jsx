@@ -1,42 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "./Nav/Navbar";
-import axiosInstance from "../utils/axiosInstance";
 
 const Intro = () => {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [modalContent, setModalContent] = useState("");
   const [modalTitle, setModalTitle] = useState("");
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Pre-login on component mount
-  useEffect(() => {
-    const preLogin = async () => {
-      try {
-        const response = await axiosInstance.post("/login", {
-          email: "test@mymail.com",
-          password: "1",
-        });
-
-        if (response.data && response.data.accessToken) {
-          localStorage.setItem("token", response.data.accessToken);
-          if (response.data.fullName) {
-            localStorage.setItem("fullName", response.data.fullName);
-          }
-          setIsLoggedIn(true);
-        }
-      } catch (error) {
-        console.error("Pre-login failed:", error);
-        // If pre-login fails, user can still click Start and it will try again
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    preLogin();
-  }, []);
 
   const handleShowInfo = (content, title) => {
     setModalContent(content);
@@ -47,34 +17,11 @@ const Intro = () => {
   const handleCloseModal = () => {
     setShowModal(false);
   };
-  const handleStartClick = async () => {
-    // If already logged in from pre-login, navigate immediately
-    if (isLoggedIn) {
-      navigate("/home");
-      return;
-    }
 
-    // If pre-login failed, try again
-    try {
-      const response = await axiosInstance.post("/login", {
-        email: "test@mymail.com",
-        password: "1",
-      });
-
-      if (response.data && response.data.accessToken) {
-        localStorage.setItem("token", response.data.accessToken);
-        if (response.data.fullName) {
-          localStorage.setItem("fullName", response.data.fullName);
-        }
-        navigate("/home");
-      }
-    } catch (error) {
-      console.error("Login error:", error);
-    }
-  };
-
-  const handleRegisterClick = () => {
-    navigate("/login");
+  const handleStartClick = () => {
+    // Set a default user name for the session
+    localStorage.setItem("fullName", "testing");
+    navigate("/home");
   };
 
   return (

@@ -3,7 +3,6 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const Project = require("../models/Project");
 const Evaluation = require("../models/Evaluation");
-const { authenticationToken } = require("../utilities");
 
 // GET: Retrieve the project tree by projectId (create it if not exists)
 
@@ -318,7 +317,7 @@ router.delete("/:projectId/nodes/:nodeId/children", async (req, res) => {
 });
 
 // DELETE a project and all its related data.
-router.delete("/:projectId", authenticationToken, async (req, res) => {
+router.delete("/:projectId", async (req, res) => {
   try {
     const { projectId } = req.params;
     const filter = mongoose.Types.ObjectId.isValid(projectId)
@@ -330,17 +329,6 @@ router.delete("/:projectId", authenticationToken, async (req, res) => {
       return res
         .status(200)
         .json({ message: "Project not found. Nothing to delete." });
-    }
-
-    // Check authorization: only the creator (stored in eventInfo.createdBy) can delete.
-    if (
-      !project.eventInfo ||
-      !project.eventInfo.createdBy ||
-      project.eventInfo.createdBy.toString() !== req.user.userId.toString()
-    ) {
-      return res
-        .status(403)
-        .json({ message: "Not authorized to delete this project." });
     }
 
     await Project.findOneAndDelete(filter);
@@ -364,7 +352,7 @@ router.delete("/:projectId", authenticationToken, async (req, res) => {
 //
 // POST /api/projects/event
 // This route updates the project document adding/updating its eventInfo field.
-router.post("/event", authenticationToken, async (req, res) => {
+router.post("/event", async (req, res) => {
   try {
     // Expect projectId, name and description in the request body.
     const { projectId, name, description } = req.body;
@@ -377,11 +365,11 @@ router.post("/event", authenticationToken, async (req, res) => {
     if (!project) {
       return res.status(404).json({ message: "Project not found." });
     }
-    // Set the eventInfo field with the authenticated user's id.
+    // Set the eventInfo field with default testing user.
     project.eventInfo = {
       name,
       description,
-      createdBy: req.user.userId,
+      createdBy: "testing",
       createdAt: new Date(),
     };
     await project.save();

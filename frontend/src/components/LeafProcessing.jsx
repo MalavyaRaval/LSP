@@ -10,7 +10,7 @@ const LeafProcessing = ({
   onNextLeaf,
   onPrevLeaf,
 }) => {
-  const { username, projectname } = useParams();
+  const { projectname } = useParams();
   const [composition, setComposition] = useState(""); // holds the selected query e.g. "q4"
   const [showHelpPopup, setShowHelpPopup] = useState(null);
 

@@ -14,7 +14,8 @@ const Navbar = () => {
   useEffect(() => {
     const path = location.pathname;
     if (path.includes("/home")) {
-      setCurrentPage("Home");    } else if (path.includes("/project")) {
+      setCurrentPage("Home");
+    } else if (path.includes("/project")) {
       if (path.includes("/evaluate")) {
         setCurrentPage("Project Evaluation");
       } else {
@@ -44,7 +45,8 @@ const Navbar = () => {
           console.error("Error loading project name:", err);
           setProjectDisplayName(projectname);
         });
-    }  }, [projectname]);
+    }
+  }, [projectname]);
 
   const toggleHelpModal = () => {
     setIsHelpModalOpen(!isHelpModalOpen);

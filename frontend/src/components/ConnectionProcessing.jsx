@@ -49,9 +49,9 @@ const connectionLogicOptions = [
 // Helper function to convert impact levels to penalty/reward values
 const getImpactValues = (impactLevel) => {
   const impactMappings = {
-    low: { penalty: 0.05, reward: 0.03 },
-    medium: { penalty: 0.15, reward: 0.1 },
-    high: { penalty: 0.3, reward: 0.2 },
+    low: { penalty: 0.1, reward: 0.05 },
+    medium: { penalty: 0.2, reward: 0.1 },
+    high: { penalty: 0.3, reward: 0.15 },
   };
   return impactMappings[impactLevel] || impactMappings.medium;
 };
@@ -126,7 +126,6 @@ const ConnectionProcessing = ({ onComplete, currentParent, projectId }) => {
       [childId]: value,
     }));
   };
-
   const handleSavePartialAbsorption = async () => {
     try {
       // Check if all children have selections
@@ -139,8 +138,9 @@ const ConnectionProcessing = ({ onComplete, currentParent, projectId }) => {
       if (!allChildrenHaveSelections) {
         alert("Please select Mandatory or Optional for all child components.");
         return;
-      } // Save partial absorption selections for each child
-      const impactValues = getImpactValues(impactLevel);
+      }
+
+      // Save partial absorption selections for each child (without penalty/reward)
       for (const child of children) {
         const selection = partialAbsorptionSelections[child.id];
         await axiosInstance.put(
@@ -149,14 +149,26 @@ const ConnectionProcessing = ({ onComplete, currentParent, projectId }) => {
             attributes: {
               ...child.attributes,
               partialabsorption: selection,
-              penaltyreward: {
-                penalty: impactValues.penalty,
-                reward: impactValues.reward,
-              },
             },
           }
         );
       }
+
+      // Save penalty/reward on the parent node that will have CPA connection
+      const impactValues = getImpactValues(impactLevel);
+      await axiosInstance.put(
+        `/api/projects/${projectId}/nodes/${currentParent.id}`,
+        {
+          attributes: {
+            ...currentParent.attributes,
+            connection: "CPA",
+            penaltyreward: {
+              penalty: impactValues.penalty,
+              reward: impactValues.reward,
+            },
+          },
+        }
+      );
 
       // Complete with CPA connection
       onComplete("CPA");

@@ -20,7 +20,8 @@ export const buildParentChildrenMap = (treeData) => {
           partialabsorption: child.attributes?.partialabsorption, // Include partial absorption setting
           penaltyreward: child.attributes?.penaltyreward // Include penalty reward setting
         })),
-        connection: node.attributes?.connection || "SC" // Default to "SC" if no connection specified
+        connection: node.attributes?.connection || "SC", // Default to "SC" if no connection specified
+        penaltyreward: node.attributes?.penaltyreward // Include parent's penalty/reward for CPA
       };
       
       // Recursively traverse children
@@ -95,6 +96,25 @@ const arithmeticMean = (values, weights) => {
 };
 
 /**
+ * Calculate harmonic mean
+ * @param {Array} values - Array of satisfaction values (0-1)
+ * @param {Array} weights - Array of normalized weights
+ * @returns {number} Harmonic mean result
+ */
+const harmonicMean = (values, weights) => {
+  // Handle edge case where any value is 0
+  if (values.some(v => v === 0)) {
+    return 0;
+  }
+  
+  const reciprocalSum = values.reduce((sum, value, index) => {
+    return sum + (weights[index] / value);
+  }, 0);
+  
+  return 1 / reciprocalSum;
+};
+
+/**
  * Calculate W1 based on the CPA formula
  * @param {number} P - Penalty value
  * @param {number} R - Reward value
@@ -123,7 +143,7 @@ const calculateW2 = (P, R) => {
  * @param {Array} penaltyRewards - Array of penalty/reward objects with penalty and reward properties
  * @returns {number} CPA aggregation result
  */
-const cpa = (values, weights, partialAbsorptions, penaltyRewards = null) => {
+const cpa = (values, weights, partialAbsorptions, penaltyRewards = null, parentPenaltyReward = null) => {
   if (!partialAbsorptions || partialAbsorptions.length !== values.length) {
     // Fallback to arithmetic mean if no partial absorption data
     return arithmeticMean(values, weights);
@@ -137,8 +157,7 @@ const cpa = (values, weights, partialAbsorptions, penaltyRewards = null) => {
     const data = {
       value: values[i],
       weight: weights[i],
-      originalIndex: i,
-      penaltyReward: penaltyRewards ? penaltyRewards[i] : null
+      originalIndex: i
     };
     
     if (partialAbsorptions[i] === "Mandatory") {
@@ -156,73 +175,48 @@ const cpa = (values, weights, partialAbsorptions, penaltyRewards = null) => {
     return arithmeticMean(values, weights);
   }
 
-  // For now, we expect exactly one mandatory and one optional component
-  // If there are multiple mandatory or optional components, we'll aggregate them first
-  let x; // mandatory value
-  let y; // optional value
-  let P = 0.15; // Default penalty value
-  let R = 0.1;  // Default reward value
-
+  // Calculate mandatory value (x)
+  let x;
   if (mandatoryData.length === 1) {
     x = mandatoryData[0].value;
-    // Use penalty/reward from the mandatory component if available
-    if (mandatoryData[0].penaltyReward) {
-      P = mandatoryData[0].penaltyReward.penalty || P;
-      R = mandatoryData[0].penaltyReward.reward || R;
-    }
   } else {
-    // Multiple mandatory components - use weighted average
+    // Multiple mandatory components - use harmonic mean
     const mandatoryValues = mandatoryData.map(d => d.value);
     const mandatoryWeights = mandatoryData.map(d => d.weight);
     const mandatoryWeightSum = mandatoryWeights.reduce((sum, w) => sum + w, 0);
     const normalizedMandatoryWeights = mandatoryWeights.map(w => w / mandatoryWeightSum);
-    x = arithmeticMean(mandatoryValues, normalizedMandatoryWeights);
-    
-    // Use penalty/reward from the first mandatory component with data, or average them
-    const mandatoryWithPenaltyReward = mandatoryData.filter(d => d.penaltyReward);
-    if (mandatoryWithPenaltyReward.length > 0) {
-      const avgPenalty = mandatoryWithPenaltyReward.reduce((sum, d) => sum + (d.penaltyReward.penalty || 0), 0) / mandatoryWithPenaltyReward.length;
-      const avgReward = mandatoryWithPenaltyReward.reduce((sum, d) => sum + (d.penaltyReward.reward || 0), 0) / mandatoryWithPenaltyReward.length;
-      P = avgPenalty || P;
-      R = avgReward || R;
-    }
+    x = harmonicMean(mandatoryValues, normalizedMandatoryWeights);
   }
 
+  // Calculate optional value (y)
+  let y;
   if (optionalData.length === 0) {
-    // No optional components, set y = 0
-    y = 0;
+    y = 0; // No optional components
   } else if (optionalData.length === 1) {
     y = optionalData[0].value;
-    // If penalty/reward is not set from mandatory component, try optional component
-    if (P === 0.15 && R === 0.1 && optionalData[0].penaltyReward) {
-      P = optionalData[0].penaltyReward.penalty || P;
-      R = optionalData[0].penaltyReward.reward || R;
-    }
   } else {
-    // Multiple optional components - use weighted average
+    // Multiple optional components - use arithmetic mean
     const optionalValues = optionalData.map(d => d.value);
     const optionalWeights = optionalData.map(d => d.weight);
     const optionalWeightSum = optionalWeights.reduce((sum, w) => sum + w, 0);
     const normalizedOptionalWeights = optionalWeights.map(w => w / optionalWeightSum);
     y = arithmeticMean(optionalValues, normalizedOptionalWeights);
-    
-    // If penalty/reward is not set from mandatory component, try optional components
-    if (P === 0.15 && R === 0.1) {
-      const optionalWithPenaltyReward = optionalData.filter(d => d.penaltyReward);
-      if (optionalWithPenaltyReward.length > 0) {
-        const avgPenalty = optionalWithPenaltyReward.reduce((sum, d) => sum + (d.penaltyReward.penalty || 0), 0) / optionalWithPenaltyReward.length;
-        const avgReward = optionalWithPenaltyReward.reduce((sum, d) => sum + (d.penaltyReward.reward || 0), 0) / optionalWithPenaltyReward.length;
-        P = avgPenalty || P;
-        R = avgReward || R;
-      }
-    }
+  }
+
+  // Get penalty and reward values from parent node
+  let P = 0.2; // Default penalty value (Medium: 20%)
+  let R = 0.1; // Default reward value (Medium: 10%)
+  // Use parent's penalty/reward if available
+  if (parentPenaltyReward && parentPenaltyReward.penalty !== undefined && parentPenaltyReward.reward !== undefined) {
+    P = parentPenaltyReward.penalty;
+    R = parentPenaltyReward.reward;
   }
 
   // Calculate W1 and W2 coefficients
   const W1 = calculateW1(P, R);
   const W2 = calculateW2(P, R);
 
-  // Apply the CPA formula
+  // Apply the CPA formula: CPA = x * (W1*x + (1-W1)*y) / (W1*W2*x + (1-W1)*W2*y + (1-W2)*x)
   const numerator = x * (W1 * x + (1 - W1) * y);
   const denominator = W1 * W2 * x + (1 - W1) * W2 * y + (1 - W2) * x;
 
@@ -428,7 +422,7 @@ const getAggregationFunction = (connectionValue) => {
  * @param {Array} penaltyRewards - Array of penalty/reward objects (for CPA)
  * @returns {number} Aggregated satisfaction (0-1)
  */
-export const calculateAggregatedSatisfaction = (satisfactionValues, weights, connectionValue, partialAbsorptions = null, penaltyRewards = null) => {
+export const calculateAggregatedSatisfaction = (satisfactionValues, weights, connectionValue, partialAbsorptions = null, penaltyRewards = null, parentPenaltyReward = null) => {
   if (satisfactionValues.length !== weights.length) {
     throw new Error('Satisfaction values and weights arrays must have the same length');
   }
@@ -442,7 +436,7 @@ export const calculateAggregatedSatisfaction = (satisfactionValues, weights, con
   
   // For CPA, pass the partial absorption data and penalty/reward data
   if (connectionValue === "CPA" && partialAbsorptions) {
-    return aggregationFunction(satisfactionValues, weights, partialAbsorptions, penaltyRewards);
+    return aggregationFunction(satisfactionValues, weights, partialAbsorptions, penaltyRewards, parentPenaltyReward);
   }
   
   // For all other connection types, use standard aggregation
@@ -498,15 +492,15 @@ export const calculateParentSatisfactions = (leafSatisfactionMap, parentChildren
         
         // Calculate normalized weights
         const normalizedWeights = calculateNormalizedWeights(importanceValues);
-        
-        // Calculate aggregated satisfaction using connection-based method
+          // Calculate aggregated satisfaction using connection-based method
         // Pass partial absorption data and penalty/reward data for CPA connections
         const aggregatedSatisfaction = calculateAggregatedSatisfaction(
           satisfactionValues, 
           normalizedWeights, 
           parentInfo.connection,
           partialAbsorptions, // Pass partial absorption settings
-          penaltyRewards // Pass penalty/reward settings
+          penaltyRewards, // Pass child penalty/reward settings
+          parentInfo.penaltyreward // Pass parent's penalty/reward for CPA
         );
         
         allSatisfactions[parentId] = aggregatedSatisfaction;

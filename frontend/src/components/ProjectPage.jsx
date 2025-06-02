@@ -41,7 +41,8 @@ const ProjectPage = () => {
           setProjectDisplayName(projectname);
         });
     }
-  }, [projectSlug, projectname]);  const handleNav = (action) => {
+  }, [projectSlug, projectname]);
+  const handleNav = (action) => {
     if (action === "projects") {
       navigate("/home");
     } else if (action === "evaluate") {
@@ -58,7 +59,9 @@ const ProjectPage = () => {
       {/* Ultra-compact header with navigation buttons */}
       <header className="border-b border-gray-200 py-0.5 -mt-2">
         <div className="flex flex-wrap items-center justify-between px-3 gap-1">
-          <div className="flex flex-wrap gap-1">            <button
+          <div className="flex flex-wrap gap-1">
+            {" "}
+            <button
               className="px-3 py-1 border border-gray-300 text-gray-700 rounded bg-gray-200 hover:bg-gray-300 text-2xl font-bold"
               onClick={() => handleNav("projects")}
             >

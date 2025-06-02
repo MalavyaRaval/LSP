@@ -30,25 +30,29 @@ const Home = () => {
   const handleStartProject = (project) => {
     const projectSlug = project.projectId;
     navigate(`/project/${projectSlug}`);
-  };  const handleSubmit = async (e) => {
+  };
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validation
     if (!eventDetails.name.trim()) {
       showToast("Project name is required", "error");
       return;
     }
-    
+
     if (!eventDetails.description.trim()) {
       showToast("Project description is required", "error");
       return;
     }
-      try {
+    try {
       const projectPayload = {
         projectName: eventDetails.name.trim(),
       };
-      
-      const projectResponse = await axiosInstance.post("/api/projects", projectPayload);
+
+      const projectResponse = await axiosInstance.post(
+        "/api/projects",
+        projectPayload
+      );
 
       // Then set the event info via the new /api/projects/event endpoint.
       const eventPayload = {

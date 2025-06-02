@@ -88,7 +88,8 @@ const ProjectEvaluation = () => {
       setError("Please fill in a value for all components.");
       return;
     }
-    setError("");    try {
+    setError("");
+    try {
       const payload = {
         projectId: projectname, // using projectname as project id
         user: "testing", // Use a fixed user
@@ -112,7 +113,8 @@ const ProjectEvaluation = () => {
       setError("Please fill in a value for all components.");
       return;
     }
-    setError("");    try {
+    setError("");
+    try {
       const payload = {
         projectId: projectname, // using projectname as project id
         user: "testing", // Use a fixed user

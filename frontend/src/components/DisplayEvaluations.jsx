@@ -36,9 +36,9 @@ const getImpactLevelFromValues = (penaltyreward) => {
   const { penalty, reward } = penaltyreward;
 
   // Match against predefined mappings
-  if (penalty <= 0.05 && reward <= 0.03) return "Low";
-  if (penalty <= 0.15 && reward <= 0.1) return "Medium";
-  if (penalty <= 0.3 && reward <= 0.2) return "High";
+  if (penalty <= 0.1 && reward <= 0.05) return "Low";
+  if (penalty <= 0.2 && reward <= 0.1) return "Medium";
+  if (penalty <= 0.3 && reward <= 0.15) return "High";
 
   // For custom values, show the raw numbers
   return `Custom (P:${penalty}, R:${reward})`;

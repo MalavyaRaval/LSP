@@ -78,12 +78,11 @@ const projectSchema = new mongoose.Schema({
       children: [],
       parent: null,
     }),
-  },
-  // New eventInfo field to store event details from /event route.
+  },  // New eventInfo field to store event details from /event route.
   eventInfo: {
     name: String,
     description: String,
-    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    createdBy: String, // Changed from ObjectId to String since we removed authentication
     createdAt: Date,
   },
   createdAt: { type: Date, default: Date.now },

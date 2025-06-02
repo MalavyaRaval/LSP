@@ -13,7 +13,7 @@ const getLeafNodes = (node) => {
 };
 
 const ProjectEvaluation = () => {
-  const { username, projectname } = useParams(); // Get username from params
+  const { projectname } = useParams();
   const navigate = useNavigate();
   const [evaluationStep, setEvaluationStep] = useState(1);
   const [alternativeName, setAlternativeName] = useState("");
@@ -88,11 +88,10 @@ const ProjectEvaluation = () => {
       setError("Please fill in a value for all components.");
       return;
     }
-    setError("");
-    try {
+    setError("");    try {
       const payload = {
         projectId: projectname, // using projectname as project id
-        user: username, // Use the username from useParams
+        user: "testing", // Use a fixed user
         alternativeName,
         alternativeCost: parseFloat(alternativeCost),
         alternativeValues, // object mapping each leaf id to a number
@@ -113,11 +112,10 @@ const ProjectEvaluation = () => {
       setError("Please fill in a value for all components.");
       return;
     }
-    setError("");
-    try {
+    setError("");    try {
       const payload = {
         projectId: projectname, // using projectname as project id
-        user: username, // Use the username from useParams
+        user: "testing", // Use a fixed user
         alternativeName,
         alternativeCost: parseFloat(alternativeCost),
         alternativeValues, // object mapping each leaf id to a number
@@ -136,10 +134,9 @@ const ProjectEvaluation = () => {
     setAlternativeValues({});
     setEvaluationStep(1);
   };
-
   const handleConfirmNo = () => {
     // Navigate to the summary page or re-evaluation page.
-    navigate(`/user/${username}/project/${projectname}/evaluate`);
+    navigate(`/project/${projectname}/evaluate`);
   };
 
   const renderStep2 = () => (

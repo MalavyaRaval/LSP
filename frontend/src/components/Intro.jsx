@@ -17,10 +17,7 @@ const Intro = () => {
   const handleCloseModal = () => {
     setShowModal(false);
   };
-
   const handleStartClick = () => {
-    // Set a default user name for the session
-    localStorage.setItem("fullName", "testing");
     navigate("/home");
   };
 

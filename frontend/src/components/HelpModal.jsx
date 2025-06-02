@@ -8,10 +8,6 @@ const HelpModal = ({ isOpen, onClose, currentPage }) => {
     Introduction:
       "Welcome to the Introduction page help. This page gives you an overview of the LSPrec system. Navigate through the sections to learn about the features and how to use the system effectively.",
 
-    Login:
-      "This is the Login page help. Enter your registered email and password to access your account. If you forget your password, use the 'Forgot Password' option to reset it.",    "Sign Up":
-      "This is the Sign Up page help. Fill in the required information to create a new account. Make sure to use a valid email address and create a strong password for security.",
-
     // Default help content for any other pages
     default:
       "This help section provides information about the current page. Navigate through different sections of the application using the menu. If you need more specific assistance, please contact support.",

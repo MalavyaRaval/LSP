@@ -301,7 +301,7 @@ const DisplayEvaluations = () => {
                 <th className="border border-gray-300 p-2">Node #</th>
                 <th className="border border-gray-300 p-2">Node Name</th>
                 <th className="border border-gray-300 p-2">Importance</th>
-                <th className="border border-gray-300 p-2">Connection</th>{" "}
+                <th className="border border-gray-300 p-2">Connection</th>
                 <th className="border border-gray-300 p-2">
                   Partial Absorption
                 </th>
@@ -363,7 +363,7 @@ const DisplayEvaluations = () => {
                     </td>
                     <td className="border border-gray-300 p-2">
                       {node.connection || "-"}
-                    </td>{" "}
+                    </td>
                     <td className="border border-gray-300 p-2">
                       {node.partialabsorption || "-"}
                     </td>

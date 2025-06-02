@@ -60,7 +60,6 @@ const ProjectPage = () => {
       <header className="border-b border-gray-200 py-0.5 -mt-2">
         <div className="flex flex-wrap items-center justify-between px-3 gap-1">
           <div className="flex flex-wrap gap-1">
-            {" "}
             <button
               className="px-3 py-1 border border-gray-300 text-gray-700 rounded bg-gray-200 hover:bg-gray-300 text-2xl font-bold"
               onClick={() => handleNav("projects")}
@@ -163,7 +162,7 @@ const ProjectPage = () => {
                   </>
                 )}
               </TransformWrapper>
-            </div>{" "}
+            </div>
           </Resizable>
         )}
       </main>

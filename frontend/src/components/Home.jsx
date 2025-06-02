@@ -337,7 +337,7 @@ const Home = () => {
                   Close
                 </button>
               </div>
-            </div>{" "}
+            </div>
           </div>
         )}
       </div>

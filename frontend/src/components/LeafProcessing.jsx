@@ -42,7 +42,7 @@ const LeafProcessing = ({
   return (
     <div className="p-2 bg-white rounded-lg shadow-md mx-0">
       <h2 className="text-xl font-semibold mb-0">
-        Evaluated item:{" "}
+        Evaluated item:{}
         <span className="text-indigo-600">{currentLeaf.name}</span>
       </h2>
       {!composition && (
@@ -80,7 +80,8 @@ const LeafProcessing = ({
               >
                 ?
               </button>
-            </div>{" "}
+            </div>
+            {}
             <div className="flex items-center">
               <button
                 className="bg-gray-200 text-black px-6 py-2 rounded-lg shadow-sm hover:bg-gray-300 hover:shadow-md transition-all flex-grow"
@@ -138,7 +139,8 @@ const LeafProcessing = ({
               projectId={projectname}
               nodeName={currentLeaf.name}
             />
-          )}{" "}
+          )}
+          {}
           {composition === "q6" && (
             <Query6
               onSave={handleSaveAndNext}

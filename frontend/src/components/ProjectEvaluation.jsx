@@ -146,7 +146,8 @@ const ProjectEvaluation = () => {
       <h1 className="text-2xl font-bold mb-4">Project Evaluation</h1>
       <div className="mb-4 flex gap-4">
         <p className="m-0">
-          <span className="font-medium">Alternative Name:</span>{" "}
+          <span className="font-medium">Alternative Name:</span>
+          {}
           {alternativeName}
         </p>
         <p className="m-0">
@@ -156,7 +157,8 @@ const ProjectEvaluation = () => {
       <p className="text-red-700 m-0 leading-tight">
         PLEASE ENTER THE VALUES OF ATTRIBUTES
       </p>
-      {error && <p className="text-red-500">{error}</p>}{" "}
+      {error && <p className="text-red-500">{error}</p>}
+      {}
       <div className="overflow-x-auto mt-4">
         <table className="min-w-full border-collapse border border-gray-300">
           <thead className="bg-gray-200">
@@ -208,7 +210,8 @@ const ProjectEvaluation = () => {
                       }
                       className="w-full border rounded px-2 py-1"
                       placeholder="Enter value"
-                    />{" "}
+                    />
+                    {}
                   </td>
                 </tr>
               );

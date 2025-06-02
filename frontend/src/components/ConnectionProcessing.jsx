@@ -222,7 +222,7 @@ const ConnectionProcessing = ({ onComplete, currentParent, projectId }) => {
         <div>
           <h2 className="font-semibold leading-tight mb-3 text-red-700">
             Select Mandatory or Optional for each component:
-          </h2>{" "}
+          </h2>
           <p className="text-lg text-gray-600 mb-4">
             Mandatory components must be satisfied, while Optional components
             can enhance the overall satisfaction.
@@ -256,8 +256,10 @@ const ConnectionProcessing = ({ onComplete, currentParent, projectId }) => {
             </div>
             <div className="mt-3 text-sm text-gray-600">
               <p>
-                <strong>Current setting:</strong>{" "}
-                {impactLevel.charAt(0).toUpperCase() + impactLevel.slice(1)}{" "}
+                <strong>Current setting:</strong>
+                {}
+                {impactLevel.charAt(0).toUpperCase() + impactLevel.slice(1)}
+                {}
                 Impact
               </p>
               {(() => {

@@ -52,7 +52,7 @@ const ParentProcessing = ({
     <div className="p-6 bg-white rounded-lg shadow-md mx-4">
       <h2 className="text-xl font-semibold mb-4">
         For : <span className="text-indigo-600">{currentParent.name}</span>
-      </h2>{" "}
+      </h2>
       {step === 1 ? (
         <ConnectionProcessing
           onComplete={handleSaveConnection}

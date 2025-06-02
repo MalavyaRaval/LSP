@@ -30,7 +30,7 @@ const Intro = () => {
             <h1 className="text-6xl font-bold">Welcome to LSPrec</h1>
             <p className="text-4xl text-gray-800 mb-12">
               Decision making and recommendation aid for everybody.
-            </p>{" "}
+            </p>
             {/* Center Start button */}
             <div className="flex justify-center mt-8">
               <button
@@ -61,7 +61,7 @@ const Intro = () => {
                 >
                   Close
                 </button>
-              </div>{" "}
+              </div>
             </div>
           </div>
         )}

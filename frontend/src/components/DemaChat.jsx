@@ -610,7 +610,7 @@ const DemaChat = () => {
     return (
       <div className="p-0 bg-white rounded-lg mx-4">
         <h2 className="text-xl font-semibold text-gray-800 mb-0">
-          {steps[0].question}{" "}
+          {steps[0].question}
           <span className="text-indigo-600">
             [{parentNodeNumber}] {parentName}
           </span>
@@ -675,7 +675,7 @@ const DemaChat = () => {
               ))}
             </tbody>
           </table>
-        </div>{" "}
+        </div>
         <div className="flex items-center mt-4 space-x-4">
           <button
             onClick={handleBack}

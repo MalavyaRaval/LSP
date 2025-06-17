@@ -298,7 +298,7 @@ const DisplayEvaluations = () => {
           <table className="min-w-full border-collapse border border-gray-300">
             <thead className="bg-gray-200">
               <tr>
-                <th className="border border-gray-300 p-2">Node #</th>
+                {/* <th className="border border-gray-300 p-2">Node #</th> */}
                 <th className="border border-gray-300 p-2">Node Name</th>
                 {/* <th className="border border-gray-300 p-2">Importance</th>
                 <th className="border border-gray-300 p-2">Connection</th>
@@ -323,6 +323,7 @@ const DisplayEvaluations = () => {
             </thead>
             <tbody>
               {/* Cost Row */}
+              {/*
               <tr className="hover:bg-gray-100">
                 <td className="border border-gray-300 p-2">-</td>
                 <td className="border border-gray-300 p-2 font-medium">Cost</td>
@@ -341,6 +342,7 @@ const DisplayEvaluations = () => {
                   </td>
                 ))}
               </tr>
+              */}
               {/* All Nodes Rows */}
               {allNodes.map((node) => {
                 const isLeaf = allLeafKeys.includes(node.id.toString());
@@ -348,9 +350,9 @@ const DisplayEvaluations = () => {
 
                 return (
                   <tr key={node.id} className="hover:bg-gray-100">
-                    <td className="border border-gray-300 p-2">
+                    {/* <td className="border border-gray-300 p-2">
                       {node.nodeNumber}
-                    </td>
+                    </td> */}
                     <td className="border border-gray-300 p-2">{node.name}</td>
                     {/* <td className="border border-gray-300 p-2">
                       {node.importance || "-"}

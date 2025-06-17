@@ -237,8 +237,8 @@ const Home = () => {
                     {/* Introduction to Next Steps */}
                     <div className="bg-blue-50 p-2 rounded-lg border border-blue-200">
                       <p className="text-blue-700 text-xl mb-2">
-                        Welcome! This tool helps you choose the best option based
-                        on your input.
+                        Welcome! This tool helps you choose the best option
+                        based on your input.
                       </p>
                       <ul className="text-blue-700 text-xl list-disc pl-5">
                         <li>Create your project.</li>

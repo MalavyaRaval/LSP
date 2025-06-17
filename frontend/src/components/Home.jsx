@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Navbar from "./Nav/Navbar";
 import axiosInstance from "./utils/axiosInstance";
 import ToastMessage from "./ToastMessage";
@@ -19,6 +19,7 @@ const Home = () => {
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -161,6 +162,12 @@ const Home = () => {
 
   useEffect(() => {
     getAllEvents();
+    // Open modal if navigated from Intro.jsx with showCreate flag
+    if (location.state && location.state.showCreate) {
+      setShowModal(true);
+      // Optionally clear the state so it doesn't persist on refresh
+      window.history.replaceState({}, document.title);
+    }
   }, []);
 
   return (
@@ -169,111 +176,108 @@ const Home = () => {
       <button
         type="button"
         className="fixed top-28 left-4 w-auto px-4 h-14 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg shadow-lg hover:shadow-xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 transform hover:scale-110 focus:outline-none z-10 flex items-center justify-center"
-        data-bs-toggle="modal"
-        data-bs-target="#createEventModal"
+        onClick={() => setShowModal(true)}
         aria-label="Create New Project"
       >
         <span className="text-lg font-bold">Create New Project</span>
       </button>
       <div className="flex-1 container mx-auto px-4 py-8">
-        <div
-          className="modal fade"
-          id="createEventModal"
-          tabIndex="-1"
-          aria-hidden="true"
-        >
-          <div className="modal-dialog modal-lg">
-            <div className="modal-content p-6 bg-white rounded-xl">
-              <div className="modal-header flex justify-between items-center mb-0">
-                <h3 className="text-2xl font-bold text-gray-800">
-                  Create New Project
-                </h3>
-                <button
-                  type="button"
-                  className="text-gray-500 hover:text-gray-700"
-                  data-bs-dismiss="modal"
-                  aria-label="Close"
-                >
-                  ✕
-                </button>
-              </div>
-              <div className="modal-body">
-                {successMessage && (
-                  <div className="p-3 mb-2 bg-green-100 text-green-700 rounded-lg">
-                    {successMessage}
-                  </div>
-                )}
-                <form onSubmit={handleSubmit}>
-                  <div>
-                    <label className="block text-2xl font-medium text-gray-700 mb-1">
-                      Please enter the name of object(s) you want to evaluate
-                      (e.g., car, home, laptop, job, school, hotel, etc.)
-                    </label>
-                    <input
-                      type="text"
-                      name="name"
-                      className="w-full px-4 py-0 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      value={eventDetails.name}
-                      onChange={handleChange}
-                      placeholder="Enter project name"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xl font-medium text-gray-700 mb-2">
-                      Description
-                    </label>
-                    <textarea
-                      name="description"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent h-8"
-                      value={eventDetails.description}
-                      onChange={handleChange}
-                      required
-                    ></textarea>
-                  </div>
-                  {/* Introduction to Next Steps */}
-                  <div className="bg-blue-50 p-2 rounded-lg border border-blue-200">
-                    <p className="text-blue-700 text-xl mb-2">
-                      Welcome! This tool helps you choose the best option based
-                      on your input.
-                    </p>
-                    <ul className="text-blue-700 text-xl list-disc pl-5">
-                      <li>Create your project.</li>
-                      <li>
-                        Build an attribute tree by listing the key features of
-                        your object.
-                      </li>
-                      <li>
-                        Select your preferred evaluation criteria (e.g., low,
-                        high, range, etc.).
-                      </li>
-                      <li>Enter the alternative values for comparison.</li>
-                      <li>
-                        The system will analyze your inputs and recommend the
-                        best option.
-                      </li>
-                    </ul>
-                  </div>
-                  <div className="flex justify-end gap-8 mt-4">
-                    <button
-                      type="button"
-                      className="px-6 py-0 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200"
-                      data-bs-dismiss="modal"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      className="px-6 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                    >
-                      Create Project
-                    </button>
-                  </div>
-                </form>
+        {/* Modal for creating a new project */}
+        {showModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="modal-dialog modal-lg">
+              <div className="modal-content p-6 bg-white rounded-xl">
+                <div className="modal-header flex justify-between items-center mb-0">
+                  <h3 className="text-2xl font-bold text-gray-800">
+                    Create New Project
+                  </h3>
+                  <button
+                    type="button"
+                    className="text-gray-500 hover:text-gray-700"
+                    onClick={() => setShowModal(false)}
+                    aria-label="Close"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div className="modal-body">
+                  {successMessage && (
+                    <div className="p-3 mb-2 bg-green-100 text-green-700 rounded-lg">
+                      {successMessage}
+                    </div>
+                  )}
+                  <form onSubmit={handleSubmit}>
+                    <div>
+                      <label className="block text-2xl font-medium text-gray-700 mb-1">
+                        Please enter the name of object(s) you want to evaluate
+                        (e.g., car, home, laptop, job, school, hotel, etc.)
+                      </label>
+                      <input
+                        type="text"
+                        name="name"
+                        className="w-full px-4 py-0 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        value={eventDetails.name}
+                        onChange={handleChange}
+                        placeholder="Enter project name"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xl font-medium text-gray-700 mb-2">
+                        Description
+                      </label>
+                      <textarea
+                        name="description"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent h-8"
+                        value={eventDetails.description}
+                        onChange={handleChange}
+                        required
+                      ></textarea>
+                    </div>
+                    {/* Introduction to Next Steps */}
+                    <div className="bg-blue-50 p-2 rounded-lg border border-blue-200">
+                      <p className="text-blue-700 text-xl mb-2">
+                        Welcome! This tool helps you choose the best option based
+                        on your input.
+                      </p>
+                      <ul className="text-blue-700 text-xl list-disc pl-5">
+                        <li>Create your project.</li>
+                        <li>
+                          Build an attribute tree by listing the key features of
+                          your object.
+                        </li>
+                        <li>
+                          Select your preferred evaluation criteria (e.g., low,
+                          high, range, etc.).
+                        </li>
+                        <li>Enter the alternative values for comparison.</li>
+                        <li>
+                          The system will analyze your inputs and recommend the
+                          best option.
+                        </li>
+                      </ul>
+                    </div>
+                    <div className="flex justify-end gap-8 mt-4">
+                      <button
+                        type="button"
+                        className="px-6 py-0 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200"
+                        onClick={() => setShowModal(false)}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        className="px-6 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      >
+                        Create Project
+                      </button>
+                    </div>
+                  </form>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
         {/* Projects Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {events.map((event, index) => (

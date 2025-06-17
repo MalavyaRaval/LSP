@@ -18,7 +18,7 @@ const Intro = () => {
     setShowModal(false);
   };
   const handleStartClick = () => {
-    navigate("/home");
+    navigate("/home", { state: { showCreate: true } });
   };
 
   return (

@@ -64,7 +64,7 @@ const DisplayEvaluations = () => {
   const [queryDetails, setQueryDetails] = useState({});
   const [nodeDetails, setNodeDetails] = useState({});
   const [allNodes, setAllNodes] = useState([]);
-  const [allSatisfactions, setAllSatisfactions] = useState({}); // Store satisfactions for all alternatives
+  const [allSatisfactions, setAllSatisfactions] = useState({});
 
   // Fetch evaluations.
   useEffect(() => {

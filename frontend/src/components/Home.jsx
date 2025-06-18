@@ -204,41 +204,31 @@ const Home = () => {
                       {successMessage}
                     </div>
                   )}
-                  <form onSubmit={handleSubmit}>
-                    <div>
-                      <label className="block text-2xl font-medium text-gray-700 mb-1">
+                  <form onSubmit={handleSubmit} className="space-y-4 mt-2">
+                    <div className="mb-3">
+                      <label className="block text-xl font-semibold text-gray-700 mb-2">
                         Please enter the name of object(s) you want to evaluate
-                        (e.g., car, home, laptop, job, school, hotel, etc.)
+                        <span className="block text-sm font-normal text-gray-500 mt-0.5">
+                          (e.g., car, home, laptop, job, school, hotel, etc.)
+                        </span>
                       </label>
                       <input
                         type="text"
                         name="name"
-                        className="w-full px-4 py-0 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-3 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base shadow-sm transition-all"
                         value={eventDetails.name}
                         onChange={handleChange}
                         placeholder="Enter project name"
                         required
                       />
                     </div>
-                    {/* <div>
-                      <label className="block text-xl font-medium text-gray-700 mb-2">
-                        Description
-                      </label>
-                      <textarea
-                        name="description"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent h-8"
-                        value={eventDetails.description}
-                        onChange={handleChange}
-                        required
-                      ></textarea>
-                    </div> */}
                     {/* Introduction to Next Steps */}
-                    <div className="bg-blue-50 p-2 rounded-lg border border-blue-200">
-                      <p className="text-blue-700 text-xl mb-2">
+                    <div className="bg-blue-50 p-2.5 rounded-xl border border-blue-200 mb-3">
+                      <p className="text-blue-700 text-base mb-2 font-semibold">
                         Welcome! This tool helps you choose the best option
                         based on your input.
                       </p>
-                      <ul className="text-blue-700 text-xl list-disc pl-5">
+                      <ul className="text-blue-700 text-base list-disc pl-5 space-y-0.5">
                         <li>Create your project.</li>
                         <li>
                           Build an attribute tree by listing the key features of
@@ -255,17 +245,17 @@ const Home = () => {
                         </li>
                       </ul>
                     </div>
-                    <div className="flex justify-end gap-8 mt-4">
+                    <div className="flex justify-end gap-3 mt-4">
                       <button
                         type="button"
-                        className="px-6 py-0 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200"
+                        className="px-4 py-1.5 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 text-base font-medium shadow-sm transition-all"
                         onClick={() => setShowModal(false)}
                       >
                         Cancel
                       </button>
                       <button
                         type="submit"
-                        className="px-6 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                        className="px-4 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-base font-semibold shadow-md transition-all"
                       >
                         Create Project
                       </button>

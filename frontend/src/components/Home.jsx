@@ -11,7 +11,7 @@ const Home = () => {
   // Remove the image field completely since it's not used anymore.
   const [eventDetails, setEventDetails] = useState({
     name: "",
-    description: "",
+    description: "description", // default value
   });
 
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -40,11 +40,7 @@ const Home = () => {
       showToast("Project name is required", "error");
       return;
     }
-
-    if (!eventDetails.description.trim()) {
-      showToast("Project description is required", "error");
-      return;
-    }
+    // No description validation needed
     try {
       const projectPayload = {
         projectName: eventDetails.name.trim(),
@@ -59,7 +55,7 @@ const Home = () => {
       const eventPayload = {
         projectId: projectResponse.data.projectId,
         name: eventDetails.name.trim(),
-        description: eventDetails.description.trim(),
+        description: "description", // always send default
       };
       const eventResponse = await axiosInstance.post(
         "/api/projects/event",
@@ -78,7 +74,9 @@ const Home = () => {
       // Reset form.
       setEventDetails({ name: "", description: "" });
       showToast("Project added successfully!", "success");
-      document.querySelector('[data-bs-dismiss="modal"]').click();
+      // Automatically navigate to the new project page
+      navigate(`/project/${eventDetails.name.trim()}`);
+      // document.querySelector('[data-bs-dismiss="modal"]').click();
     } catch (error) {
       const errorMessage =
         error.response?.data?.message ||
@@ -222,7 +220,7 @@ const Home = () => {
                         required
                       />
                     </div>
-                    <div>
+                    {/* <div>
                       <label className="block text-xl font-medium text-gray-700 mb-2">
                         Description
                       </label>
@@ -233,7 +231,7 @@ const Home = () => {
                         onChange={handleChange}
                         required
                       ></textarea>
-                    </div>
+                    </div> */}
                     {/* Introduction to Next Steps */}
                     <div className="bg-blue-50 p-2 rounded-lg border border-blue-200">
                       <p className="text-blue-700 text-xl mb-2">

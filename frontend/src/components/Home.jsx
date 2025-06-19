@@ -277,7 +277,13 @@ const Home = () => {
               <div className="p-4">
                 <div className="flex flex-wrap gap-2 mt-4">
                   <button
-                    onClick={() => navigate(`/project/${event.name.toLowerCase().replace(/\s+/g, "-")}/evaluate`)}
+                    onClick={() =>
+                      navigate(
+                        `/project/${event.name
+                          .toLowerCase()
+                          .replace(/\s+/g, "-")}/evaluate`
+                      )
+                    }
                     className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm"
                   >
                     View Details
@@ -289,7 +295,13 @@ const Home = () => {
                     Delete
                   </button>
                   <button
-                    onClick={() => navigate(`/project/${event.name.toLowerCase().replace(/\s+/g, "-")}`)}
+                    onClick={() =>
+                      navigate(
+                        `/project/${event.name
+                          .toLowerCase()
+                          .replace(/\s+/g, "-")}`
+                      )
+                    }
                     className="px-4 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors text-sm"
                   >
                     Open Project

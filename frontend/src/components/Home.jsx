@@ -72,7 +72,12 @@ const Home = () => {
 
       setEventDetails({ name: "", description: "" });
       showToast("Project added successfully!", "success");
-      navigate(`/project/${eventDetails.name.trim()}`);
+      navigate(
+        `/project/${eventDetails.name
+          .trim()
+          .toLowerCase()
+          .replace(/\s+/g, "-")}`
+      );
     } catch (error) {
       const errorMessage =
         error.response?.data?.message ||

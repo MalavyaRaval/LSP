@@ -556,6 +556,33 @@ const DemaChat = () => {
     }
   };
 
+  // Reset all relevant state when projectId changes (i.e., new tree)
+  useEffect(() => {
+    setParentId(null);
+    setParentName("");
+    setParentNodeNumber("1");
+    setChildrenDetails(getInitialChildren());
+    setCurrentStep(0);
+    setProcessing(false);
+    setBfsQueue([]);
+    setProcessingLeaves(false);
+    setLeafNodes([]);
+    setCurrentLeafIndex(0);
+    setLeafValues({});
+    setError("");
+    setProcessingParents(false);
+    setParentNodes([]);
+    setCurrentParentIndex(0);
+    setProcessedParentIds(new Set());
+    setEvaluationStarted(false);
+    setHistory([]);
+    setCreatedNodeIds({});
+    setNodeCreationTimestamps({});
+    setLastNavigationTimestamp(0);
+    sessionStorage.removeItem("bfsQueue");
+    window.dispatchEvent(new Event("refreshProjectTree"));
+  }, [projectId]);
+
   const renderStep = () => {
     if (evaluationStarted) {
       return <ProjectEvaluation />;

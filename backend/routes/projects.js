@@ -4,6 +4,17 @@ const mongoose = require("mongoose");
 const Project = require("../models/Project");
 const Evaluation = require("../models/Evaluation");
 
+// Helper to ensure every node has a valid name
+function ensureNodeNames(node, isRoot = false) {
+  if (!node) return;
+  if (!node.name || typeof node.name !== "string" || node.name.trim() === "") {
+    node.name = isRoot ? "Root" : "Untitled Node";
+  }
+  if (Array.isArray(node.children)) {
+    node.children.forEach((child) => ensureNodeNames(child));
+  }
+}
+
 // GET: Retrieve the project tree by projectId (create it if not exists)
 
 router.get("/events", async (req, res) => {
@@ -40,6 +51,7 @@ router.get("/:projectId", async (req, res) => {
       });
       await project.save();
     }
+    ensureNodeNames(project.treeData, true); // Ensure all nodes have names
     res.json(project.treeData);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -119,6 +131,10 @@ router.post("/:projectId/nodes", async (req, res) => {
 
     const addChildrenToParent = (node) => {
       if (node.id == parentId) {
+        // Ensure parent node has a valid name
+        if (!node.name || typeof node.name !== "string" || node.name.trim() === "") {
+          node.name = node.parent === null ? "Root" : "Untitled Node";
+        }
         // Loose equality for type flexibility
         node.attributes = node.attributes || {};
         node.attributes.decisionProcess = metadata?.decisionProcess || "DEMA";
@@ -128,6 +144,7 @@ router.post("/:projectId/nodes", async (req, res) => {
         node.children.push(
           ...children.map((child) => ({
             ...child,
+            name: child.name || "Untitled Node", // Ensure name is set
             attributes: {
               importance: Number(child.attributes?.importance),
               connection: child.attributes?.connection, // Keep connection as string

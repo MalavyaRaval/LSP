@@ -348,10 +348,6 @@ router.delete("/:projectId", async (req, res) => {
   }
 });
 
-// --- New Event Routes using the Project Model ---
-//
-// POST /api/projects/event
-// This route updates the project document adding/updating its eventInfo field.
 router.post("/event", async (req, res) => {
   try {
     // Expect projectId, name and description in the request body.

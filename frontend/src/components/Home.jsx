@@ -8,11 +8,7 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 const Home = () => {
   const [events, setEvents] = useState([]);
-  // Remove the image field completely since it's not used anymore.
-  const [eventDetails, setEventDetails] = useState({
-    name: "",
-    description: "description", // default value
-  });
+  const [eventDetails, setEventDetails] = useState({ name: "" });
 
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -40,7 +36,6 @@ const Home = () => {
       showToast("Project name is required", "error");
       return;
     }
-    // No description validation needed
     try {
       const projectPayload = {
         projectName: eventDetails.name.trim(),
@@ -55,7 +50,6 @@ const Home = () => {
       const eventPayload = {
         projectId: projectResponse.data.projectId,
         name: eventDetails.name.trim(),
-        description: "description", // always send default
       };
       const eventResponse = await axiosInstance.post(
         "/api/projects/event",
@@ -70,7 +64,7 @@ const Home = () => {
         },
       ]);
 
-      setEventDetails({ name: "", description: "" });
+      setEventDetails({ name: "" });
       showToast("Project added successfully!", "success");
       navigate(
         `/project/${eventDetails.name
@@ -329,11 +323,7 @@ const Home = () => {
                   ✕
                 </button>
               </div>
-              <div className="p-6">
-                <p className="text-gray-600 mb-4">
-                  {selectedEvent.description}
-                </p>
-              </div>
+              <div className="p-6">{/* description removed */}</div>
               <div className="flex justify-end p-6 border-t">
                 <button
                   onClick={closeModal}

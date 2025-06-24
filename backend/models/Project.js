@@ -81,7 +81,6 @@ const projectSchema = new mongoose.Schema({
   },  // New eventInfo field to store event details from /event route.
   eventInfo: {
     name: String,
-    description: String,
     createdBy: String, // Changed from ObjectId to String since we removed authentication
     createdAt: Date,
   },

@@ -12,7 +12,6 @@ router.get("/events", async (req, res) => {
     const events = projects.map((p) => ({
       projectId: p.projectId,
       name: p.eventInfo?.name || p.treeData.name,
-      description: p.eventInfo?.description || "",
       createdAt: p.eventInfo?.createdAt || p.createdAt,
     }));
     res.json({ events });
@@ -350,21 +349,18 @@ router.delete("/:projectId", async (req, res) => {
 
 router.post("/event", async (req, res) => {
   try {
-    // Expect projectId, name and description in the request body.
-    const { projectId, name, description } = req.body;
-    if (!projectId || !name || !description) {
+    const { projectId, name } = req.body;
+    if (!projectId || !name) {
       return res
         .status(400)
-        .json({ message: "projectId, name and description are required." });
+        .json({ message: "projectId and name are required." });
     }
     const project = await Project.findOne({ projectId });
     if (!project) {
       return res.status(404).json({ message: "Project not found." });
     }
-    // Set the eventInfo field with default testing user.
     project.eventInfo = {
       name,
-      description,
       createdBy: "testing",
       createdAt: new Date(),
     };

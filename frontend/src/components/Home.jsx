@@ -202,7 +202,7 @@ const Home = () => {
                   <form onSubmit={handleSubmit} className="space-y-4 mt-2">
                     <div className="mb-3">
                       <label className="block text-xl font-semibold text-gray-700 mb-2">
-                        Please enter the name of object(s) you want to evaluate
+                        Please enter the type of object you want to evaluate
                         <span className="block text-sm font-normal text-gray-500 mt-0.5">
                           (e.g., car, home, laptop, job, school, hotel, etc.)
                         </span>

@@ -4,6 +4,7 @@ import Home from "./components/Home.jsx";
 import Intro from "./components/Intro.jsx";
 import ProjectPage from "./components/ProjectPage.jsx";
 import DisplayEvaluations from "./components/DisplayEvaluations";
+import ProjectEvaluation from "./components/ProjectEvaluation.jsx";
 
 const App = () => {
   return (
@@ -14,6 +15,10 @@ const App = () => {
         <Route
           path="/project/:projectname/evaluate"
           element={<DisplayEvaluations />}
+        />
+        <Route
+          path="/project/:projectname/evaluation/new"
+          element={<ProjectEvaluation />}
         />
         <Route path="/" element={<Intro />} />
       </Routes>

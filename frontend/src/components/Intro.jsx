@@ -2,11 +2,19 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "./Nav/Navbar";
 
+// Import images
+import image1 from "./Nav/image1.png";
+import image2 from "./Nav/image2.png";
+import image3 from "./Nav/image3.png";
+
+const images = [image1, image2, image3];
+
 const Intro = () => {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [modalContent, setModalContent] = useState("");
   const [modalTitle, setModalTitle] = useState("");
+  const [imageStep, setImageStep] = useState(0);
 
   const handleShowInfo = (content, title) => {
     setModalContent(content);
@@ -17,8 +25,21 @@ const Intro = () => {
   const handleCloseModal = () => {
     setShowModal(false);
   };
+
+  // Modified Start click handler
   const handleStartClick = () => {
-    navigate("/home", { state: { showCreate: true } });
+    setImageStep(0);
+    setShowModal(true);
+  };
+
+  // Handle continue through images
+  const handleContinue = () => {
+    if (imageStep < images.length - 1) {
+      setImageStep((prev) => prev + 1);
+    } else {
+      setShowModal(false);
+      navigate("/home", { state: { showCreate: true } });
+    }
   };
 
   return (
@@ -44,22 +65,23 @@ const Intro = () => {
           </div>
         </div>
 
-        {/* Modal for displaying information */}
+        {/* Modal for displaying images in sequence */}
         {showModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6 max-h-[80vh] overflow-y-auto">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-3xl font-semibold text-blue-600">
-                  {modalTitle}
-                </h2>
-              </div>
-              <div className="mb-6">{modalContent}</div>
-              <div className="flex justify-end">
+            <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6 max-h-[80vh] overflow-y-auto flex flex-col items-center">
+              <img
+                src={images[imageStep]}
+                alt={`Step ${imageStep + 1}`}
+                className="mb-6 max-h-96 object-contain"
+              />
+              <div className="flex justify-end w-full">
                 <button
                   className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-2 px-6 rounded transition-all duration-300"
-                  onClick={handleCloseModal}
+                  onClick={handleContinue}
                 >
-                  Close
+                  {imageStep < images.length - 1
+                    ? "Continue"
+                    : "Continue to App"}
                 </button>
               </div>
             </div>

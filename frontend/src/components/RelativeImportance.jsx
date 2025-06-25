@@ -145,7 +145,7 @@ const RelativeImportance = ({
           </button>
           <div className="flex justify-end">
             <button
-              className="text-3xl font-extrabold bg-gradient-to-r from-green-500 to-green-700 text-white px-6 py-2 rounded-xl hover:from-green-600 hover:to-green-800 transition-all duration-300 shadow-xl transform hover:scale-105 min-w-[250px] flex items-center justify-center"
+              className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-all shadow-md min-w-[180px] text-2xl font-bold"
               onClick={onComplete}
               style={{ fontSize: "2rem" }}
             >
@@ -220,7 +220,7 @@ const RelativeImportance = ({
         </button>
         <div className="flex justify-end">
           <button
-            className="text-3xl font-extrabold bg-gradient-to-r from-green-500 to-green-700 text-white px-6 py-2 rounded-xl hover:from-green-600 hover:to-green-800 transition-all duration-300 shadow-xl transform hover:scale-105 min-w-[250px] flex items-center justify-center"
+            className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-all shadow-md min-w-[180px] text-2xl font-bold"
             onClick={handleSave}
             disabled={saving}
             style={{ fontSize: "2rem" }}

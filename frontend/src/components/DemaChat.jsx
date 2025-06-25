@@ -375,6 +375,12 @@ const DemaChat = () => {
         if (res.data && res.data.id) {
           const rootId = res.data.id.toString();
 
+          // If already at root node, navigate to /home
+          if (parentId === rootId || parentId === "1") {
+            navigate("/home");
+            return;
+          }
+
           // Keep track of existing nodes to scan for proper BFS ordering
           let existingTree = res.data;
 

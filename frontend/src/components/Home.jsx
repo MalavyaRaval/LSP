@@ -36,9 +36,20 @@ const Home = () => {
       showToast("Project name is required", "error");
       return;
     }
+
+    // Find a unique project name (case-insensitive)
+    let baseName = eventDetails.name.trim();
+    let uniqueName = baseName;
+    let suffix = 1;
+    const existingNamesLower = events.map((ev) => ev.name.toLowerCase());
+    while (existingNamesLower.includes(uniqueName.toLowerCase())) {
+      uniqueName = `${baseName}${suffix}`;
+      suffix++;
+    }
+
     try {
       const projectPayload = {
-        projectName: eventDetails.name.trim(),
+        projectName: uniqueName,
       };
 
       const projectResponse = await axiosInstance.post(
@@ -49,7 +60,7 @@ const Home = () => {
       // Then set the event info via the new /api/projects/event endpoint.
       const eventPayload = {
         projectId: projectResponse.data.projectId,
-        name: eventDetails.name.trim(),
+        name: uniqueName,
       };
       const eventResponse = await axiosInstance.post(
         "/api/projects/event",
@@ -67,10 +78,7 @@ const Home = () => {
       setEventDetails({ name: "" });
       showToast("Project added successfully!", "success");
       navigate(
-        `/project/${eventDetails.name
-          .trim()
-          .toLowerCase()
-          .replace(/\s+/g, "-")}`
+        `/project/${uniqueName.trim().toLowerCase().replace(/\s+/g, "-")}`
       );
     } catch (error) {
       const errorMessage =

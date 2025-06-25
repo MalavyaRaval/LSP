@@ -14,10 +14,10 @@ const Navbar = () => {
   useEffect(() => {
     const path = location.pathname;
     if (path.includes("/home")) {
-      setCurrentPage("Home");
+      setCurrentPage("Existing Projects");
     } else if (path.includes("/project")) {
       if (path.includes("/evaluate")) {
-        setCurrentPage("Project Evaluation");
+        setCurrentPage("Evaluation Results");
       } else {
         // When on queries page, we'll display the project name in the center
         if (projectname) {
@@ -27,7 +27,7 @@ const Navbar = () => {
         }
       }
     } else if (path === "/") {
-      setCurrentPage("Introduction");
+      setCurrentPage("V-1.0 (Single User)");
     }
   }, [location, projectname]);
   useEffect(() => {

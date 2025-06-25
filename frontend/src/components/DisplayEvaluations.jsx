@@ -256,8 +256,8 @@ const DisplayEvaluations = () => {
 
     const barWidth = `${Math.round(percentage * 100)}%`;
     const barColor = (() => {
-      if (percentage < 0.3) return "bg-red-500";
-      if (percentage < 0.7) return "bg-yellow-500";
+      if (percentage < 0.33) return "bg-red-500";
+      if (percentage < 0.67) return "bg-yellow-500";
       return "bg-green-500";
     })();
 
@@ -291,7 +291,6 @@ const DisplayEvaluations = () => {
     <>
       <Navbar />
       <div className="p-6 bg-white rounded-lg shadow-md mx-4">
-        <h1 className="text-2xl font-bold mb-4">Project Evaluation Analysis</h1>
         {error && <p className="text-red-500">{error}</p>}
 
         <div className="overflow-x-auto">
@@ -299,13 +298,15 @@ const DisplayEvaluations = () => {
             <thead className="bg-gray-200">
               <tr>
                 {/* <th className="border border-gray-300 p-2">Node #</th> */}
-                <th className="border border-gray-300 p-2">Node Name</th>
+                <th className="border border-gray-300 p-2">Component Name</th>
                 {/* <th className="border border-gray-300 p-2">Importance</th>
                 <th className="border border-gray-300 p-2">Connection</th>
                 <th className="border border-gray-300 p-2">Partial Absorption</th>
                 <th className="border border-gray-300 p-2">Impact Level</th>
                 <th className="border border-gray-300 p-2">Query Type</th> */}
-                <th className="border border-gray-300 p-2">Criteria</th>
+                <th className="border border-gray-300 p-2">
+                  Attribute Criteria
+                </th>
                 {evaluations.map((evalItem) => (
                   <th key={evalItem._id} className="border border-gray-300 p-2">
                     {evalItem.alternativeName}
@@ -316,7 +317,7 @@ const DisplayEvaluations = () => {
                     key={`${evalItem._id}-satisfaction`}
                     className="border border-gray-300 p-2 bg-blue-50"
                   >
-                    {evalItem.alternativeName} Satisfaction
+                    {evalItem.alternativeName} Suitability
                   </th>
                 ))}
               </tr>

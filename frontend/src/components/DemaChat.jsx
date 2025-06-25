@@ -653,7 +653,7 @@ const DemaChat = () => {
                   Component Name
                 </th>
                 <th className="px-1 py-0 text-center text-2xl font-bold text-gray-700 uppercase">
-                  Further decompose?
+                  Do you intend to further decompose this component?
                 </th>
               </tr>
             </thead>

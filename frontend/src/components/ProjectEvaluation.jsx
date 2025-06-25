@@ -247,7 +247,7 @@ const ProjectEvaluation = () => {
           <label className="block mb-2">Alternative Name:</label>
           <input
             type="text"
-            value={alternativeName}
+            value={alternativeName ?? ""}
             onChange={(e) => setAlternativeName(e.target.value)}
             className="border border-gray-300 rounded-lg p-2 w-full"
             placeholder="Enter alternative name"
@@ -257,7 +257,7 @@ const ProjectEvaluation = () => {
           <label className="block mb-2">Cost:</label>
           <input
             type="number"
-            value={alternativeCost}
+            value={alternativeCost ?? ""}
             onChange={(e) => setAlternativeCost(e.target.value)}
             className="border border-gray-300 rounded-lg p-2 w-full"
             placeholder="Enter positive cost"

@@ -187,23 +187,37 @@ const DisplayEvaluations = () => {
     const values = queryInfo.values;
     if (!values) return "-";
     if (queryInfo.queryType === "q4") {
-      const hasSpecificPoints =
-        values.specificPoints && values.specificPoints.length > 0;
-      return `Prefer high values: ${values.from} to ${values.to}${
-        hasSpecificPoints
-          ? ` (${values.specificPoints.length} custom points)`
-          : ""
-      }`;
+      // Q4: Prefer high values
+      return (
+        <>
+          <div>
+            Range: {values.from}-{values.to}
+          </div>
+          <div>preferred high values</div>
+        </>
+      );
     } else if (queryInfo.queryType === "q5") {
-      const hasSpecificPoints =
-        values.specificPoints && values.specificPoints.length > 0;
-      return `Prefer low values: ${values.from} to ${values.to}${
-        hasSpecificPoints
-          ? ` (${values.specificPoints.length} custom points)`
-          : ""
-      }`;
+      // Q5: Prefer low values
+      return (
+        <>
+          <div>
+            Range: {values.from}-{values.to}
+          </div>
+          <div>preferred low values</div>
+        </>
+      );
     } else if (queryInfo.queryType === "q6") {
-      return `Acceptance range: A=${values.A}, B=${values.B}, C=${values.C}, D=${values.D}`;
+      // Q6: Range: a, (b, c), d and preferred range b-c
+      return (
+        <>
+          <div>
+            Range: {values.A}, ({values.B}, {values.C}), {values.D}
+          </div>
+          <div>
+            preferred range {values.B}-{values.C}
+          </div>
+        </>
+      );
     }
     return JSON.stringify(values);
   };
@@ -309,7 +323,9 @@ const DisplayEvaluations = () => {
                 </th>
                 {evaluations.map((evalItem) => (
                   <th key={evalItem._id} className="border border-gray-300 p-2">
-                    {evalItem.alternativeName}
+                    {evalItem.alternativeName.length > 15
+                      ? `${evalItem.alternativeName.slice(0, 10)}...`
+                      : evalItem.alternativeName}
                   </th>
                 ))}
                 {evaluations.map((evalItem) => (
@@ -317,7 +333,10 @@ const DisplayEvaluations = () => {
                     key={`${evalItem._id}-satisfaction`}
                     className="border border-gray-300 p-2 bg-blue-50"
                   >
-                    {evalItem.alternativeName} Suitability
+                    {evalItem.alternativeName.length > 15
+                      ? `${evalItem.alternativeName.slice(0, 10)}...`
+                      : evalItem.alternativeName}{" "}
+                    Suitability
                   </th>
                 ))}
               </tr>
@@ -345,16 +364,30 @@ const DisplayEvaluations = () => {
               </tr>
               */}
               {/* All Nodes Rows */}
-              {allNodes.map((node) => {
+              {allNodes.map((node, idx) => {
                 const isLeaf = allLeafKeys.includes(node.id.toString());
                 const query = queryDetails[node.id.toString()];
+                const isFirstRow = idx === 0;
 
                 return (
-                  <tr key={node.id} className="hover:bg-gray-100">
+                  <tr
+                    key={node.id}
+                    className={`hover:bg-gray-100 ${
+                      isFirstRow
+                        ? "bg-blue-100 font-bold text-lg border-2 border-blue-400 shadow-md"
+                        : ""
+                    }`}
+                  >
                     {/* <td className="border border-gray-300 p-2">
                       {node.nodeNumber}
                     </td> */}
-                    <td className="border border-gray-300 p-2">{node.name}</td>
+                    <td
+                      className={`border border-gray-300 p-2 ${
+                        isFirstRow ? "text-blue-900" : ""
+                      }`}
+                    >
+                      {node.name}
+                    </td>
                     {/* <td className="border border-gray-300 p-2">
                       {node.importance || "-"}
                     </td>
@@ -370,13 +403,19 @@ const DisplayEvaluations = () => {
                     <td className="border border-gray-300 p-2">
                       {isLeaf && query ? query.queryType.toUpperCase() : "-"}
                     </td> */}
-                    <td className="border border-gray-300 p-2">
+                    <td
+                      className={`border border-gray-300 p-2 ${
+                        isFirstRow ? "text-blue-900" : ""
+                      }`}
+                    >
                       {isLeaf ? getQueryValuesDisplay(node.id.toString()) : "-"}
                     </td>
                     {evaluations.map((evalItem) => (
                       <td
                         key={evalItem._id}
-                        className="border border-gray-300 p-2"
+                        className={`border border-gray-300 p-2 ${
+                          isFirstRow ? "text-blue-900" : ""
+                        }`}
                       >
                         {isLeaf
                           ? evalItem.alternativeValues &&
@@ -389,7 +428,9 @@ const DisplayEvaluations = () => {
                     {evaluations.map((evalItem) => (
                       <td
                         key={`${evalItem._id}-satisfaction`}
-                        className="border border-gray-300 p-2 bg-blue-50"
+                        className={`border border-gray-300 p-2 bg-blue-50 ${
+                          isFirstRow ? "text-blue-900" : ""
+                        }`}
                       >
                         {(() => {
                           const satisfaction = allSatisfactions[evalItem._id]

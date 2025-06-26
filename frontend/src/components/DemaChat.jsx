@@ -161,6 +161,11 @@ const DemaChat = () => {
   const handleDetailChange = (index, field, value) => {
     const newDetails = [...childrenDetails];
     newDetails[index][field] = field === "decompose" ? value === "true" : value;
+
+    // If the name is cleared, also reset the decompose field
+    if (field === "name" && value.trim() === "") {
+      newDetails[index]["decompose"] = null;
+    }
     setChildrenDetails(newDetails);
   };
 

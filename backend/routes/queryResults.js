@@ -24,6 +24,27 @@ router.post("/", async (req, res) => {
   }
 });
 
+// PUT: Update an existing query result
+router.put("/", async (req, res) => {
+  try {
+    const { nodeId, projectId, queryType, values, nodeName } = req.body;
+
+    if (!nodeId || !projectId || !queryType || !values || !nodeName) {
+      return res.status(400).json({ message: "Missing required fields for update" });
+    }
+
+    const updatedResult = await QueryResult.findOneAndUpdate(
+      { nodeId, projectId },
+      { queryType, values, nodeName }, // Update queryType, values, and nodeName
+      { new: true, upsert: true } // Return the updated document and create if not exists
+    );
+
+    res.json({ message: "Query result updated", result: updatedResult });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // GET: Retrieve query results, optionally filtering by projectId
 router.get("/", async (req, res) => {
     try {

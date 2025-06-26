@@ -47,7 +47,7 @@ const ProjectEvaluation = () => {
       const fetchQueryResults = async () => {
         try {
           const res = await axiosInstance.get(
-            `/api/query-results?project=${projectname}`
+            `/api/query-results?project=${projectname}&_=${new Date().getTime()}`
           );
           setQueryResults(res.data);
         } catch (err) {

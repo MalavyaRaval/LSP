@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axiosInstance from "../utils/axiosInstance";
 
 const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
@@ -9,6 +9,39 @@ const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
   const [specificValues, setSpecificValues] = useState([]);
   const [error, setError] = useState("");
   const [showSpecificValue, setShowSpecificValue] = useState(false);
+
+  // New state to store the ID of an existing query result
+  const [queryResultId, setQueryResultId] = useState(null);
+
+  useEffect(() => {
+    const fetchExistingQueryResult = async () => {
+      try {
+        const response = await axiosInstance.get(
+          `/api/query-results?project=${projectId}&nodeId=${nodeId}`
+        );
+        if (response.data && response.data.length > 0) {
+          const existingResult = response.data[0];
+          setQueryResultId(existingResult._id);
+          setValues({
+            from: existingResult.values.from,
+            to: existingResult.values.to,
+          });
+          if (existingResult.values.specificPoints) {
+            setSpecificValues(
+              existingResult.values.specificPoints.map((point) => ({
+                value: point.value,
+                satisfaction: point.satisfaction * 100, // Convert back to percentage for display
+              }))
+            );
+            setShowSpecificValue(true);
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching existing query result:", err);
+      }
+    };
+    fetchExistingQueryResult();
+  }, [nodeId, projectId]);
 
   const handleChange = (e) => {
     setValues({ ...values, [e.target.name]: e.target.value });
@@ -118,7 +151,17 @@ const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
         },
         projectId,
       };
-      await axiosInstance.post("/api/query-results", payload);
+
+      if (queryResultId) {
+        // If an existing result ID is found, use PUT to update
+        await axiosInstance.put("/api/query-results", {
+          ...payload,
+          _id: queryResultId,
+        });
+      } else {
+        // Otherwise, use POST to create a new one
+        await axiosInstance.post("/api/query-results", payload);
+      }
       onSave();
     } catch (err) {
       console.error("Error saving Query4", err);
@@ -238,7 +281,7 @@ const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
                 </tr>
                 <tr className="bg-blue-50 border-t-0">
                   <td className="text-2xl border border-gray-400 p-4">
-                    ... then my satisfaction degree  is (%):
+                    ... then my satisfaction degree is (%):
                   </td>
                   <td className="border border-gray-400 p-2">
                     <input

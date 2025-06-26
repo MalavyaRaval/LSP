@@ -23,8 +23,8 @@ const Query5 = ({ onSave, nodeId, projectId, nodeName }) => {
           const existingResult = response.data[0];
           setQueryResultId(existingResult._id);
           setValues({
-            from: existingResult.values.from,
-            to: existingResult.values.to,
+            from: existingResult.values.from || "",
+            to: existingResult.values.to || "",
           });
           if (existingResult.values.specificPoints) {
             setSpecificValues(

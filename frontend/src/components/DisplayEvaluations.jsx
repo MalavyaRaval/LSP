@@ -71,7 +71,7 @@ const DisplayEvaluations = () => {
     const fetchEvaluations = async () => {
       try {
         const res = await axiosInstance.get(
-          `/api/evaluations?project=${projectname}`
+          `/api/evaluations?project=${projectname}&_=${new Date().getTime()}`
         );
         setEvaluations(res.data);
       } catch (err) {
@@ -130,7 +130,7 @@ const DisplayEvaluations = () => {
     const fetchQueryResultsMapping = async () => {
       try {
         const res = await axiosInstance.get(
-          `/api/queryResults?project=${projectname}`
+          `/api/queryResults?project=${projectname}&_=${new Date().getTime()}`
         );
         const mapping = {};
         const queryDetailsMap = {};

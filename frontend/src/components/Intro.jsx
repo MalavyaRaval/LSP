@@ -68,13 +68,13 @@ const Intro = () => {
         {/* Modal for displaying images in sequence */}
         {showModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6 max-h-[80vh] overflow-y-auto flex flex-col items-center">
+            <div className="bg-white rounded-lg shadow-xl max-w-5xl w-full p-2 max-h-[98vh] flex flex-col items-center">
               <img
                 src={images[imageStep]}
                 alt={`Step ${imageStep + 1}`}
-                className="mb-6 max-h-96 object-contain"
+                className="w-full object-contain flex-1"
               />
-              <div className="flex justify-end w-full">
+              <div className="flex justify-end w-full flex-shrink-0">
                 <button
                   className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-2 px-6 rounded transition-all duration-300"
                   onClick={handleContinue}

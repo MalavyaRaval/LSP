@@ -23,10 +23,10 @@ const Query6 = ({ onSave, nodeId, projectId, nodeName }) => {
           const existingResult = response.data[0];
           setQueryResultId(existingResult._id);
           setValues({
-            lower: existingResult.values.A,
-            middleLower: existingResult.values.B,
-            middleUpper: existingResult.values.C,
-            upper: existingResult.values.D,
+            lower: existingResult.values.A || "",
+            middleLower: existingResult.values.B || "",
+            middleUpper: existingResult.values.C || "",
+            upper: existingResult.values.D || "",
           });
         }
       } catch (err) {

@@ -183,10 +183,10 @@ const ProjectEvaluation = () => {
                 if (
                   result.queryType === "q6" &&
                   result.values &&
-                  result.values.lower !== undefined &&
-                  result.values.upper !== undefined
+                  result.values.A !== undefined &&
+                  result.values.D !== undefined
                 ) {
-                  existingValue = `${result.values.lower} to ${result.values.upper}`;
+                  existingValue = `${result.values.A} to ${result.values.D}`;
                 } else if (
                   result.values &&
                   result.values.from !== undefined &&

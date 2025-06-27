@@ -22,13 +22,12 @@ const Query6 = ({ onSave, nodeId, projectId, nodeName }) => {
         if (response.data && response.data.length > 0) {
           const existingResult = response.data[0];
           setQueryResultId(existingResult._id);
-          // Remove value population to keep fields empty
-          // setValues({
-          //   lower: existingResult.values.A || "",
-          //   middleLower: existingResult.values.B || "",
-          //   middleUpper: existingResult.values.C || "",
-          //   upper: existingResult.values.D || "",
-          // });
+          setValues({
+            lower: existingResult.values.A || "",
+            middleLower: existingResult.values.B || "",
+            middleUpper: existingResult.values.C || "",
+            upper: existingResult.values.D || "",
+          });
         }
       } catch (err) {
         console.error("Error fetching existing query result:", err);
@@ -185,11 +184,18 @@ const Query6 = ({ onSave, nodeId, projectId, nodeName }) => {
         </tbody>
       </table>
       {error && <p className="text-red-500">{error}</p>}
-      <div className="flex justify-end mt-4">
+      <div className="flex justify-between mt-4">
         <button
-          className="text-3xl font-extrabold bg-gradient-to-r from-green-500 to-green-700 text-white px-6 py-2 rounded-xl hover:from-green-600 hover:to-green-800 transition-all duration-300 shadow-xl transform hover:scale-105 min-w-[250px] flex items-center justify-center"
+          onClick={() => onSave("back")}
+          className="text-lg font-extrabold bg-gradient-to-r from-gray-500 to-gray-700 text-white px-6 py-3 rounded-lg hover:from-gray-600 hover:to-gray-800 transition-all duration-300 shadow-lg transform hover:scale-105"
+          style={{ fontSize: "1.5rem" }}
+        >
+          Back
+        </button>
+        <button
+          className="text-lg font-extrabold bg-gradient-to-r from-green-500 to-green-700 text-white px-6 py-3 rounded-lg hover:from-green-600 hover:to-green-800 transition-all duration-300 shadow-lg transform hover:scale-105"
           onClick={handleSaveQuery}
-          style={{ fontSize: "2rem" }}
+          style={{ fontSize: "1.5rem" }}
         >
           Continue
         </button>

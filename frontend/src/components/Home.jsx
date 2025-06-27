@@ -185,8 +185,8 @@ const Home = () => {
       <div className="flex-1 container mx-auto px-4 py-8">
         {/* Modal for creating a new project */}
         {showModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="modal-dialog modal-lg">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 backdrop-filter backdrop-blur-xl">
+            <div className="modal-dialog w-11/12 max-w-5xl">
               <div className="modal-content p-6 bg-white rounded-xl">
                 <div className="modal-header flex justify-between items-center mb-0">
                   <h3 className="text-2xl font-bold text-gray-800">
@@ -225,29 +225,7 @@ const Home = () => {
                         required
                       />
                     </div>
-                    {/* Introduction to Next Steps */}
-                    <div className="bg-blue-50 p-2.5 rounded-xl border border-blue-200 mb-3">
-                      <p className="text-blue-700 text-base mb-2 font-semibold">
-                        Welcome! This tool helps you choose the best option
-                        based on your input.
-                      </p>
-                      <ul className="text-blue-700 text-base list-disc pl-5 space-y-0.5">
-                        <li>Create your project.</li>
-                        <li>
-                          Build an attribute tree by listing the key features of
-                          your object.
-                        </li>
-                        <li>
-                          Select your preferred evaluation criteria (e.g., low,
-                          high, range, etc.).
-                        </li>
-                        <li>Enter the alternative values for comparison.</li>
-                        <li>
-                          The system will analyze your inputs and recommend the
-                          best option.
-                        </li>
-                      </ul>
-                    </div>
+
                     <div className="flex justify-end gap-3 mt-4">
                       <button
                         type="button"

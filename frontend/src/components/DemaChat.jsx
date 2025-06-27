@@ -70,7 +70,7 @@ const DemaChat = () => {
   const steps = [
     {
       id: "childrenDetails",
-      question: "Analyzed item:",
+      question: "Analyzed item: ",
     },
   ];
 
@@ -822,7 +822,6 @@ const DemaChat = () => {
         />
       );
     }
-    // Render fixed five rows without an Add Row button.
     return (
       <div className="p-0 bg-white rounded-lg mx-4">
         <h2 className="text-xl font-semibold text-gray-800 mb-0">

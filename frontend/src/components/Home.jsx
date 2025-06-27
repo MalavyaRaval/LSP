@@ -186,10 +186,10 @@ const Home = () => {
         {/* Modal for creating a new project */}
         {showModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 backdrop-filter backdrop-blur-xl">
-            <div className="modal-dialog w-11/12 max-w-5xl">
-              <div className="modal-content p-6 bg-white rounded-xl">
+            <div className="modal-dialog w-full max-w-2xl md:max-w-3xl lg:max-w-4xl">
+              <div className="modal-content p-8 bg-white rounded-xl">
                 <div className="modal-header flex justify-between items-center mb-0">
-                  <h3 className="text-2xl font-bold text-gray-800">
+                  <h3 className="text-3xl font-bold text-gray-800">
                     Create New Project
                   </h3>
                   <button
@@ -207,18 +207,18 @@ const Home = () => {
                       {successMessage}
                     </div>
                   )}
-                  <form onSubmit={handleSubmit} className="space-y-4 mt-2">
-                    <div className="mb-3">
+                  <form onSubmit={handleSubmit} className="space-y-6 mt-4">
+                    <div className="mb-4">
                       <label className="block text-xl font-semibold text-gray-700 mb-2">
                         Please enter the type of object you want to evaluate
-                        <span className="block text-sm font-normal text-gray-500 mt-0.5">
+                        <span className="block text-base font-normal text-gray-500 mt-1">
                           (e.g., car, home, laptop, job, school, hotel, etc.)
                         </span>
                       </label>
                       <input
                         type="text"
                         name="name"
-                        className="w-full px-3 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base shadow-sm transition-all"
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg shadow-sm transition-all"
                         value={eventDetails.name}
                         onChange={handleChange}
                         placeholder="Enter project name"
@@ -226,17 +226,17 @@ const Home = () => {
                       />
                     </div>
 
-                    <div className="flex justify-end gap-3 mt-4">
+                    <div className="flex justify-end gap-4 mt-6">
                       <button
                         type="button"
-                        className="px-4 py-1.5 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 text-base font-medium shadow-sm transition-all"
+                        className="px-6 py-2.5 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 text-lg font-medium shadow-sm transition-all"
                         onClick={() => setShowModal(false)}
                       >
                         Cancel
                       </button>
                       <button
                         type="submit"
-                        className="px-4 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-base font-semibold shadow-md transition-all"
+                        className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-lg font-semibold shadow-md transition-all"
                       >
                         Create Project
                       </button>

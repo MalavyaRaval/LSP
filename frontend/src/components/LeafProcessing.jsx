@@ -21,9 +21,11 @@ const LeafProcessing = ({
     setComposition(comp);
   };
 
-  const handleSaveAndNext = () => {
+  const handleSaveAndNext = (action) => {
     setComposition("");
-    onNextLeaf();
+    if (action !== "back") {
+      onNextLeaf();
+    }
   };
   const helpContent = {
     q4: "Choose this option when you prefer higher values for this attribute. For example, if evaluating car fuel efficiency, you'd prefer more miles per gallon.",

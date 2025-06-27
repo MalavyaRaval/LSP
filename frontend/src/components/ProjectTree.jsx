@@ -1,138 +1,20 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 import axiosInstance from "./utils/axiosInstance";
 
-const TreeNode = ({
-  node,
-  addChild,
-  deleteNode,
-  editNode,
-  projectId,
-  username,
-  projectname,
-  level = 0,
-}) => {
-  const navigate = useNavigate();
-  const [showOptions, setShowOptions] = useState(false);
-  const [childName, setChildName] = useState("");
-  const [editing, setEditing] = useState(false);
-  const [showAddChildInput, setShowAddChildInput] = useState(false);
-  const optionsRef = useRef(null);
-  const nodeRef = useRef(null);
-
-  const currentColor =
-    node.children && node.children.length === 0
-      ? "bg-blue-300 border-blue-300"
-      : "bg-gray-300 border-gray-300";
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (optionsRef.current && !optionsRef.current.contains(event.target)) {
-        setShowOptions(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const handleAddChild = () => {
-    if (childName.trim()) {
-      addChild(node.id, childName.trim());
-      setChildName("");
-      setShowAddChildInput(false);
-    }
-  };
-
-  const handleOptionClick = (action) => {
-    setShowOptions(false);
-    action();
-  };
+const TreeNode = ({ node, level = 0 }) => {
+  // Render simple text with indentation
+  const indentation = "  ".repeat(level); // 2 spaces per level
 
   return (
-    <div className={`relative my-8`} style={{ marginLeft: `${level * 80}px` }}>
-      {node.parent && (
-        <div className="absolute top-[-24px] left-[-48px] h-[calc(100%+24px)] w-12 border-l-2 border-dashed border-gray-100 rounded-bl-lg" />
-      )}
-
-      {/* Node Content Container */}
-      <div className="relative" ref={nodeRef}>
-        <div
-          className={`p-4 rounded-lg shadow-lg hover:shadow-2xl transition-shadow cursor-pointer group border-2 mb-4 ${currentColor} min-w-[400px] whitespace-nowrap`}
-          onClick={() => setShowOptions(!showOptions)}
-        >
-          {editing ? (
-            <input
-              className="w-full px-2 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={node.name}
-              onChange={(e) => editNode(node.id, e.target.value)}
-              onBlur={() => setEditing(false)}
-              autoFocus
-            />
-          ) : (
-            <div className="space-y-2">
-              <span className="block text-3xl font-bold text-gray-900">
-                [{node.nodeNumber || "1"}] {node.name}
-              </span>
-            </div>
-          )}
-        </div>
-
-        {/* Options Menu */}
-        {showOptions && (
-          <div
-            ref={optionsRef}
-            className="absolute left-full ml-4 top-0 flex flex-col gap-2 z-10"
-          >
-            <button
-              className="px-4 py-2 bg-red-600 text-white rounded-lg shadow hover:bg-red-700 transition-colors whitespace-nowrap"
-              onClick={() => handleOptionClick(() => deleteNode(node.id))}
-            >
-              Delete
-            </button>
-            <button
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition-colors whitespace-nowrap"
-              onClick={() => handleOptionClick(() => setEditing(true))}
-            >
-              Edit
-            </button>
-          </div>
-        )}
-
-        {showAddChildInput && (
-          <div className="absolute left-full ml-4 top-0 flex items-center bg-white p-2 rounded shadow z-10">
-            <input
-              type="text"
-              value={childName}
-              onChange={(e) => setChildName(e.target.value)}
-              placeholder="Child name"
-              className="px-2 py-1 border rounded mr-2"
-              onKeyPress={(e) => e.key === "Enter" && handleAddChild()}
-            />
-            <button
-              className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
-              onClick={handleAddChild}
-            >
-              Add
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* Children Container */}
+    <div>
+      <pre
+        className="font-bold leading-tight mb-4"
+        style={{ fontSize: "20px" }}
+      >{`${indentation}[${node.nodeNumber || "1"}] ${node.name}`}</pre>
       {node.children && node.children.length > 0 && (
-        <div className="ml-16 mt-8 space-y-8">
+        <div className="ml-4">
           {node.children.map((child) => (
-            <TreeNode
-              key={child.id}
-              node={child}
-              level={level + 1}
-              addChild={addChild}
-              deleteNode={deleteNode}
-              editNode={editNode}
-              projectId={projectId}
-              username={username}
-              projectname={projectname}
-            />
+            <TreeNode key={child.id} node={child} level={level + 1} />
           ))}
         </div>
       )}
@@ -170,80 +52,12 @@ const ProjectTree = ({ projectId, username, projectname }) => {
     };
   }, []);
 
-  const saveProject = async (updatedTree) => {
-    try {
-      await axiosInstance.put(`/api/projects/${projectId}`, updatedTree);
-    } catch (error) {
-      console.error("Error saving project:", error);
-      alert("Failed to save changes");
-    }
-  };
-
-  const addChild = async (parentId, childName) => {
-    const newNode = {
-      id: Date.now(),
-      name: childName,
-      children: [],
-      parent: parentId,
-    };
-
-    const updateTree = (node) => {
-      if (node.id === parentId) {
-        if (node.children.length >= 5) {
-          alert("Maximum of 5 children allowed per node!");
-          return node;
-        }
-        return { ...node, children: [...node.children, newNode] };
-      }
-      return { ...node, children: node.children.map(updateTree) };
-    };
-
-    const updatedTree = updateTree({ ...tree });
-    setTree(updatedTree);
-    await saveProject(updatedTree);
-  };
-
-  const deleteNode = async (nodeId) => {
-    const removeNode = (node) => ({
-      ...node,
-      children: node.children
-        .filter((child) => child.id !== nodeId)
-        .map(removeNode),
-    });
-
-    const updatedTree = removeNode(tree);
-    setTree(updatedTree);
-    await saveProject(updatedTree);
-    // Also call the backend to delete query results for this node:
-    await axiosInstance.delete(
-      `/api/projects/node/${nodeId}?projectId=${projectId}`
-    );
-  };
-
-  const editNode = async (nodeId, newName) => {
-    const updateName = (node) =>
-      node.id === nodeId
-        ? { ...node, name: newName }
-        : { ...node, children: node.children.map(updateName) };
-    const updatedTree = updateName(tree);
-    setTree(updatedTree);
-    await saveProject(updatedTree);
-  };
-
   if (loading) return <div className="text-center p-4">Loading project...</div>;
   if (!tree) return <div className="text-center p-4">Project not found</div>;
 
   return (
-    <div className="tree-container p-4">
-      <TreeNode
-        node={tree}
-        addChild={addChild}
-        deleteNode={deleteNode}
-        editNode={editNode}
-        projectId={projectId}
-        username={username}
-        projectname={projectname}
-      />
+    <div className="tree-container">
+      <TreeNode node={tree} />
     </div>
   );
 };

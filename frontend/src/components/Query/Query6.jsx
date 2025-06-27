@@ -22,12 +22,13 @@ const Query6 = ({ onSave, nodeId, projectId, nodeName }) => {
         if (response.data && response.data.length > 0) {
           const existingResult = response.data[0];
           setQueryResultId(existingResult._id);
-          setValues({
-            lower: existingResult.values.A || "",
-            middleLower: existingResult.values.B || "",
-            middleUpper: existingResult.values.C || "",
-            upper: existingResult.values.D || "",
-          });
+          // Remove value population to keep fields empty
+          // setValues({
+          //   lower: existingResult.values.A || "",
+          //   middleLower: existingResult.values.B || "",
+          //   middleUpper: existingResult.values.C || "",
+          //   upper: existingResult.values.D || "",
+          // });
         }
       } catch (err) {
         console.error("Error fetching existing query result:", err);

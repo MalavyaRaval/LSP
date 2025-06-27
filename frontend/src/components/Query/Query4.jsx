@@ -22,19 +22,20 @@ const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
         if (response.data && response.data.length > 0) {
           const existingResult = response.data[0];
           setQueryResultId(existingResult._id);
-          setValues({
-            from: existingResult.values.from || "",
-            to: existingResult.values.to || "",
-          });
-          if (existingResult.values.specificPoints) {
-            setSpecificValues(
-              existingResult.values.specificPoints.map((point) => ({
-                value: point.value,
-                satisfaction: point.satisfaction * 100, // Convert back to percentage for display
-              }))
-            );
-            setShowSpecificValue(true);
-          }
+          // Remove value population to keep fields empty
+          // setValues({
+          //   from: existingResult.values.from || "",
+          //   to: existingResult.values.to || "",
+          // });
+          // if (existingResult.values.specificPoints) {
+          //   setSpecificValues(
+          //     existingResult.values.specificPoints.map((point) => ({
+          //       value: point.value,
+          //       satisfaction: point.satisfaction * 100, // Convert back to percentage for display
+          //     }))
+          //   );
+          //   setShowSpecificValue(true);
+          // }
         }
       } catch (err) {
         console.error("Error fetching existing query result:", err);
@@ -189,7 +190,7 @@ const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
         <tbody>
           <tr className="hover:bg-gray-100">
             <td className="text-2xl border border-gray-400 p-2">
-              It is unacceptable if the given value is less than
+              It is unacceptable if the given value is less than or equal to
             </td>
             <td className="border border-gray-400 p-2">
               <input
@@ -205,7 +206,7 @@ const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
           </tr>
           <tr className="hover:bg-gray-100">
             <td className="text-2xl border border-gray-400 p-2">
-              I am fully satisfied if the value is greater than
+              I am fully satisfied if the value is greater than or equal to
             </td>
             <td className="border border-gray-400 p-2">
               <input
@@ -237,7 +238,7 @@ const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
                   }
                 >
                   {showSpecificValue
-                    ? "Optional Condition to Increase Precision"
+                    ? "Optional Condition to Increase Precision ( Close optional condition if not used)"
                     : "Optional Condition to Increase Precision"}
                 </button>
               </div>

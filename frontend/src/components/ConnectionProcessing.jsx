@@ -201,7 +201,7 @@ const ConnectionProcessing = ({ onComplete, currentParent, projectId }) => {
       {step === 2 && selectedLogic && (
         <div>
           <h2 className="font-semibold leading-tight mb-1">
-            Select the intensity level:
+            Select the desired degree of simultaneous satisfaction:
           </h2>
           <div className="flex flex-col gap-1">
             {getConnectionOptions(selectedLogic.connectionType).map(

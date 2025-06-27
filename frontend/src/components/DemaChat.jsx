@@ -35,7 +35,6 @@ const DemaChat = () => {
   const [parentNodeNumber, setParentNodeNumber] = useState("1"); // Store parent's node number
   // Use five preset rows.
   const [childrenDetails, setChildrenDetails] = useState(INITIAL_CHILDREN);
-  const [currentStep, setCurrentStep] = useState(0);
   const [processing, setProcessing] = useState(false);
   const [bfsQueue, setBfsQueue] = useState([]);
   // States for leaf processing.
@@ -53,11 +52,7 @@ const DemaChat = () => {
   const [evaluationStarted, setEvaluationStarted] = useState(false);
   const [history, setHistory] = useState([]); // Add history state to track previous states
   const [createdNodeIds, setCreatedNodeIds] = useState({}); // Track node IDs created at each parent
-  const [nodeCreationTimestamps, setNodeCreationTimestamps] = useState({}); // Track when nodes were created
-  const [lastNavigationTimestamp, setLastNavigationTimestamp] = useState(0); // Track when we last visited a node
   const [originalChildren, setOriginalChildren] = useState([]); // New state to store original children for comparison
-
-  const messagesEndRef = useRef(null);
 
   const getInitialChildren = () =>
     Array.from({ length: 5 }, (_, id) => ({
@@ -65,14 +60,6 @@ const DemaChat = () => {
       name: "",
       decompose: null,
     }));
-
-  // Single step: Enter details for each Component.
-  const steps = [
-    {
-      id: "childrenDetails",
-      question: "Analyzed item: ",
-    },
-  ];
 
   // Helper: Recursively find a node by id.
   const findNodeById = (node, id) => {
@@ -607,33 +594,6 @@ const DemaChat = () => {
     }
   };
 
-  // Helper function to get all descendant IDs of a node (for removing from queue)
-  const getAllDescendantIds = (node) => {
-    if (!node) return [];
-    if (!node.children || node.children.length === 0) return [];
-
-    let descendants = [];
-
-    const collectDescendants = (currentNode) => {
-      if (!currentNode) return;
-      if (currentNode.id) descendants.push(currentNode.id.toString());
-
-      if (currentNode.children && currentNode.children.length > 0) {
-        currentNode.children.forEach((child) => {
-          if (child.id) descendants.push(child.id.toString());
-          collectDescendants(child);
-        });
-      }
-    };
-
-    node.children.forEach((child) => {
-      if (child.id) descendants.push(child.id.toString());
-      collectDescendants(child);
-    });
-
-    return descendants;
-  };
-
   const finalizeNode = async () => {
     alert("All decompositions complete.");
     window.dispatchEvent(new Event("refreshProjectTree"));
@@ -658,6 +618,8 @@ const DemaChat = () => {
     } catch (error) {
       console.error("Error fetching tree after finalizing:", error);
     }
+    sessionStorage.removeItem("bfsQueue");
+    window.dispatchEvent(new Event("refreshProjectTree"));
   };
   // Parent processing functions - modified to include root processing
   const startParentProcessing = async () => {
@@ -751,7 +713,6 @@ const DemaChat = () => {
     setParentName("");
     setParentNodeNumber("1");
     setChildrenDetails(getInitialChildren());
-    setCurrentStep(0);
     setProcessing(false);
     setBfsQueue([]);
     setProcessingLeaves(false);
@@ -766,8 +727,6 @@ const DemaChat = () => {
     setEvaluationStarted(false);
     setHistory([]);
     setCreatedNodeIds({});
-    setNodeCreationTimestamps({});
-    setLastNavigationTimestamp(0);
     sessionStorage.removeItem("bfsQueue");
     window.dispatchEvent(new Event("refreshProjectTree"));
   }, [projectId]);
@@ -825,7 +784,7 @@ const DemaChat = () => {
     return (
       <div className="p-0 bg-white rounded-lg mx-4">
         <h2 className="text-xl font-semibold text-gray-800 mb-0">
-          {steps[0].question}
+          Analyzed item:
           <span className="text-indigo-600">
             [{parentNodeNumber}] {parentName}
           </span>
@@ -937,12 +896,7 @@ const DemaChat = () => {
       </div>
     );
   };
-  return (
-    <div className="w-full h-full bg-gray-50">
-      {renderStep()}
-      <div ref={messagesEndRef} />
-    </div>
-  );
+  return <div className="w-full h-full bg-gray-50">{renderStep()}</div>;
 };
 
 export default DemaChat;

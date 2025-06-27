@@ -25,7 +25,6 @@ const Home = () => {
 
     // Validation
     if (!eventDetails.name.trim()) {
-      showToast("Project name is required", "error");
       return;
     }
 
@@ -68,7 +67,6 @@ const Home = () => {
       ]);
 
       setEventDetails({ name: "" });
-      showToast("Project added successfully!", "success");
       navigate(
         `/project/${uniqueName.trim().toLowerCase().replace(/\s+/g, "-")}`
       );
@@ -77,7 +75,7 @@ const Home = () => {
         error.response?.data?.message ||
         error.message ||
         "Project creation failed";
-      showToast(errorMessage, "error");
+      alert(errorMessage);
     }
   };
 
@@ -92,19 +90,15 @@ const Home = () => {
           `/api/projects/${projectId}`
         );
         if (response.data && !response.data.error) {
-          showToast("Project deleted successfully!", "success");
           getAllEvents();
         } else {
-          showToast("Failed to delete Project", "error");
+          alert("Failed to delete Project");
         }
       } catch (error) {
         if (error.response && error.response.status === 403) {
-          showToast(
-            "You do not have permission to delete this Project",
-            "error"
-          );
+          alert("You do not have permission to delete this Project");
         } else {
-          showToast("Error deleting Project: " + error.message, "error");
+          alert("Error deleting Project: " + error.message);
         }
       }
     }
@@ -122,7 +116,7 @@ const Home = () => {
         "Error fetching Projects:",
         error.response || error.message || error
       );
-      showToast("Error fetching Projects: " + error.message, "error");
+      alert("Error fetching Projects: " + error.message);
     }
   };
 

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Navbar from "./Nav/Navbar";
 import axiosInstance from "./utils/axiosInstance";
-import ToastMessage from "./ToastMessage";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
@@ -10,10 +9,7 @@ const Home = () => {
   const [events, setEvents] = useState([]);
   const [eventDetails, setEventDetails] = useState({ name: "" });
 
-  const [selectedEvent, setSelectedEvent] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [error, setError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -23,10 +19,6 @@ const Home = () => {
       ...eventDetails,
       [name]: value,
     });
-  };
-  const handleStartProject = (project) => {
-    const projectSlug = project.projectId;
-    navigate(`/project/${projectSlug}`);
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -118,15 +110,6 @@ const Home = () => {
     }
   };
 
-  const showDetails = (event) => {
-    setSelectedEvent(event);
-    setShowModal(true);
-  };
-
-  const closeModal = () => {
-    setShowModal(false);
-  };
-
   // Update getAllEvents to call the new endpoint that fetches event info from projects.
   const getAllEvents = async () => {
     try {
@@ -141,24 +124,6 @@ const Home = () => {
       );
       showToast("Error fetching Projects: " + error.message, "error");
     }
-  };
-
-  const [toast, setToast] = useState({
-    isShow: false,
-    message: "",
-    type: "",
-  });
-
-  const showToast = (message, type) => {
-    setToast({
-      isShow: true,
-      message,
-      type,
-    });
-
-    setTimeout(() => {
-      setToast({ ...toast, isShow: false });
-    }, 3000);
   };
 
   useEffect(() => {
@@ -202,11 +167,6 @@ const Home = () => {
                   </button>
                 </div>
                 <div className="modal-body">
-                  {successMessage && (
-                    <div className="p-3 mb-2 bg-green-100 text-green-700 rounded-lg">
-                      {successMessage}
-                    </div>
-                  )}
                   <form onSubmit={handleSubmit} className="space-y-6 mt-4">
                     <div className="mb-4">
                       <label className="block text-xl font-semibold text-gray-700 mb-2">
@@ -296,33 +256,7 @@ const Home = () => {
             </div>
           ))}
         </div>
-        {/* Project Details Modal */}
-        {showModal && selectedEvent && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-xl max-w-2xl w-full">
-              <div className="flex justify-between items-center p-6 border-b">
-                <h3 className="text-xl font-bold">{selectedEvent.name}</h3>
-                <button
-                  onClick={closeModal}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  ✕
-                </button>
-              </div>
-              <div className="p-6">{/* description removed */}</div>
-              <div className="flex justify-end p-6 border-t">
-                <button
-                  onClick={closeModal}
-                  className="px-6 py-2 text-gray-600 hover:text-gray-800"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
-      <ToastMessage {...toast} />
     </div>
   );
 };

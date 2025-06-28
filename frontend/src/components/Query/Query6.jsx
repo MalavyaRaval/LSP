@@ -122,7 +122,10 @@ const Query6 = ({ onSave, nodeId, projectId, nodeName }) => {
                 type="number"
                 name="lower"
                 value={values.lower}
-                onChange={handleChange}
+                onChange={(e) => {
+                  handleChange(e);
+                  validate();
+                }}
                 onBlur={validate}
                 className="w-full border rounded px-2 py-0"
                 style={{ fontSize: "1.5rem" }}
@@ -140,7 +143,10 @@ const Query6 = ({ onSave, nodeId, projectId, nodeName }) => {
                   type="number"
                   name="middleLower"
                   value={values.middleLower}
-                  onChange={handleChange}
+                  onChange={(e) => {
+                    handleChange(e);
+                    validate();
+                  }}
                   onBlur={validate}
                   placeholder="Lower bound"
                   className="w-1/2 border rounded px-2 py-0"
@@ -150,7 +156,10 @@ const Query6 = ({ onSave, nodeId, projectId, nodeName }) => {
                   type="number"
                   name="middleUpper"
                   value={values.middleUpper}
-                  onChange={handleChange}
+                  onChange={(e) => {
+                    handleChange(e);
+                    validate();
+                  }}
                   onBlur={validate}
                   placeholder="Upper bound"
                   className="w-1/2 border rounded px-2 py-0"
@@ -168,7 +177,10 @@ const Query6 = ({ onSave, nodeId, projectId, nodeName }) => {
                 type="number"
                 name="upper"
                 value={values.upper}
-                onChange={handleChange}
+                onChange={(e) => {
+                  handleChange(e);
+                  validate();
+                }}
                 onBlur={validate}
                 className="w-full border rounded px-2 py-0"
                 style={{ fontSize: "1.5rem" }}
@@ -177,7 +189,7 @@ const Query6 = ({ onSave, nodeId, projectId, nodeName }) => {
           </tr>
         </tbody>
       </table>
-      {error && <p className="text-red-500">{error}</p>}
+      {error && <p className="text-red-500 text-3xl font-bold">{error}</p>}
       <div className="flex justify-between mt-4">
         <button
           onClick={() => onSave("back")}

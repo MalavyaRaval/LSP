@@ -63,6 +63,8 @@ const ConnectionProcessing = ({ onComplete, currentParent, projectId }) => {
   const [partialAbsorptionSelections, setPartialAbsorptionSelections] =
     useState({});
   const [impactLevel, setImpactLevel] = useState("medium");
+  const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
+  const [helpModalContent, setHelpModalContent] = useState("");
 
   // Fetch children when we need to show partial absorption selection
   useEffect(() => {
@@ -118,6 +120,73 @@ const ConnectionProcessing = ({ onComplete, currentParent, projectId }) => {
 
   const handleConnectionSelect = (connection) => {
     onComplete(connection);
+  };
+
+  const handleHelpClick = (connectionType, connectionValue) => {
+    // This is where we'll dynamically set the content based on connectionType and connectionValue
+    let content = "Default help text.";
+    if (connectionType === "SC") {
+      if (connectionValue === "SC+") {
+        content =
+          "High desirable satisfaction (SC+): All components being satisfied is desirable but not mandatory. The overall satisfaction is highly influenced by the components with the highest satisfaction, effectively prioritizing strengths. However, very low values in some components can still drag down the overall score.";
+      } else if (connectionValue === "SC") {
+        content =
+          "Medium desirable satisfaction (SC): All components being satisfied is desirable but not mandatory. The overall satisfaction is a balanced consideration of all components. It aims for a good average while allowing for some variations.";
+      } else if (connectionValue === "SC-") {
+        content =
+          "Low desirable satisfaction (SC-): All components being satisfied is desirable but not mandatory. This option provides the most flexibility, with the overall satisfaction being less sensitive to individual component performance. It is suitable when a general trend of satisfaction across components is sufficient.";
+      }
+    } else if (connectionType === "HC") {
+      if (connectionValue === "HC++") {
+        content =
+          "Highest simultaneous satisfaction (HC++): For this option, all components are mandatory and must be simultaneously highly satisfied. The overall satisfaction is determined by the *minimum* satisfaction level among all components. This means even a single component with a low value will significantly penalize the overall satisfaction. It is suitable when all requirements are critical and must be met at the highest level.";
+      } else if (connectionValue === "HC+") {
+        content =
+          "High simultaneous satisfaction (HC+): All components are mandatory and must be simultaneously highly satisfied. The overall satisfaction heavily depends on all components performing well. While not as strict as HC++, low values in individual components will still lead to a substantial reduction in overall satisfaction.";
+      } else if (connectionValue === "HC") {
+        content =
+          "Medium simultaneous satisfaction (HC): All components are mandatory and should be simultaneously satisfied. The overall satisfaction is a balanced aggregation of all component satisfactions. Low values have a noticeable, but not extreme, negative impact.";
+      } else if (connectionValue === "HC-") {
+        content =
+          "Low simultaneous satisfaction (HC-): All components are mandatory, but there's more tolerance for variations in individual satisfaction levels. The overall satisfaction considers all components, but a single low value will have a less severe impact compared to higher HC options.";
+      }
+    } else if (connectionType === "SD") {
+      if (connectionValue === "SD+") {
+        content =
+          "High substitutability (SD+): Components can significantly substitute each other. High values in some components can powerfully compensate for lower values in others. The focus is on achieving a high overall score even if individual components vary widely.";
+      } else if (connectionValue === "SD") {
+        content =
+          "Medium substitutability (SD): Components can substitute each other. High values in some areas can offset low values in others, leading to a balanced overall satisfaction. This option provides a moderate degree of compensation.";
+      } else if (connectionValue === "SD-") {
+        content =
+          "Low substitutability (SD-): Components can substitute each other, but the ability of high values to compensate for low values is limited. While some substitution is allowed, persistent low values in multiple components will prevent a high overall satisfaction.";
+      }
+    } else if (connectionType === "HD") {
+      if (connectionValue === "HD++") {
+        content =
+          "Highest contributive satisfaction (HD++): Any single fully satisfied component is sufficient for the compound requirement, and a very strong positive impact is given to components that are highly satisfied. This is ideal when a single outstanding performance can carry the entire requirement.";
+      } else if (connectionValue === "HD+") {
+        content =
+          "High contributive satisfaction (HD+): Any single fully satisfied component is sufficient for the compound requirement. High-performing components contribute significantly to the overall satisfaction, allowing one strong component to make a big difference.";
+      } else if (connectionValue === "HD") {
+        content =
+          "Medium contributive satisfaction (HD): Any single fully satisfied component is sufficient for the compound requirement. Good performance in individual components contributes positively to the overall satisfaction, but the impact is more balanced across all components.";
+      } else if (connectionValue === "HD-") {
+        content =
+          "Low contributive satisfaction (HD-): Any single fully satisfied component is sufficient for the compound requirement, but the positive impact from highly satisfied individual components is less pronounced. It still allows for single component sufficiency but reduces the reward for exceptionally high performance.";
+      }
+    } else if (connectionType === "A") {
+      content =
+        "Arithmetic Mean (A): Good satisfaction of most component requirements is appreciated, and the overall satisfaction is calculated as a simple average of individual component satisfactions. This option provides a straightforward, unbiased aggregation where all components contribute equally to the final score.";
+    }
+
+    setHelpModalContent(content);
+    setIsHelpModalOpen(true);
+  };
+
+  const closeHelpModal = () => {
+    setIsHelpModalOpen(false);
+    setHelpModalContent("");
   };
 
   const handlePartialAbsorptionChange = (childId, value) => {
@@ -206,13 +275,22 @@ const ConnectionProcessing = ({ onComplete, currentParent, projectId }) => {
           <div className="flex flex-col gap-1">
             {getConnectionOptions(selectedLogic.connectionType).map(
               (connection) => (
-                <button
-                  key={connection}
-                  className="p-1 border rounded bg-gray-200 hover:bg-gray-300 transition"
-                  onClick={() => handleConnectionSelect(connection)}
-                >
-                  {getLabelForConnection(connection)} ({connection})
-                </button>
+                <div key={connection} className="flex items-center gap-2">
+                  <button
+                    className="flex-grow text-left p-1 border rounded bg-gray-200 hover:bg-gray-300 transition"
+                    onClick={() => handleConnectionSelect(connection)}
+                  >
+                    {getLabelForConnection(connection)}
+                  </button>
+                  <button
+                    className="p-2 border rounded bg-blue-700 hover:bg-blue-800 text-white w-10 h-10 flex items-center justify-center font-bold text-xl"
+                    onClick={() =>
+                      handleHelpClick(selectedLogic.connectionType, connection)
+                    }
+                  >
+                    ?
+                  </button>
+                </div>
               )
             )}
           </div>
@@ -329,6 +407,22 @@ const ConnectionProcessing = ({ onComplete, currentParent, projectId }) => {
               </div>
             </div>
           )}
+        </div>
+      )}
+      {isHelpModalOpen && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex justify-center items-center">
+          <div className="bg-white p-6 rounded-lg shadow-xl max-w-lg mx-auto">
+            <h3 className="text-xl font-bold mb-4">Help Information</h3>
+            <p className="text-gray-700">{helpModalContent}</p>
+            <div className="flex justify-end">
+              <button
+                onClick={closeHelpModal}
+                className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+              >
+                Close
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

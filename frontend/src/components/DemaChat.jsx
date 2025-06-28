@@ -164,7 +164,37 @@ const DemaChat = () => {
       return [];
     }
 
-    let treeData;
+    // Fetch the latest tree data to accurately determine the next node number
+    let treeDataResponse;
+    try {
+      treeDataResponse = await axiosInstance.get(`/api/projects/${projectId}`);
+    } catch (err) {
+      console.error(
+        "Error fetching tree data for node number generation:",
+        err
+      );
+      throw err; // Re-throw to be caught by handleProcessChildren
+    }
+    const treeData = treeDataResponse.data;
+    const currentParentInTree = findNodeById(treeData, effectiveParentId);
+
+    // Determine the highest existing suffix for children of the current parent
+    let maxSuffix = 0;
+    if (currentParentInTree && currentParentInTree.children) {
+      currentParentInTree.children.forEach((child) => {
+        if (child.nodeNumber) {
+          const parts = child.nodeNumber.split(parentNodeNumber);
+          if (parts.length > 1) {
+            const suffix = parseInt(parts[1], 10);
+            if (!isNaN(suffix) && suffix > maxSuffix) {
+              maxSuffix = suffix;
+            }
+          }
+        }
+      });
+    }
+
+    let treeDataToSend;
 
     // Separate children into those to add/update and those that are unchanged
     const childrenToAddOrUpdate = [];
@@ -188,9 +218,13 @@ const DemaChat = () => {
     // Create nodeNumbers for children based on parent's nodeNumber
     const nodesToSendToBackend = childrenToAddOrUpdate.map((child, index) => {
       // Generate a new node number if it's a new child, or keep existing for modified
-      const nodeNumber = child.nodeNumber
-        ? child.nodeNumber
-        : `${parentNodeNumber}${index + 1}`;
+      let nodeNumber = child.nodeNumber;
+      const isNewChild = !originalChildren.some((oc) => oc.id === child.id);
+
+      if (!nodeNumber || isNewChild) {
+        maxSuffix += 1; // Increment for each new child
+        nodeNumber = `${parentNodeNumber}${maxSuffix}`;
+      }
 
       // Check if this child is a renamed version of an existing child
       const isRenamed = originalChildren.some(
@@ -234,8 +268,8 @@ const DemaChat = () => {
             },
           }
         );
-        treeData = res.data;
-        const parentNode = findNodeById(treeData, effectiveParentId);
+        treeDataToSend = res.data;
+        const parentNode = findNodeById(treeDataToSend, effectiveParentId);
         if (
           !parentNode ||
           !parentNode.children ||
@@ -285,8 +319,7 @@ const DemaChat = () => {
       }
     } else {
       // If no changes, just use the existing children from the tree data.
-      const res = await axiosInstance.get(`/api/projects/${projectId}`);
-      treeData = res.data;
+      treeDataToSend = treeData;
       const parentNode = findNodeById(treeData, effectiveParentId);
       if (parentNode && parentNode.children) {
         newChildrenInTree = parentNode.children;
@@ -316,7 +349,7 @@ const DemaChat = () => {
     setBfsQueue(updatedQueue);
 
     // After saving, update originalChildren to reflect the new state of the children for the current parent
-    const currentParentNode = findNodeById(treeData, parentId);
+    const currentParentNode = findNodeById(treeDataToSend, parentId);
     if (currentParentNode && currentParentNode.children) {
       const updatedOriginalChildren = currentParentNode.children.map(
         (child) => ({

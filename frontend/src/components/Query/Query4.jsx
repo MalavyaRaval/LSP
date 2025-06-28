@@ -183,7 +183,10 @@ const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
                 type="number"
                 name="from"
                 value={values.from}
-                onChange={handleChange}
+                onChange={(e) => {
+                  handleChange(e);
+                  validate();
+                }}
                 onBlur={validate}
                 className="w-full border rounded px-2 py-1"
                 style={{ fontSize: "1.75rem" }}
@@ -199,7 +202,10 @@ const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
                 type="number"
                 name="to"
                 value={values.to}
-                onChange={handleChange}
+                onChange={(e) => {
+                  handleChange(e);
+                  validate();
+                }}
                 onBlur={validate}
                 className="w-full border rounded px-2 py-1"
                 style={{ fontSize: "1.75rem" }}
@@ -246,13 +252,14 @@ const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
                     <input
                       type="number"
                       value={item.value}
-                      onChange={(e) =>
+                      onChange={(e) => {
                         handleSpecificValueChange(
                           index,
                           "value",
                           e.target.value
-                        )
-                      }
+                        );
+                        validate();
+                      }}
                       onBlur={validate}
                       className="w-full border rounded px-3 py-2"
                       style={{ fontSize: "1.75rem" }}
@@ -274,13 +281,14 @@ const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
                     <input
                       type="number"
                       value={item.satisfaction}
-                      onChange={(e) =>
+                      onChange={(e) => {
                         handleSpecificValueChange(
                           index,
                           "satisfaction",
                           e.target.value
-                        )
-                      }
+                        );
+                        validate();
+                      }}
                       onBlur={validate}
                       min="0"
                       max="100"
@@ -305,7 +313,7 @@ const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
           )}
         </tbody>
       </table>
-      {error && <p className="text-red-500 text-xl">{error}</p>}
+      {error && <p className="text-red-500 text-3xl font-bold">{error}</p>}
       <div className="flex justify-between mt-4">
         <button
           onClick={() => onSave("back")}

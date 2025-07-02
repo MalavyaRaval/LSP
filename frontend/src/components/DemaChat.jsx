@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import axiosInstance from "./utils/axiosInstance";
 import LeafProcessing from "./LeafProcessing.jsx";
 import ParentProcessing from "./ParentProcessing.jsx";
 import ProjectEvaluation from "./ProjectEvaluation.jsx";
+import ProjectTree from "./ProjectTree.jsx";
 
 // Helper: recursively extract leaf nodes (nodes with no children)
 const getLeafNodes = (node) => {
@@ -48,11 +49,23 @@ const DemaChat = () => {
   const [parentNodes, setParentNodes] = useState([]);
   const [currentParentIndex, setCurrentParentIndex] = useState(0);
   // New state to track processed parent IDs.
-  const [processedParentIds, setProcessedParentIds] = useState(new Set());
+  const [processedParentIds, setProcessedParentIds] = useState(new Set()); // This needs to be a useState
   const [evaluationStarted, setEvaluationStarted] = useState(false);
   const [history, setHistory] = useState([]); // Add history state to track previous states
   const [createdNodeIds, setCreatedNodeIds] = useState({}); // Track node IDs created at each parent
   const [originalChildren, setOriginalChildren] = useState([]); // New state to store original children for comparison
+  const [showProjectTreeModal, setShowProjectTreeModal] = useState(false);
+
+  // Computed value for processedParentIds (now combines with the state variable)
+  const allVisibleProcessedIds = useMemo(() => {
+    const ids = new Set(processedParentIds); // Start with the actual state
+    // Add current parentId if it exists
+    if (parentId) {
+      ids.add(parentId);
+    }
+    // History is no longer directly iterated here, as processedParentIds state is maintained by explicit calls.
+    return ids;
+  }, [parentId, processedParentIds]);
 
   const getInitialChildren = () =>
     Array.from({ length: 5 }, (_, id) => ({
@@ -244,12 +257,12 @@ const DemaChat = () => {
       return {
         id: childId,
         name: child.name.trim() || `Child ${index + 1}`,
-        nodeNumber: nodeNumber, // Add the nodeNumber to the node
+        nodeNumber: nodeNumber,
         decompose: child.decompose,
         attributes: { created: Date.now() },
         children: [],
         parent: effectiveParentId,
-        processed: false, // Add a flag to track processed state
+        processed: false,
       };
     });
 
@@ -280,10 +293,8 @@ const DemaChat = () => {
           return [];
         }
 
-        // Extract the IDs of the newly created/updated children
         const newChildrenIds = nodesToSendToBackend.map((node) => node.id);
 
-        // Save these IDs for this parent
         setCreatedNodeIds((prev) => ({
           ...prev,
           [effectiveParentId]: [
@@ -293,18 +304,16 @@ const DemaChat = () => {
         }));
         newChildrenInTree = parentNode.children;
 
-        // --- Update childrenDetails and originalChildren with actual backend children ---
         if (parentNode && parentNode.children) {
           const backendChildren = parentNode.children.map((child) => ({
             id: child.id,
             name: child.name,
             decompose: child.decompose,
           }));
-          // Pad with empty rows if less than 5 children
           const paddedChildren = [...backendChildren];
           while (paddedChildren.length < 5) {
             paddedChildren.push({
-              id: Date.now() + paddedChildren.length, // Temporary ID for new empty rows
+              id: Date.now() + paddedChildren.length,
               name: "",
               decompose: null,
             });
@@ -312,13 +321,11 @@ const DemaChat = () => {
           setChildrenDetails(paddedChildren.slice(0, 5));
           setOriginalChildren(backendChildren);
         }
-        // --- End update ---
       } catch (error) {
         console.error("Error saving children:", error);
-        throw error; // Re-throw to be caught by handleProcessChildren
+        throw error;
       }
     } else {
-      // If no changes, just use the existing children from the tree data.
       treeDataToSend = treeData;
       const parentNode = findNodeById(treeData, effectiveParentId);
       if (parentNode && parentNode.children) {
@@ -326,13 +333,11 @@ const DemaChat = () => {
       }
     }
 
-    // Mark the current parent as processed
     const currentQueue = JSON.parse(sessionStorage.getItem("bfsQueue") || "[]");
     const updatedCurrentQueue = currentQueue.map((node) =>
       node.id === effectiveParentId ? { ...node, processed: true } : node
     );
 
-    // Combine new children from backend with unchanged children
     const allChildrenForQueue = [...newChildrenInTree];
 
     const nodesToDecompose = allChildrenForQueue
@@ -343,12 +348,10 @@ const DemaChat = () => {
       )
       .map((node) => ({ ...node, processed: false }));
 
-    // Combine current queue with new nodes
     const updatedQueue = [...updatedCurrentQueue, ...nodesToDecompose];
     sessionStorage.setItem("bfsQueue", JSON.stringify(updatedQueue));
     setBfsQueue(updatedQueue);
 
-    // After saving, update originalChildren to reflect the new state of the children for the current parent
     const currentParentNode = findNodeById(treeDataToSend, parentId);
     if (currentParentNode && currentParentNode.children) {
       const updatedOriginalChildren = currentParentNode.children.map(
@@ -366,7 +369,6 @@ const DemaChat = () => {
     return updatedQueue;
   };
 
-  // New function to delete children from the backend
   const deleteChildren = async (nodeIdsToDelete) => {
     if (nodeIdsToDelete.length === 0) return;
     try {
@@ -379,70 +381,29 @@ const DemaChat = () => {
     }
   };
 
-  // Update handleProcessChildren to work with the filtered non-empty rows.
   const handleProcessChildren = async (nonEmptyChildren) => {
     try {
       setProcessing(true);
 
-      // Identify children to be deleted (missing from current list, or renamed)
       const nodeIdsToDelete = originalChildren
         .filter((originalChild) => {
           const currentVersion = nonEmptyChildren.find(
             (child) => child.id === originalChild.id
           );
-          // If not found in current children, or if found but name has changed (implies rename -> delete old)
           return !currentVersion || currentVersion.name !== originalChild.name;
         })
         .map((child) => child.id);
 
-      // Execute deletion if there are nodes to delete
       if (nodeIdsToDelete.length > 0) {
         await deleteChildren(nodeIdsToDelete);
       }
 
-      const updatedQueue = await saveChildren(nonEmptyChildren);
-      if (updatedQueue && updatedQueue.length > 0) {
-        // After saving, update originalChildren to reflect the new state of the children for the current parent
-        const res = await axiosInstance.get(`/api/projects/${projectId}`);
-        const treeData = res.data;
-        const currentParentNode = findNodeById(treeData, parentId);
-        if (currentParentNode && currentParentNode.children) {
-          const updatedOriginalChildren = currentParentNode.children.map(
-            (child) => ({
-              id: child.id,
-              name: child.name,
-              decompose: child.decompose,
-            })
-          );
-          setOriginalChildren(updatedOriginalChildren);
-        } else {
-          setOriginalChildren([]);
-        }
+      await saveChildren(nonEmptyChildren);
 
-        // Find the FIRST unprocessed node to maintain BFS order
-        const nextNode = updatedQueue.find((node) => !node.processed);
-        if (nextNode) {
-          // Mark this node as currently being processed
-          const newQueue = updatedQueue.map((node) =>
-            node.id === nextNode.id
-              ? { ...node, currentlyProcessing: true }
-              : node
-          );
+      setProcessedParentIds((prev) => new Set(prev).add(parentId)); // Add current parent to processed list
 
-          // Update the queue but don't remove the node - it stays in the queue until its children are added
-          sessionStorage.setItem("bfsQueue", JSON.stringify(newQueue));
-          setBfsQueue(newQueue);
-
-          // Navigate to this node
-          setParentId(nextNode.id);
-          setParentNodeNumber(nextNode.nodeNumber || "1");
-          setChildrenDetails(getInitialChildren());
-        } else {
-          finalizeNode();
-        }
-      } else {
-        finalizeNode();
-      }
+      setShowProjectTreeModal(true);
+      window.dispatchEvent(new Event("refreshProjectTree"));
     } catch (error) {
       console.error("Error processing Components:", error);
       alert("Failed to process Components nodes.");
@@ -462,7 +423,6 @@ const DemaChat = () => {
       return;
     }
 
-    // Save current state to history before proceeding
     const currentBfsQueue = JSON.parse(
       sessionStorage.getItem("bfsQueue") || "[]"
     );
@@ -482,23 +442,18 @@ const DemaChat = () => {
 
   const handleBack = async () => {
     if (history.length > 0) {
-      // Get the last history entry - this is where we're going back to
       const previousState = history[history.length - 1];
 
-      // Remove the entry from history
       setHistory((prev) => prev.slice(0, -1));
 
       try {
-        // Get the IDs of nodes created under this parent - these are the ones we'll delete
         const nodesToDelete = createdNodeIds[previousState.parentId] || [];
 
         if (nodesToDelete.length > 0) {
-          // Delete specifically these nodes
           await axiosInstance.delete(`/api/projects/${projectId}/nodes`, {
             data: { nodeIds: nodesToDelete },
           });
 
-          // Remove these IDs from our tracking state
           setCreatedNodeIds((prev) => {
             const newState = { ...prev };
             delete newState[previousState.parentId];
@@ -506,12 +461,10 @@ const DemaChat = () => {
           });
         }
 
-        // Restore the parent state
         setParentId(previousState.parentId);
         setParentName(previousState.parentName);
         setParentNodeNumber(previousState.parentNodeNumber);
 
-        // Fetch the project data to get the children of the previous parent
         const res = await axiosInstance.get(`/api/projects/${projectId}`);
         const treeData = res.data;
         const node = findNodeById(treeData, previousState.parentId);
@@ -525,20 +478,18 @@ const DemaChat = () => {
           const paddedChildren = [...existingChildren];
           while (paddedChildren.length < 5) {
             paddedChildren.push({
-              id: Date.now() + paddedChildren.length, // Temporary ID for new empty rows
+              id: Date.now() + paddedChildren.length,
               name: "",
               decompose: null,
             });
           }
           setChildrenDetails(paddedChildren.slice(0, 5));
-          setOriginalChildren(existingChildren); // Restore original children for comparison
+          setOriginalChildren(existingChildren);
         } else {
           setChildrenDetails(getInitialChildren());
           setOriginalChildren([]);
         }
 
-        // CRITICAL CHANGE: Restore the BFS queue from the history instead of clearing it
-        // This ensures we preserve the siblings that need processing
         if (previousState.bfsQueue) {
           sessionStorage.setItem(
             "bfsQueue",
@@ -547,22 +498,18 @@ const DemaChat = () => {
           setBfsQueue(previousState.bfsQueue);
         }
 
-        // Reset processing states
         setProcessingLeaves(false);
         setProcessingParents(false);
         setEvaluationStarted(false);
 
-        // Refresh the project tree to reflect changes
         window.dispatchEvent(new Event("refreshProjectTree"));
       } catch (err) {
         console.error("Error during back operation:", err);
-        // Fallback - at minimum restore the parent state
         setParentId(previousState.parentId);
         setParentName(previousState.parentName);
         setParentNodeNumber(previousState.parentNodeNumber);
         setChildrenDetails(getInitialChildren());
 
-        // Even in error case, try to restore queue
         if (previousState.bfsQueue) {
           sessionStorage.setItem(
             "bfsQueue",
@@ -572,28 +519,23 @@ const DemaChat = () => {
         }
       }
     } else {
-      // If no history, go back to the root
       try {
         const res = await axiosInstance.get(`/api/projects/${projectId}`);
         if (res.data && res.data.id) {
           const rootId = res.data.id.toString();
 
-          // If already at root node, navigate to /home
           if (parentId === rootId || parentId === "1") {
             navigate("/home");
             return;
           }
 
-          // Keep track of existing nodes to scan for proper BFS ordering
           let existingTree = res.data;
 
-          // Set to root node
           setParentId(rootId);
           setParentNodeNumber(res.data.nodeNumber || "1");
           setParentName(res.data.name || "Root");
           setChildrenDetails(getInitialChildren());
 
-          // Get all direct children of the root that should be processed
           let bfsQueue = [];
           if (existingTree.children && existingTree.children.length > 0) {
             bfsQueue = existingTree.children
@@ -608,17 +550,14 @@ const DemaChat = () => {
               }));
           }
 
-          // Update the queue with these nodes
           sessionStorage.setItem("bfsQueue", JSON.stringify(bfsQueue));
           setBfsQueue(bfsQueue);
 
-          // Reset all states
           setProcessingLeaves(false);
           setProcessingParents(false);
           setEvaluationStarted(false);
           setCreatedNodeIds({});
 
-          // Refresh the project tree to reflect changes
           window.dispatchEvent(new Event("refreshProjectTree"));
         }
       } catch (err) {
@@ -631,7 +570,6 @@ const DemaChat = () => {
     alert("All decompositions complete.");
     window.dispatchEvent(new Event("refreshProjectTree"));
     setParentId(null);
-    // Reset children details to five preset rows.
     setChildrenDetails(getInitialChildren());
     try {
       const res = await axiosInstance.get(`/api/projects/${projectId}`);
@@ -640,7 +578,7 @@ const DemaChat = () => {
       setLeafNodes(leaves);
       setProcessingLeaves(true);
       setCurrentLeafIndex(0);
-      setProcessedParentIds(new Set());
+      setProcessedParentIds(new Set()); // Explicitly reset on finalization
       const hasParentNodes = treeData.children && treeData.children.length > 0;
       if (!hasParentNodes) {
         alert(
@@ -654,21 +592,19 @@ const DemaChat = () => {
     sessionStorage.removeItem("bfsQueue");
     window.dispatchEvent(new Event("refreshProjectTree"));
   };
-  // Parent processing functions - modified to include root processing
+
   const startParentProcessing = async () => {
     try {
       const res = await axiosInstance.get(`/api/projects/${projectId}`);
       const treeData = res.data;
       let initialParentIds = new Set();
 
-      // Add all parents of leaf nodes (excluding root for now)
       leafNodes.forEach((leaf) => {
         if (leaf.parent && leaf.parent.toString() !== treeData.id.toString()) {
           initialParentIds.add(leaf.parent.toString());
         }
       });
 
-      // Also add the root node if it has children (should be processed)
       if (treeData && treeData.children && treeData.children.length > 0) {
         initialParentIds.add(treeData.id.toString());
       }
@@ -676,9 +612,7 @@ const DemaChat = () => {
       const filteredParentIds = Array.from(initialParentIds).filter(
         (pid) => !processedParentIds.has(pid)
       );
-      const newProcessed = new Set(processedParentIds);
-      filteredParentIds.forEach((pid) => newProcessed.add(pid));
-      setProcessedParentIds(newProcessed);
+      // No direct addition to processedParentIds here; it will be added when children are processed
       const parentNodesArr = filteredParentIds
         .map((pid) => findNodeById(treeData, pid))
         .filter(Boolean);
@@ -702,14 +636,12 @@ const DemaChat = () => {
       const treeData = res.data;
       let nextLevelParentIds = new Set();
 
-      // Add all parents of current parent nodes (excluding root for now)
       parentNodes.forEach((node) => {
         if (node.parent && node.parent.toString() !== treeData.id.toString()) {
           nextLevelParentIds.add(node.parent.toString());
         }
       });
 
-      // Also add the root node if it has children and hasn't been processed yet
       if (
         treeData &&
         treeData.children &&
@@ -722,9 +654,7 @@ const DemaChat = () => {
       const filteredNextIds = Array.from(nextLevelParentIds).filter(
         (pid) => !processedParentIds.has(pid)
       );
-      const newProcessed = new Set(processedParentIds);
-      filteredNextIds.forEach((pid) => newProcessed.add(pid));
-      setProcessedParentIds(newProcessed);
+      // No direct addition to processedParentIds here; it will be added when children are processed
       const nextParentsArr = filteredNextIds
         .map((pid) => findNodeById(treeData, pid))
         .filter(Boolean);
@@ -740,7 +670,6 @@ const DemaChat = () => {
     }
   };
 
-  // Reset all relevant state when projectId changes (i.e., new tree)
   useEffect(() => {
     setParentId(null);
     setParentName("");
@@ -756,7 +685,7 @@ const DemaChat = () => {
     setProcessingParents(false);
     setParentNodes([]);
     setCurrentParentIndex(0);
-    setProcessedParentIds(new Set());
+    setProcessedParentIds(new Set()); // Explicitly reset on project change
     setEvaluationStarted(false);
     setHistory([]);
     setCreatedNodeIds({});
@@ -927,6 +856,65 @@ const DemaChat = () => {
             )}
           </button>
         </div>
+        {showProjectTreeModal && (
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex justify-center items-center z-50">
+            <div className="bg-white p-5 rounded-lg shadow-xl m-4 max-w-6xl w-full h-[90vh] flex flex-col">
+              <h3 className="text-xl font-bold mb-4">Project Tree</h3>
+              <div
+                className="flex-grow overflow-y-auto mb-4"
+                style={{ scrollBehavior: "smooth" }}
+              >
+                <ProjectTree
+                  projectId={projectId}
+                  processedNodes={allVisibleProcessedIds}
+                  bfsQueue={bfsQueue}
+                  currentParentId={parentId}
+                />
+              </div>
+              <div className="flex justify-end space-x-4 mt-auto">
+                <button
+                  onClick={() => {
+                    setShowProjectTreeModal(false);
+                  }}
+                  className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-700"
+                >
+                  Back
+                </button>
+                <button
+                  onClick={() => {
+                    setShowProjectTreeModal(false);
+                    const updatedQueue = JSON.parse(
+                      sessionStorage.getItem("bfsQueue") || "[]"
+                    );
+                    const nextNode = updatedQueue.find(
+                      (node) => !node.processed
+                    );
+                    if (nextNode) {
+                      const newQueue = updatedQueue.map((node) =>
+                        node.id === nextNode.id
+                          ? { ...node, currentlyProcessing: true }
+                          : node
+                      );
+                      sessionStorage.setItem(
+                        "bfsQueue",
+                        JSON.stringify(newQueue)
+                      );
+                      setBfsQueue(newQueue);
+                      setParentId(nextNode.id);
+                      setParentNodeNumber(nextNode.nodeNumber || "1");
+                      setChildrenDetails(getInitialChildren());
+                    } else {
+                      finalizeNode();
+                    }
+                  }}
+                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700"
+                >
+                  Continue
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   };

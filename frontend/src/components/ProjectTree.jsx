@@ -8,8 +8,8 @@ const TreeNode = ({ node, level = 0 }) => {
   return (
     <div>
       <pre
-        className="font-bold leading-tight mb-4"
-        style={{ fontSize: "20px" }}
+        className="font-bold leading-none"
+        style={{ fontSize: "28px" }}
       >{`${indentation}[${node.nodeNumber || "1"}] ${node.name}`}</pre>
       {node.children && node.children.length > 0 && (
         <div className="ml-4">

@@ -162,51 +162,45 @@ const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
         Please specify your requirements, keeping in mind that the first value
         should always be less than the second.
       </h4>
-      <table className="min-w-full border-collapse border border-gray-400 mb-4">
+      <table className="min-w-full border-collapse border border-gray-700 mb-4">
         <thead>
           <tr className="bg-gray-200">
-            <th className="text-2xl border border-gray-400 p-2">
+            <th className="text-2xl border border-gray-700 p-2">
               Description of requirements
             </th>
-            <th className="text-2xl border border-gray-400 p-2">
+            <th className="text-2xl border border-gray-700 p-2">
               Your (numeric) values
             </th>
           </tr>
         </thead>
         <tbody>
           <tr className="hover:bg-gray-100">
-            <td className="text-2xl border border-gray-400 p-2">
+            <td className="text-2xl border border-gray-700 p-2">
               It is unacceptable if the given value is less than or equal to
             </td>
-            <td className="border border-gray-400 p-2">
+            <td className="border border-gray-700 p-2">
               <input
                 type="number"
                 name="from"
                 value={values.from}
-                onChange={(e) => {
-                  handleChange(e);
-                  validate();
-                }}
-                onBlur={validate}
+                onChange={handleChange}
+                onBlur={handleChange}
                 className="w-full border rounded px-2 py-1"
                 style={{ fontSize: "1.75rem" }}
               />
             </td>
           </tr>
           <tr className="hover:bg-gray-100">
-            <td className="text-2xl border border-gray-400 p-2">
+            <td className="text-2xl border border-gray-700 p-2">
               I am fully satisfied if the value is greater than or equal to
             </td>
-            <td className="border border-gray-400 p-2">
+            <td className="border border-gray-700 p-2">
               <input
                 type="number"
                 name="to"
                 value={values.to}
-                onChange={(e) => {
-                  handleChange(e);
-                  validate();
-                }}
-                onBlur={validate}
+                onChange={handleChange}
+                onBlur={handleChange}
                 className="w-full border rounded px-2 py-1"
                 style={{ fontSize: "1.75rem" }}
               />
@@ -214,7 +208,7 @@ const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
           </tr>
           {/* Button for adding specific values */}
           <tr className="bg-gray-50 hover:bg-gray-100">
-            <td colSpan="2" className="border border-gray-400 p-2">
+            <td colSpan="2" className="border border-gray-700 p-2">
               <div className="flex justify-between items-center">
                 <button
                   className="text-4xl font-bold bg-blue-500 hover:bg-blue-600 text-white px-4 py-1 rounded transition-all w-full"
@@ -241,14 +235,14 @@ const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
             specificValues.map((item, index) => (
               <React.Fragment key={index}>
                 <tr className="bg-blue-50">
-                  <td className="text-2xl border border-gray-400 p-2">
+                  <td className="text-2xl border border-gray-700 p-2">
                     <div className="flex justify-between items-center">
                       <div className="flex-grow">
                         If the analyzed item has this value:
                       </div>
                     </div>
                   </td>
-                  <td className="border border-gray-400 p-2">
+                  <td className="border border-gray-700 p-2">
                     <input
                       type="number"
                       value={item.value}
@@ -258,9 +252,14 @@ const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
                           "value",
                           e.target.value
                         );
-                        validate();
                       }}
-                      onBlur={validate}
+                      onBlur={(e) => {
+                        handleSpecificValueChange(
+                          index,
+                          "value",
+                          e.target.value
+                        );
+                      }}
                       className="w-full border rounded px-3 py-2"
                       style={{ fontSize: "1.75rem" }}
                       min={values.from ? parseFloat(values.from) + 0.01 : ""}
@@ -274,10 +273,10 @@ const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
                   </td>
                 </tr>
                 <tr className="bg-blue-50 border-t-0">
-                  <td className="text-2xl border border-gray-400 p-4">
+                  <td className="text-2xl border border-gray-700 p-2">
                     ... then my satisfaction degree is (%):
                   </td>
-                  <td className="border border-gray-400 p-2">
+                  <td className="border border-gray-700 p-2">
                     <input
                       type="number"
                       value={item.satisfaction}
@@ -287,9 +286,14 @@ const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
                           "satisfaction",
                           e.target.value
                         );
-                        validate();
                       }}
-                      onBlur={validate}
+                      onBlur={(e) => {
+                        handleSpecificValueChange(
+                          index,
+                          "satisfaction",
+                          e.target.value
+                        );
+                      }}
                       min="0"
                       max="100"
                       className="w-full border rounded px-3 py-2"
@@ -304,7 +308,7 @@ const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
             <tr className="bg-blue-50">
               <td
                 colSpan="2"
-                className="border border-gray-400 p-2 text-center text-gray-500"
+                className="border border-gray-700 p-2 text-center text-gray-500"
               >
                 Click the "+ Add Value" button to add specific values between
                 your min and max values

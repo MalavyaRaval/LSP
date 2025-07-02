@@ -49,7 +49,7 @@ const LeafProcessing = ({
       </h2>
       {!composition && (
         <p className="text-3xl text-red-600 mb-4">
-          Please select one of the following 5 options.
+          Please select one of the following 3 options.
         </p>
       )}
       {!composition ? (

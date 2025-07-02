@@ -1,1 +1,0 @@
-export const BASE_URL = "https://lsp-backend.onrender.com";

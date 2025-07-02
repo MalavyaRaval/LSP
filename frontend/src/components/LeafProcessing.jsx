@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Query4 from "./Query/Query4.jsx";
 import Query5 from "./Query/Query5.jsx";
 import Query6 from "./Query/Query6.jsx";
@@ -9,8 +9,10 @@ const LeafProcessing = ({
   currentLeafIndex,
   onNextLeaf,
   onPrevLeaf,
+  onBackToParentProcess,
 }) => {
   const { projectname } = useParams();
+  const navigate = useNavigate();
   const [composition, setComposition] = useState(""); // holds the selected query e.g. "q4"
   const [showHelpPopup, setShowHelpPopup] = useState(null);
 
@@ -98,6 +100,20 @@ const LeafProcessing = ({
                 ?
               </button>
             </div>
+          </div>
+          <div className="flex justify-between mt-4">
+            <button
+              className="bg-gray-300 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-400 transition-all duration-300"
+              onClick={() => {
+                if (currentLeafIndex === 0) {
+                  onBackToParentProcess();
+                } else {
+                  onPrevLeaf();
+                }
+              }}
+            >
+              Back
+            </button>
           </div>
           {showHelpPopup && (
             <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">

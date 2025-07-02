@@ -790,6 +790,7 @@ const DemaChat = () => {
               setCurrentLeafIndex(currentLeafIndex - 1);
             }
           }}
+          onBackToParentProcess={handleBack}
         />
       );
     }

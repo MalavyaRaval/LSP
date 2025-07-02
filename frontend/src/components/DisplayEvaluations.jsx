@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axiosInstance from "./utils/axiosInstance";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   scoreIncreasing,
   scoreDecreasing,
@@ -56,6 +56,7 @@ const getLeafNodes = (node) => {
 
 const DisplayEvaluations = () => {
   const { projectname } = useParams();
+  const navigate = useNavigate();
   const [evaluations, setEvaluations] = useState([]);
   const [leafMapping, setLeafMapping] = useState({});
   const [queryMapping, setQueryMapping] = useState({});
@@ -305,24 +306,42 @@ const DisplayEvaluations = () => {
     <>
       <Navbar />
       <div className="p-6 bg-white rounded-lg shadow-md mx-4">
+        <button
+          onClick={() => navigate("/home")}
+          className="mb-4 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5 mr-2"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fillRule="evenodd"
+              d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+              clipRule="evenodd"
+            />
+          </svg>
+          Back to Home
+        </button>
         {error && <p className="text-red-500">{error}</p>}
 
         <div className="overflow-x-auto">
-          <table className="min-w-full border-collapse border border-gray-300">
+          <table className="min-w-full border-collapse border border-gray-700">
             <thead className="bg-gray-200">
               <tr>
                 {/* <th className="border border-gray-300 p-2">Node #</th> */}
-                <th className="border border-gray-300 p-2">Component Name</th>
+                <th className="border border-gray-700 p-2">Component Name</th>
                 {/* <th className="border border-gray-300 p-2">Importance</th>
                 <th className="border border-gray-300 p-2">Connection</th>
                 <th className="border border-gray-300 p-2">Partial Absorption</th>
                 <th className="border border-gray-300 p-2">Impact Level</th>
                 <th className="border border-gray-300 p-2">Query Type</th> */}
-                <th className="border border-gray-300 p-2">
+                <th className="border border-gray-700 p-2">
                   Attribute Criteria
                 </th>
                 {evaluations.map((evalItem) => (
-                  <th key={evalItem._id} className="border border-gray-300 p-2">
+                  <th key={evalItem._id} className="border border-gray-700 p-2">
                     {evalItem.alternativeName.length > 15
                       ? `${evalItem.alternativeName.slice(0, 10)}...`
                       : evalItem.alternativeName}
@@ -331,7 +350,7 @@ const DisplayEvaluations = () => {
                 {evaluations.map((evalItem) => (
                   <th
                     key={`${evalItem._id}-satisfaction`}
-                    className="border border-gray-300 p-2 bg-blue-50"
+                    className="border border-gray-700 p-2 bg-blue-50"
                   >
                     {evalItem.alternativeName.length > 15
                       ? `${evalItem.alternativeName.slice(0, 10)}...`
@@ -382,7 +401,7 @@ const DisplayEvaluations = () => {
                       {node.nodeNumber}
                     </td> */}
                     <td
-                      className={`border border-gray-300 p-2 ${
+                      className={`border border-gray-700 p-2 ${
                         isFirstRow ? "text-blue-900" : ""
                       }`}
                     >
@@ -404,7 +423,7 @@ const DisplayEvaluations = () => {
                       {isLeaf && query ? query.queryType.toUpperCase() : "-"}
                     </td> */}
                     <td
-                      className={`border border-gray-300 p-2 ${
+                      className={`border border-gray-700 p-2 ${
                         isFirstRow ? "text-blue-900" : ""
                       }`}
                     >
@@ -413,7 +432,7 @@ const DisplayEvaluations = () => {
                     {evaluations.map((evalItem) => (
                       <td
                         key={evalItem._id}
-                        className={`border border-gray-300 p-2 ${
+                        className={`border border-gray-700 p-2 ${
                           isFirstRow ? "text-blue-900" : ""
                         }`}
                       >
@@ -428,7 +447,7 @@ const DisplayEvaluations = () => {
                     {evaluations.map((evalItem) => (
                       <td
                         key={`${evalItem._id}-satisfaction`}
-                        className={`border border-gray-300 p-2 bg-blue-50 ${
+                        className={`border border-gray-700 p-2 bg-blue-50 ${
                           isFirstRow ? "text-blue-900" : ""
                         }`}
                       >

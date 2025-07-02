@@ -101,53 +101,47 @@ const Query6 = ({ onSave, nodeId, projectId, nodeName }) => {
         Please specify your requirements, ensuring values are in ascending
         order.
       </h4>
-      <table className="min-w-full border-collapse border border-gray-400 mb-0">
+      <table className="min-w-full border-collapse border border-gray-700 mb-0">
         <thead>
           <tr className="bg-gray-200">
-            <th className="text-xl border border-gray-400 p-2">
+            <th className="text-xl border border-gray-700 p-2">
               Description of requirements
             </th>
-            <th className="text-xl border border-gray-400 p-2">
+            <th className="text-xl border border-gray-700 p-2">
               Your (numeric) values
             </th>
           </tr>
         </thead>
         <tbody>
           <tr className="hover:bg-gray-100">
-            <td className="text-2xl border border-gray-400 p-2">
+            <td className="text-2xl border border-gray-700 p-2">
               It is unacceptable if the value is less than
             </td>
-            <td className="border border-gray-400 p-2">
+            <td className="border border-gray-700 p-2">
               <input
                 type="number"
                 name="lower"
                 value={values.lower}
-                onChange={(e) => {
-                  handleChange(e);
-                  validate();
-                }}
-                onBlur={validate}
+                onChange={handleChange}
+                onBlur={handleChange}
                 className="w-full border rounded px-2 py-0"
                 style={{ fontSize: "1.5rem" }}
               />
             </td>
           </tr>
           <tr className="hover:bg-gray-100">
-            <td className="text-2xl border border-gray-400 p-2">
+            <td className="text-2xl border border-gray-700 p-2">
               I am fully satisfied if the offered value is between the following
               two values
             </td>
-            <td className="border border-gray-400 p-2">
+            <td className="border border-gray-700 p-2">
               <div className="flex space-x-2">
                 <input
                   type="number"
                   name="middleLower"
                   value={values.middleLower}
-                  onChange={(e) => {
-                    handleChange(e);
-                    validate();
-                  }}
-                  onBlur={validate}
+                  onChange={handleChange}
+                  onBlur={handleChange}
                   placeholder="Lower bound"
                   className="w-1/2 border rounded px-2 py-0"
                   style={{ fontSize: "1.5rem" }}
@@ -156,11 +150,8 @@ const Query6 = ({ onSave, nodeId, projectId, nodeName }) => {
                   type="number"
                   name="middleUpper"
                   value={values.middleUpper}
-                  onChange={(e) => {
-                    handleChange(e);
-                    validate();
-                  }}
-                  onBlur={validate}
+                  onChange={handleChange}
+                  onBlur={handleChange}
                   placeholder="Upper bound"
                   className="w-1/2 border rounded px-2 py-0"
                   style={{ fontSize: "1.5rem" }}
@@ -169,19 +160,16 @@ const Query6 = ({ onSave, nodeId, projectId, nodeName }) => {
             </td>
           </tr>
           <tr className="hover:bg-gray-100">
-            <td className="text-2xl border border-gray-400 p-2">
+            <td className="text-2xl border border-gray-700 p-2">
               It is unacceptable if the value is greater than
             </td>
-            <td className="border border-gray-400 p-2">
+            <td className="border border-gray-700 p-2">
               <input
                 type="number"
                 name="upper"
                 value={values.upper}
-                onChange={(e) => {
-                  handleChange(e);
-                  validate();
-                }}
-                onBlur={validate}
+                onChange={handleChange}
+                onBlur={handleChange}
                 className="w-full border rounded px-2 py-0"
                 style={{ fontSize: "1.5rem" }}
               />

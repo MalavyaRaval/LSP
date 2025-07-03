@@ -50,7 +50,23 @@ const DemaChat = () => {
   const [parentNodes, setParentNodes] = useState([]);
   const [currentParentIndex, setCurrentParentIndex] = useState(0);
   // New state to track processed parent IDs.
-  const [processedParentIds, setProcessedParentIds] = useState(new Set()); // This needs to be a useState
+  const [processedParentIds, setProcessedParentIds] = useState(() => {
+    const storedProcessedIds = sessionStorage.getItem("processedParentIds");
+    return storedProcessedIds
+      ? new Set(JSON.parse(storedProcessedIds))
+      : new Set();
+  }); // This needs to be a useState
+  // New state to track parents that have completed connection processing
+  const [completedConnectionParents, setCompletedConnectionParents] = useState(
+    () => {
+      const storedCompletedConnections = sessionStorage.getItem(
+        "completedConnectionParents"
+      );
+      return storedCompletedConnections
+        ? new Set(JSON.parse(storedCompletedConnections))
+        : new Set();
+    }
+  );
   const [evaluationStarted, setEvaluationStarted] = useState(false);
   const [history, setHistory] = useState([]); // Add history state to track previous states
   const [createdNodeIds, setCreatedNodeIds] = useState({}); // Track node IDs created at each parent
@@ -368,6 +384,19 @@ const DemaChat = () => {
       setOriginalChildren([]);
     }
 
+    setProcessing(false);
+    setProcessedParentIds((prev) => {
+      const newState = new Set(prev).add(parentId);
+      sessionStorage.setItem(
+        "processedParentIds",
+        JSON.stringify(Array.from(newState))
+      );
+      return newState;
+    }); // Add current parent to processed list
+
+    setShowProjectTreeModal(true);
+    window.dispatchEvent(new Event("refreshProjectTree"));
+
     return updatedQueue;
   };
 
@@ -401,8 +430,6 @@ const DemaChat = () => {
       }
 
       await saveChildren(nonEmptyChildren);
-
-      setProcessedParentIds((prev) => new Set(prev).add(parentId)); // Add current parent to processed list
 
       setShowProjectTreeModal(true);
       window.dispatchEvent(new Event("refreshProjectTree"));
@@ -579,25 +606,39 @@ const DemaChat = () => {
   const finalizeNode = async () => {
     alert("All decompositions complete.");
     window.dispatchEvent(new Event("refreshProjectTree"));
-    setParentId(null);
-    setChildrenDetails(getInitialChildren());
+    setParentId(null); // Reset parentId to indicate no active decomposition
+    setChildrenDetails(getInitialChildren()); // Clear children input
+
     try {
       const res = await axiosInstance.get(`/api/projects/${projectId}`);
       const treeData = res.data;
+
       const leaves = getLeafNodes(treeData);
-      setLeafNodes(leaves);
-      setProcessingLeaves(true);
-      setCurrentLeafIndex(0);
-      setProcessedParentIds(new Set()); // Explicitly reset on finalization
-      const hasParentNodes = treeData.children && treeData.children.length > 0;
-      if (!hasParentNodes) {
-        alert(
-          "All parent nodes completed process. Tree finalization complete."
-        );
-        setEvaluationStarted(true);
+      if (leaves.length > 0) {
+        setLeafNodes(leaves);
+        setProcessingLeaves(true);
+        setCurrentLeafIndex(0);
+      } else {
+        // If no leaves, immediately check for parents needing connection
+        const parentsToProcessForConnection = Array.from(processedParentIds)
+          .filter((pid) => !completedConnectionParents.has(pid))
+          .map((pid) => findNodeById(treeData, pid))
+          .filter(Boolean);
+
+        if (parentsToProcessForConnection.length > 0) {
+          setParentNodes(parentsToProcessForConnection);
+          setCurrentParentIndex(0);
+          setProcessingParents(true);
+        } else {
+          alert(
+            "All parent nodes and leaves completed process. Tree finalization complete."
+          );
+          setEvaluationStarted(true);
+        }
       }
     } catch (error) {
-      console.error("Error fetching tree after finalizing:", error);
+      console.error("Error during finalization process:", error);
+      setEvaluationStarted(true);
     }
     sessionStorage.removeItem("bfsQueue");
     window.dispatchEvent(new Event("refreshProjectTree"));
@@ -607,27 +648,30 @@ const DemaChat = () => {
     try {
       const res = await axiosInstance.get(`/api/projects/${projectId}`);
       const treeData = res.data;
-      let initialParentIds = new Set();
 
-      leafNodes.forEach((leaf) => {
-        if (leaf.parent && leaf.parent.toString() !== treeData.id.toString()) {
-          initialParentIds.add(leaf.parent.toString());
+      // Get all nodes that have been processed for decomposition (their children defined)
+      let parentsToProcess = Array.from(processedParentIds)
+        .map((pid) => findNodeById(treeData, pid))
+        .filter(Boolean); // Filter out any nulls if node not found
+
+      // If the root node has been processed for decomposition, ensure it's included
+      // and placed at the beginning of the list if it's not already there.
+      if (
+        treeData &&
+        treeData.id &&
+        processedParentIds.has(treeData.id.toString()) &&
+        !parentsToProcess.some(
+          (node) => node.id?.toString() === treeData.id.toString()
+        )
+      ) {
+        const rootNode = findNodeById(treeData, treeData.id);
+        if (rootNode) {
+          parentsToProcess.unshift(rootNode); // Add root to the beginning
         }
-      });
-
-      if (treeData && treeData.children && treeData.children.length > 0) {
-        initialParentIds.add(treeData.id.toString());
       }
 
-      const filteredParentIds = Array.from(initialParentIds).filter(
-        (pid) => !processedParentIds.has(pid)
-      );
-      // No direct addition to processedParentIds here; it will be added when children are processed
-      const parentNodesArr = filteredParentIds
-        .map((pid) => findNodeById(treeData, pid))
-        .filter(Boolean);
-      if (parentNodesArr.length > 0) {
-        setParentNodes(parentNodesArr);
+      if (parentsToProcess.length > 0) {
+        setParentNodes(parentsToProcess);
         setCurrentParentIndex(0);
         setProcessingParents(true);
       } else {
@@ -638,45 +682,6 @@ const DemaChat = () => {
       }
     } catch (err) {
       console.error("Error starting parent processing:", err);
-    }
-  };
-  const processNextParentLevel = async () => {
-    try {
-      const res = await axiosInstance.get(`/api/projects/${projectId}`);
-      const treeData = res.data;
-      let nextLevelParentIds = new Set();
-
-      parentNodes.forEach((node) => {
-        if (node.parent && node.parent.toString() !== treeData.id.toString()) {
-          nextLevelParentIds.add(node.parent.toString());
-        }
-      });
-
-      if (
-        treeData &&
-        treeData.children &&
-        treeData.children.length > 0 &&
-        !processedParentIds.has(treeData.id.toString())
-      ) {
-        nextLevelParentIds.add(treeData.id.toString());
-      }
-
-      const filteredNextIds = Array.from(nextLevelParentIds).filter(
-        (pid) => !processedParentIds.has(pid)
-      );
-      // No direct addition to processedParentIds here; it will be added when children are processed
-      const nextParentsArr = filteredNextIds
-        .map((pid) => findNodeById(treeData, pid))
-        .filter(Boolean);
-      if (nextParentsArr.length > 0) {
-        setParentNodes(nextParentsArr);
-        setCurrentParentIndex(0);
-      } else {
-        setProcessingParents(false);
-        setEvaluationStarted(true);
-      }
-    } catch (err) {
-      console.error("Error processing next parent level:", err);
     }
   };
 
@@ -696,6 +701,9 @@ const DemaChat = () => {
     setParentNodes([]);
     setCurrentParentIndex(0);
     setProcessedParentIds(new Set()); // Explicitly reset on project change
+    setCompletedConnectionParents(new Set()); // New reset
+    sessionStorage.removeItem("processedParentIds");
+    sessionStorage.removeItem("completedConnectionParents"); // New removal
     setEvaluationStarted(false);
     setHistory([]);
     setCreatedNodeIds({});
@@ -738,7 +746,60 @@ const DemaChat = () => {
               setCurrentLeafIndex(currentLeafIndex + 1);
             } else {
               setProcessingLeaves(false);
-              startParentProcessing();
+              // After all leaves are processed, move to parent connection processing
+              (async () => {
+                try {
+                  const res = await axiosInstance.get(
+                    `/api/projects/${projectId}`
+                  );
+                  const treeData = res.data;
+                  const parentsToProcessForConnection = Array.from(
+                    processedParentIds
+                  )
+                    .filter((pid) => !completedConnectionParents.has(pid))
+                    .map((pid) => findNodeById(treeData, pid))
+                    .filter(Boolean);
+
+                  // Failsafe for root node (similar to finalizeNode)
+                  if (
+                    treeData &&
+                    treeData.id &&
+                    processedParentIds.has(treeData.id.toString()) &&
+                    !completedConnectionParents.has(treeData.id.toString()) &&
+                    !parentsToProcessForConnection.some(
+                      (node) => node.id === treeData.id
+                    )
+                  ) {
+                    const rootNode = findNodeById(treeData, treeData.id);
+                    if (rootNode) {
+                      parentsToProcessForConnection.unshift(rootNode); // Add root to the beginning
+                    }
+                  }
+
+                  console.log(
+                    "onNextLeaf: parentsToProcessForConnection after leaves",
+                    parentsToProcessForConnection.map((p) => p.id)
+                  );
+
+                  if (parentsToProcessForConnection.length > 0) {
+                    setParentNodes(parentsToProcessForConnection);
+                    setCurrentParentIndex(0);
+                    setProcessingParents(true);
+                  } else {
+                    // No parents need connection processing, proceed to final evaluation
+                    alert(
+                      "All parent nodes and leaves completed process. Tree finalization complete."
+                    );
+                    setEvaluationStarted(true);
+                  }
+                } catch (error) {
+                  console.error(
+                    "Error fetching tree after leaf processing:",
+                    error
+                  );
+                  setEvaluationStarted(true);
+                }
+              })();
             }
           }}
           onPrevLeaf={() => {
@@ -756,10 +817,33 @@ const DemaChat = () => {
           parentNodes={parentNodes}
           currentParentIndex={currentParentIndex}
           onNextParent={() => {
+            // Mark the current parent as having completed its connection processing
+            const completedParentId = parentNodes[currentParentIndex].id;
+            setCompletedConnectionParents((prev) => {
+              const newState = new Set(prev).add(completedParentId);
+              sessionStorage.setItem(
+                "completedConnectionParents",
+                JSON.stringify(Array.from(newState))
+              );
+              console.log(
+                "onNextParent: Added to completedConnectionParents",
+                completedParentId,
+                ", New state:",
+                Array.from(newState)
+              );
+              return newState;
+            });
+
             if (currentParentIndex < parentNodes.length - 1) {
               setCurrentParentIndex(currentParentIndex + 1);
             } else {
-              processNextParentLevel();
+              // All parents in the current batch have had connections processed.
+              setProcessingParents(false); // Stop parent processing (for connections)
+              // Now move to final project evaluation
+              alert(
+                "All parent nodes and leaves completed process. Tree finalization complete."
+              );
+              setEvaluationStarted(true);
             }
           }}
           onPrevParent={() => {

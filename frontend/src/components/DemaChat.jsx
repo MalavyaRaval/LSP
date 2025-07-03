@@ -5,6 +5,7 @@ import LeafProcessing from "./LeafProcessing.jsx";
 import ParentProcessing from "./ParentProcessing.jsx";
 import ProjectEvaluation from "./ProjectEvaluation.jsx";
 import ProjectTree from "./ProjectTree.jsx";
+import { buildPartialTree } from "./utils/partialTreeBuilder";
 
 // Helper: recursively extract leaf nodes (nodes with no children)
 const getLeafNodes = (node) => {
@@ -55,6 +56,7 @@ const DemaChat = () => {
   const [createdNodeIds, setCreatedNodeIds] = useState({}); // Track node IDs created at each parent
   const [originalChildren, setOriginalChildren] = useState([]); // New state to store original children for comparison
   const [showProjectTreeModal, setShowProjectTreeModal] = useState(false);
+  const [partialTree, setPartialTree] = useState(null);
 
   // Computed value for processedParentIds (now combines with the state variable)
   const allVisibleProcessedIds = useMemo(() => {
@@ -446,6 +448,14 @@ const DemaChat = () => {
 
       setHistory((prev) => prev.slice(0, -1));
 
+      // Revert processedParentIds to the state *before* this parent was processed
+      const updatedProcessedParentIds = new Set(
+        previousState.bfsQueue
+          .filter((node) => node.processed)
+          .map((node) => node.id)
+      );
+      setProcessedParentIds(updatedProcessedParentIds);
+
       try {
         const nodesToDelete = createdNodeIds[previousState.parentId] || [];
 
@@ -693,6 +703,23 @@ const DemaChat = () => {
     window.dispatchEvent(new Event("refreshProjectTree"));
   }, [projectId]);
 
+  useEffect(() => {
+    const fetchPartialTree = async () => {
+      if (!showProjectTreeModal) return;
+      try {
+        const res = await axiosInstance.get(`/api/projects/${projectId}`);
+        const treeData = res.data;
+        // Combine processedParentIds and current parentId for the partial tree builder
+        const idsToShow = new Set(allVisibleProcessedIds);
+        const partial = buildPartialTree(treeData, idsToShow);
+        setPartialTree(partial);
+      } catch (err) {
+        setPartialTree(null);
+      }
+    };
+    fetchPartialTree();
+  }, [showProjectTreeModal, processedParentIds, parentId, projectId]);
+
   const renderStep = () => {
     if (evaluationStarted) {
       return <ProjectEvaluation />;
@@ -869,6 +896,7 @@ const DemaChat = () => {
                   processedNodes={allVisibleProcessedIds}
                   bfsQueue={bfsQueue}
                   currentParentId={parentId}
+                  treeData={partialTree}
                 />
               </div>
               <div className="flex justify-end space-x-4 mt-auto">

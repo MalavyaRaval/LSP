@@ -734,81 +734,95 @@ const DemaChat = () => {
     }
     if (processingLeaves) {
       return (
-        <LeafProcessing
-          leafNodes={leafNodes}
-          currentLeafIndex={currentLeafIndex}
-          leafValues={leafValues}
-          setLeafValues={setLeafValues}
-          error={error}
-          setError={setError}
-          onNextLeaf={() => {
-            if (currentLeafIndex < leafNodes.length - 1) {
-              setCurrentLeafIndex(currentLeafIndex + 1);
-            } else {
-              setProcessingLeaves(false);
-              // After all leaves are processed, move to parent connection processing
-              (async () => {
-                try {
-                  const res = await axiosInstance.get(
-                    `/api/projects/${projectId}`
-                  );
-                  const treeData = res.data;
-                  const parentsToProcessForConnection = Array.from(
-                    processedParentIds
-                  )
-                    .filter((pid) => !completedConnectionParents.has(pid))
-                    .map((pid) => findNodeById(treeData, pid))
-                    .filter(Boolean);
+        <div className="flex flex-row gap-4 w-full">
+          <div className="w-2/3">
+            <LeafProcessing
+              leafNodes={leafNodes}
+              currentLeafIndex={currentLeafIndex}
+              leafValues={leafValues}
+              setLeafValues={setLeafValues}
+              error={error}
+              setError={setError}
+              onNextLeaf={() => {
+                if (currentLeafIndex < leafNodes.length - 1) {
+                  setCurrentLeafIndex(currentLeafIndex + 1);
+                } else {
+                  setProcessingLeaves(false);
+                  // After all leaves are processed, move to parent connection processing
+                  (async () => {
+                    try {
+                      const res = await axiosInstance.get(
+                        `/api/projects/${projectId}`
+                      );
+                      const treeData = res.data;
+                      const parentsToProcessForConnection = Array.from(
+                        processedParentIds
+                      )
+                        .filter((pid) => !completedConnectionParents.has(pid))
+                        .map((pid) => findNodeById(treeData, pid))
+                        .filter(Boolean);
 
-                  // Failsafe for root node (similar to finalizeNode)
-                  if (
-                    treeData &&
-                    treeData.id &&
-                    processedParentIds.has(treeData.id.toString()) &&
-                    !completedConnectionParents.has(treeData.id.toString()) &&
-                    !parentsToProcessForConnection.some(
-                      (node) => node.id === treeData.id
-                    )
-                  ) {
-                    const rootNode = findNodeById(treeData, treeData.id);
-                    if (rootNode) {
-                      parentsToProcessForConnection.unshift(rootNode); // Add root to the beginning
+                      // Failsafe for root node (similar to finalizeNode)
+                      if (
+                        treeData &&
+                        treeData.id &&
+                        processedParentIds.has(treeData.id.toString()) &&
+                        !completedConnectionParents.has(
+                          treeData.id.toString()
+                        ) &&
+                        !parentsToProcessForConnection.some(
+                          (node) => node.id === treeData.id
+                        )
+                      ) {
+                        const rootNode = findNodeById(treeData, treeData.id);
+                        if (rootNode) {
+                          parentsToProcessForConnection.unshift(rootNode); // Add root to the beginning
+                        }
+                      }
+
+                      console.log(
+                        "onNextLeaf: parentsToProcessForConnection after leaves",
+                        parentsToProcessForConnection.map((p) => p.id)
+                      );
+
+                      if (parentsToProcessForConnection.length > 0) {
+                        setParentNodes(parentsToProcessForConnection);
+                        setCurrentParentIndex(0);
+                        setProcessingParents(true);
+                      } else {
+                        // No parents need connection processing, proceed to final evaluation
+                        alert(
+                          "All parent nodes and leaves completed process. Tree finalization complete."
+                        );
+                        setEvaluationStarted(true);
+                      }
+                    } catch (error) {
+                      console.error(
+                        "Error fetching tree after leaf processing:",
+                        error
+                      );
+                      setEvaluationStarted(true);
                     }
-                  }
-
-                  console.log(
-                    "onNextLeaf: parentsToProcessForConnection after leaves",
-                    parentsToProcessForConnection.map((p) => p.id)
-                  );
-
-                  if (parentsToProcessForConnection.length > 0) {
-                    setParentNodes(parentsToProcessForConnection);
-                    setCurrentParentIndex(0);
-                    setProcessingParents(true);
-                  } else {
-                    // No parents need connection processing, proceed to final evaluation
-                    alert(
-                      "All parent nodes and leaves completed process. Tree finalization complete."
-                    );
-                    setEvaluationStarted(true);
-                  }
-                } catch (error) {
-                  console.error(
-                    "Error fetching tree after leaf processing:",
-                    error
-                  );
-                  setEvaluationStarted(true);
+                  })();
                 }
-              })();
-            }
-          }}
-          onPrevLeaf={() => {
-            if (currentLeafIndex > 0) {
-              setCurrentLeafIndex(currentLeafIndex - 1);
-            }
-          }}
-          onBackToParentProcess={handleBack}
-        />
+              }}
+              onPrevLeaf={() => {
+                if (currentLeafIndex > 0) {
+                  setCurrentLeafIndex(currentLeafIndex - 1);
+                }
+              }}
+              onBackToParentProcess={handleBack}
+            />
+          </div>
+          <div className="w-1/3 p-2 bg-white rounded-lg shadow-md mx-0">
+            <h2 className="text-xl font-semibold mb-2">Project Tree</h2>
+            <ProjectTree
+              projectId={projectId}
+              processedNodes={allVisibleProcessedIds}
+              highlightedNodeId={leafNodes[currentLeafIndex]?.id}
+            />
+          </div>
+        </div>
       );
     }
     if (processingParents) {

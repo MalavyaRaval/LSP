@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axiosInstance from "./utils/axiosInstance";
 import ConnectionProcessing from "./ConnectionProcessing.jsx";
 import RelativeImportance from "./RelativeImportance.jsx";
+import ProjectTree from "./ProjectTree.jsx";
 
 const ParentProcessing = ({
   parentNodes,
@@ -54,11 +55,22 @@ const ParentProcessing = ({
         For : <span className="text-indigo-600">{currentParent.name}</span>
       </h2>
       {step === 1 ? (
-        <ConnectionProcessing
-          onComplete={handleSaveConnection}
-          currentParent={currentParent}
-          projectId={projectId}
-        />
+        <div className="flex flex-row gap-4 w-full">
+          <div className="w-2/3">
+            <ConnectionProcessing
+              onComplete={handleSaveConnection}
+              currentParent={currentParent}
+              projectId={projectId}
+            />
+          </div>
+          <div className="w-1/3 p-2 bg-white rounded-lg shadow-md mx-0">
+            <h2 className="text-xl font-semibold mb-2">Project Tree</h2>
+            <ProjectTree
+              projectId={projectId}
+              highlightedNodeId={currentParent.id}
+            />
+          </div>
+        </div>
       ) : (
         <RelativeImportance
           currentParent={currentParent}

@@ -165,6 +165,10 @@ const ProjectTree = ({
     try {
       const response = await axiosInstance.get(`/api/projects/${projectId}`);
       let fullTree = response.data;
+      console.log(
+        "Full Tree received from API:",
+        JSON.stringify(fullTree, null, 2)
+      );
 
       const filteredTree = filterTree(
         fullTree,
@@ -172,6 +176,7 @@ const ProjectTree = ({
         bfsQueue,
         currentParentId
       );
+      console.log("Filtered Tree:", filteredTree);
       setTree(filteredTree);
     } catch (error) {
       console.error("Error loading project:", error);
@@ -194,6 +199,9 @@ const ProjectTree = ({
 
   if (loading) return <div className="text-center p-4">Loading project...</div>;
   if (!tree) return <div className="text-center p-4">Project not found</div>;
+
+  // Add a log to confirm if the tree is rendered
+  console.log("Rendering Project Tree:", tree);
 
   return (
     <div

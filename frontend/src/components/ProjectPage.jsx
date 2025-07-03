@@ -9,6 +9,11 @@ const ProjectPage = () => {
   const { projectname } = useParams();
   const navigate = useNavigate();
 
+  // State for project decomposition data
+  const [processedNodes, setProcessedNodes] = useState(new Set());
+  const [bfsQueue, setBfsQueue] = useState([]);
+  const [currentParentId, setCurrentParentId] = useState(null);
+
   // Convert projectname to a slug for use as projectId.
   const projectSlug = projectname;
   const evaluatorName = "testing";
@@ -94,6 +99,9 @@ const ProjectPage = () => {
           <div>
             <ProjectTree
               projectId={projectSlug}
+              processedNodes={processedNodes}
+              bfsQueue={bfsQueue}
+              currentParentId={currentParentId}
               username={evaluatorName}
               projectname={projectname}
             />

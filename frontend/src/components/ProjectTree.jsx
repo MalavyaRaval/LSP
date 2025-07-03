@@ -10,9 +10,6 @@ const TreeNode = ({ node, level = 0 }) => {
         className="font-bold leading-none"
         style={{
           fontSize: "28px",
-          whiteSpace: "nowrap",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
         }}
       >{`${indentation}[${node.nodeNumber || "1"}] ${node.name}`}</div>
       {node.children && node.children.length > 0 && (
@@ -26,10 +23,7 @@ const TreeNode = ({ node, level = 0 }) => {
   );
 };
 
-const ProjectTree = ({
-  projectId, // Keep projectId for initial fetch fallback, though it should be handled by DemaChat
-  treeData,
-}) => {
+const ProjectTree = ({ projectId, treeData }) => {
   const [tree, setTree] = useState(treeData || null);
   const [loading, setLoading] = useState(true);
 
@@ -41,14 +35,12 @@ const ProjectTree = ({
         setLoading(false);
         return;
       }
-      // Fallback: If treeData is not provided (shouldn't happen if DemaChat is calling it correctly),
-      // fetch the full project tree. This might be a less common path now.
       const response = await axiosInstance.get(`/api/projects/${projectId}`);
       let fullTree = response.data;
       setTree(fullTree);
     } catch (error) {
       console.error("Error loading project:", error);
-      // alert("Failed to load project");
+      alert("Failed to load project");
     } finally {
       setLoading(false);
     }
@@ -58,17 +50,11 @@ const ProjectTree = ({
     loadProject();
   }, [loadProject]);
 
-  // Removed the refreshProjectTree event listener as DemaChat will now directly control treeData updates.
-
   if (loading) return <div className="text-center p-4">Loading project...</div>;
   if (!tree) return <div className="text-center p-4">Project not found</div>;
 
-  // Render the treeData directly, as it's already filtered by buildPartialTree in DemaChat
   return (
-    <div
-      className="tree-container"
-      style={{ overflowY: "auto", overflowX: "hidden" }}
-    >
+    <div className="tree-container">
       <TreeNode node={tree} />
     </div>
   );

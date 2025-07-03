@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from "react";
 import axiosInstance from "./utils/axiosInstance";
 
-const TreeNode = ({ node, level = 0 }) => {
+const TreeNode = ({ node, level = 0, highlightedNodeId }) => {
   const indentation = "  ".repeat(level);
+
+  const isHighlighted = node.id === highlightedNodeId;
 
   return (
     <div>
       <div
-        className="font-bold leading-none"
+        className={`font-bold leading-none ${
+          isHighlighted ? "bg-yellow-200 p-1 rounded" : ""
+        }`}
         style={{
           fontSize: "28px",
         }}
@@ -15,7 +19,12 @@ const TreeNode = ({ node, level = 0 }) => {
       {node.children && node.children.length > 0 && (
         <div className="ml-4">
           {node.children.map((child) => (
-            <TreeNode key={child.id} node={child} level={level + 1} />
+            <TreeNode
+              key={child.id}
+              node={child}
+              level={level + 1}
+              highlightedNodeId={highlightedNodeId}
+            />
           ))}
         </div>
       )}
@@ -23,7 +32,7 @@ const TreeNode = ({ node, level = 0 }) => {
   );
 };
 
-const ProjectTree = ({ projectId, treeData }) => {
+const ProjectTree = ({ projectId, treeData, highlightedNodeId }) => {
   const [tree, setTree] = useState(treeData || null);
   const [loading, setLoading] = useState(true);
 
@@ -55,7 +64,7 @@ const ProjectTree = ({ projectId, treeData }) => {
 
   return (
     <div className="tree-container">
-      <TreeNode node={tree} />
+      <TreeNode node={tree} highlightedNodeId={highlightedNodeId} />
     </div>
   );
 };

@@ -116,7 +116,9 @@ const Home = () => {
         "Error fetching Projects:",
         error.response || error.message || error
       );
-      alert("Error fetching Projects: " + error.message);
+      if (error.message === "timeout of 10000ms exceeded") {
+        window.location.reload();
+      }
     }
   };
 

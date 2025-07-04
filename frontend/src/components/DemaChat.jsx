@@ -607,7 +607,7 @@ const DemaChat = () => {
     alert("All decompositions complete.");
     window.dispatchEvent(new Event("refreshProjectTree"));
     setParentId(null); // Reset parentId to indicate no active decomposition
-    setChildrenDetails(getInitialChildren()); // Clear children input
+    setChildrenDetails(getInitialChildren());
 
     try {
       const res = await axiosInstance.get(`/api/projects/${projectId}`);

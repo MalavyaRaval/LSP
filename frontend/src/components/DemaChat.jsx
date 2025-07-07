@@ -878,7 +878,8 @@ const DemaChat = () => {
           </span>
         </h2>
         <p className="text-2xl text-red-700 mt-0 mb-3">
-          Please enter up to 5 components of this item
+          Please enter up to 5 components of this item (press continue when
+          done)
         </p>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
@@ -984,7 +985,9 @@ const DemaChat = () => {
         {showProjectTreeModal && (
           <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex justify-center items-center z-50">
             <div className="bg-white p-5 rounded-lg shadow-xl m-4 max-w-6xl w-full h-[90vh] flex flex-col">
-              <h3 className="text-xl font-bold mb-4">Project Tree</h3>
+              <h3 className="text-xl font-bold mb-4">
+                Components for Evaluation
+              </h3>
               <div
                 className="flex-grow overflow-y-auto mb-4"
                 style={{ scrollBehavior: "smooth" }}

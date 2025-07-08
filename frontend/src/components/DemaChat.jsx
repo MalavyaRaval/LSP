@@ -225,103 +225,95 @@ const DemaChat = () => {
       });
     }
 
-    let treeDataToSend;
-
-    // Separate children into those to add/update and those that are unchanged
-    const childrenToAddOrUpdate = [];
-    const unchangedChildren = [];
-
+    // 3. Prepare a map of children from UI for easier lookup
+    const uiChildrenMap = new Map();
     childrenToSave.forEach((child) => {
-      const originalChild = originalChildren.find((oc) => oc.id === child.id);
-
-      // Check if the child is new or if its name or decompose status has changed
-      if (
-        !originalChild ||
-        originalChild.name !== child.name ||
-        originalChild.decompose !== child.decompose
-      ) {
-        childrenToAddOrUpdate.push(child);
-      } else {
-        unchangedChildren.push(child);
+      if (child.name.trim() !== "") {
+        // Only consider non-empty UI inputs
+        uiChildrenMap.set(child.id, child);
       }
     });
 
-    // Create nodeNumbers for children based on parent's nodeNumber
-    const nodesToSendToBackend = childrenToAddOrUpdate.map((child, index) => {
-      // Generate a new node number if it's a new child, or keep existing for modified
-      let nodeNumber = child.nodeNumber;
-      const isNewChild = !originalChildren.some((oc) => oc.id === child.id);
+    // 4. Identify children to delete (those in backend but no longer in UI with a name)
+    const existingChildrenFromBackend = currentParentInTree
+      ? currentParentInTree.children || []
+      : [];
+    const nodeIdsToDelete = existingChildrenFromBackend
+      .filter((backendChild) => !uiChildrenMap.has(backendChild.id))
+      .map((child) => child.id);
 
-      if (!nodeNumber || isNewChild) {
-        maxSuffix += 1; // Increment for each new child
-        nodeNumber = `${parentNodeNumber}${maxSuffix}`;
-      }
+    if (nodeIdsToDelete.length > 0) {
+      await deleteChildren(nodeIdsToDelete);
+      // Re-fetch tree data after deletion to work with the truly current state for merging
+      treeDataResponse = await axiosInstance.get(`/api/projects/${projectId}`);
+      const updatedTreeData = treeDataResponse.data;
+      currentParentInTree = findNodeById(updatedTreeData, effectiveParentId);
+      // Update existingChildrenFromBackend to reflect deletions for the next step
+      existingChildrenFromBackend = currentParentInTree
+        ? currentParentInTree.children || []
+        : [];
+    }
 
-      // Check if this child is a renamed version of an existing child
-      const isRenamed = originalChildren.some(
-        (originalChild) =>
-          originalChild.id === child.id && originalChild.name !== child.name
+    // 5. Build the final payload: combine existing (non-deleted) and new/updated children
+    const finalChildrenPayload = [];
+    const processedBackendChildIds = new Set(); // Track backend children that have been processed
+
+    // Add/Update children from UI input
+    uiChildrenMap.forEach((uiChild) => {
+      const matchingBackendChild = existingChildrenFromBackend.find(
+        (backendChild) => backendChild.id === uiChild.id
       );
 
-      // If it's a new child (no existing ID from originalChildren) or it's a renamed child, generate a new ID
-      const childId =
-        child.id &&
-        typeof child.id === "string" &&
-        child.id.startsWith(effectiveParentId) &&
-        !isRenamed
-          ? child.id // Keep existing temporary ID for modified rows that are not yet saved, if not renamed
-          : `${effectiveParentId}-${Date.now()}-${index}`;
-
-      return {
-        id: childId,
-        name: child.name.trim() || `Child ${index + 1}`,
-        nodeNumber: nodeNumber,
-        decompose: child.decompose,
-        attributes: { created: Date.now() },
-        children: [],
-        parent: effectiveParentId,
-        processed: false,
-      };
+      let childToAddToPayload;
+      if (matchingBackendChild) {
+        // Existing child, potentially updated
+        childToAddToPayload = { ...matchingBackendChild }; // Start with backend data
+        childToAddToPayload.name = uiChild.name.trim(); // Apply UI name
+        childToAddToPayload.decompose = uiChild.decompose; // Apply UI decompose
+        processedBackendChildIds.add(matchingBackendChild.id);
+      } else {
+        // New child from UI
+        maxSuffix += 1;
+        childToAddToPayload = {
+          id: `${effectiveParentId}-${Date.now()}-${maxSuffix}`, // New unique ID
+          name: uiChild.name.trim() || `Child ${maxSuffix}`,
+          nodeNumber: `${parentNodeNumber}${maxSuffix}`,
+          decompose: uiChild.decompose,
+          attributes: { created: Date.now() },
+          children: [],
+          parent: effectiveParentId,
+          processed: false,
+        };
+      }
+      finalChildrenPayload.push(childToAddToPayload);
     });
 
-    let newChildrenInTree = [];
+    // Add any backend children that were not present in UI (meaning they are to be preserved)
+    existingChildrenFromBackend.forEach((backendChild) => {
+      if (!processedBackendChildIds.has(backendChild.id)) {
+        // This child existed in the backend and was not in the UI input (so not updated or deleted)
+        finalChildrenPayload.push(backendChild);
+      }
+    });
 
-    if (nodesToSendToBackend.length > 0) {
+    // Now send finalChildrenPayload to the backend
+    if (finalChildrenPayload.length > 0) {
       try {
         const res = await axiosInstance.post(
           `/api/projects/${projectId}/nodes`,
           {
             parentId: effectiveParentId,
-            children: nodesToSendToBackend,
+            children: finalChildrenPayload, // Send the complete desired state
             metadata: {
               decisionProcess: "LSPrec",
               objectName: "My Object",
             },
           }
         );
-        treeDataToSend = res.data;
+        const treeDataToSend = res.data; // This is the new full tree data
         const parentNode = findNodeById(treeDataToSend, effectiveParentId);
-        if (
-          !parentNode ||
-          !parentNode.children ||
-          parentNode.children.length === 0
-        ) {
-          console.warn("No children were created for the current parent.");
-          finalizeNode();
-          return [];
-        }
 
-        const newChildrenIds = nodesToSendToBackend.map((node) => node.id);
-
-        setCreatedNodeIds((prev) => ({
-          ...prev,
-          [effectiveParentId]: [
-            ...(prev[effectiveParentId] || []),
-            ...newChildrenIds,
-          ],
-        }));
-        newChildrenInTree = parentNode.children;
-
+        // Update frontend states from the fresh backend response
         if (parentNode && parentNode.children) {
           const backendChildren = parentNode.children.map((child) => ({
             id: child.id,
@@ -338,50 +330,64 @@ const DemaChat = () => {
           }
           setChildrenDetails(paddedChildren.slice(0, 5));
           setOriginalChildren(backendChildren);
+        } else {
+          setChildrenDetails(getInitialChildren());
+          setOriginalChildren([]);
         }
+
+        // Update BFS queue and processed IDs
+        const currentQueue = JSON.parse(
+          sessionStorage.getItem("bfsQueue") || "[]"
+        );
+        const updatedCurrentQueue = currentQueue.map((node) =>
+          node.id === effectiveParentId ? { ...node, processed: true } : node
+        );
+        const allChildrenForQueue =
+          parentNode && parentNode.children ? parentNode.children : [];
+        const nodesToDecompose = allChildrenForQueue
+          .filter(
+            (child) =>
+              child.decompose === true ||
+              (child.attributes && child.attributes.decompose === true)
+          )
+          .map((node) => ({ ...node, processed: false }));
+        const updatedQueue = [...updatedCurrentQueue, ...nodesToDecompose];
+        sessionStorage.setItem("bfsQueue", JSON.stringify(updatedQueue));
+        setBfsQueue(updatedQueue);
       } catch (error) {
         console.error("Error saving children:", error);
         throw error;
       }
     } else {
-      treeDataToSend = treeData;
-      const parentNode = findNodeById(treeData, effectiveParentId);
-      if (parentNode && parentNode.children) {
-        newChildrenInTree = parentNode.children;
+      // If finalChildrenPayload is empty (all children cleared from UI)
+      try {
+        const res = await axiosInstance.post(
+          `/api/projects/${projectId}/nodes`,
+          {
+            parentId: effectiveParentId,
+            children: [], // Explicitly clear children
+            metadata: {
+              decisionProcess: "LSPrec",
+              objectName: "My Object",
+            },
+          }
+        );
+        // After clearing, children list will be empty
+        setChildrenDetails(getInitialChildren());
+        setOriginalChildren([]);
+        // Update BFS queue and processed IDs after clearing
+        const currentQueue = JSON.parse(
+          sessionStorage.getItem("bfsQueue") || "[]"
+        );
+        const updatedCurrentQueue = currentQueue.map((node) =>
+          node.id === effectiveParentId ? { ...node, processed: true } : node
+        );
+        sessionStorage.setItem("bfsQueue", JSON.stringify(updatedQueue));
+        setBfsQueue(updatedQueue);
+      } catch (error) {
+        console.error("Error clearing children:", error);
+        throw error;
       }
-    }
-
-    const currentQueue = JSON.parse(sessionStorage.getItem("bfsQueue") || "[]");
-    const updatedCurrentQueue = currentQueue.map((node) =>
-      node.id === effectiveParentId ? { ...node, processed: true } : node
-    );
-
-    const allChildrenForQueue = [...newChildrenInTree];
-
-    const nodesToDecompose = allChildrenForQueue
-      .filter(
-        (child) =>
-          child.decompose === true ||
-          (child.attributes && child.attributes.decompose === true)
-      )
-      .map((node) => ({ ...node, processed: false }));
-
-    const updatedQueue = [...updatedCurrentQueue, ...nodesToDecompose];
-    sessionStorage.setItem("bfsQueue", JSON.stringify(updatedQueue));
-    setBfsQueue(updatedQueue);
-
-    const currentParentNode = findNodeById(treeDataToSend, parentId);
-    if (currentParentNode && currentParentNode.children) {
-      const updatedOriginalChildren = currentParentNode.children.map(
-        (child) => ({
-          id: child.id,
-          name: child.name,
-          decompose: child.decompose,
-        })
-      );
-      setOriginalChildren(updatedOriginalChildren);
-    } else {
-      setOriginalChildren([]);
     }
 
     setProcessing(false);
@@ -397,7 +403,9 @@ const DemaChat = () => {
     setShowProjectTreeModal(true);
     window.dispatchEvent(new Event("refreshProjectTree"));
 
-    return updatedQueue;
+    return currentParentInTree && currentParentInTree.children
+      ? currentParentInTree.children
+      : []; // Return the current children, not the queue
   };
 
   const deleteChildren = async (nodeIdsToDelete) => {
@@ -415,19 +423,6 @@ const DemaChat = () => {
   const handleProcessChildren = async (nonEmptyChildren) => {
     try {
       setProcessing(true);
-
-      const nodeIdsToDelete = originalChildren
-        .filter((originalChild) => {
-          const currentVersion = nonEmptyChildren.find(
-            (child) => child.id === originalChild.id
-          );
-          return !currentVersion || currentVersion.name !== originalChild.name;
-        })
-        .map((child) => child.id);
-
-      if (nodeIdsToDelete.length > 0) {
-        await deleteChildren(nodeIdsToDelete);
-      }
 
       await saveChildren(nonEmptyChildren);
 

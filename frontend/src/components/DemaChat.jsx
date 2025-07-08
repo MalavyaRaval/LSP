@@ -484,20 +484,6 @@ const DemaChat = () => {
       setProcessedParentIds(updatedProcessedParentIds);
 
       try {
-        const nodesToDelete = createdNodeIds[previousState.parentId] || [];
-
-        if (nodesToDelete.length > 0) {
-          await axiosInstance.delete(`/api/projects/${projectId}/nodes`, {
-            data: { nodeIds: nodesToDelete },
-          });
-
-          setCreatedNodeIds((prev) => {
-            const newState = { ...prev };
-            delete newState[previousState.parentId];
-            return newState;
-          });
-        }
-
         setParentId(previousState.parentId);
         setParentName(previousState.parentName);
         setParentNodeNumber(previousState.parentNodeNumber);

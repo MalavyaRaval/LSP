@@ -19,7 +19,7 @@ const getLeafNodes = (node) => {
 
 // Set INITIAL_CHILDREN to 5 rows by default.
 const INITIAL_CHILDREN = Array.from({ length: 5 }, (_, id) => ({
-  id,
+  id: id.toString(), // Ensure initial IDs are strings
   name: "",
   decompose: null,
 }));
@@ -79,7 +79,7 @@ const DemaChat = () => {
     const ids = new Set(processedParentIds); // Start with the actual state
     // Add current parentId if it exists
     if (parentId) {
-      ids.add(parentId);
+      ids.add(parentId.toString()); // Ensure parentId is string
     }
     // History is no longer directly iterated here, as processedParentIds state is maintained by explicit calls.
     return ids;
@@ -87,7 +87,7 @@ const DemaChat = () => {
 
   const getInitialChildren = () =>
     Array.from({ length: 5 }, (_, id) => ({
-      id,
+      id: id.toString(), // Ensure initial IDs are strings
       name: "",
       decompose: null,
     }));
@@ -116,10 +116,10 @@ const DemaChat = () => {
           setParentId(res.data.id.toString());
           setParentNodeNumber(res.data.nodeNumber || "1"); // Get root node number
         } else {
-          console.warn("No root node found; check backend logic.");
+          // console.warn("No root node found; check backend logic.");
         }
       } catch (err) {
-        console.error("Failed to fetch project root:", err);
+        // console.error("Failed to fetch project root:", err);
       }
     };
     if (projectId && !parentId) {
@@ -150,7 +150,9 @@ const DemaChat = () => {
               const paddedChildren = [...existingChildren];
               while (paddedChildren.length < 5) {
                 paddedChildren.push({
-                  id: Date.now() + paddedChildren.length, // Temporary ID for new empty rows
+                  id: `${Date.now()}-${paddedChildren.length}-${Math.random()
+                    .toString(36)
+                    .substr(2, 9)}`, // Unique string ID for new empty rows
                   name: "",
                   decompose: null,
                 });
@@ -163,7 +165,7 @@ const DemaChat = () => {
             }
           }
         } catch (err) {
-          console.error("Error fetching parent details:", err);
+          // console.error("Error fetching parent details:", err);
           setParentName("Unknown");
         }
       }
@@ -200,14 +202,14 @@ const DemaChat = () => {
     try {
       treeDataResponse = await axiosInstance.get(`/api/projects/${projectId}`);
     } catch (err) {
-      console.error(
-        "Error fetching tree data for node number generation:",
-        err
-      );
+      // console.error(
+      //   "Error fetching tree data for node number generation:",
+      //   err
+      // );
       throw err; // Re-throw to be caught by handleProcessChildren
     }
     const treeData = treeDataResponse.data;
-    const currentParentInTree = findNodeById(treeData, effectiveParentId);
+    let currentParentInTree = findNodeById(treeData, effectiveParentId); // Use let because it might be reassigned after deletion
 
     // Determine the highest existing suffix for children of the current parent
     let maxSuffix = 0;
@@ -230,16 +232,16 @@ const DemaChat = () => {
     childrenToSave.forEach((child) => {
       if (child.name.trim() !== "") {
         // Only consider non-empty UI inputs
-        uiChildrenMap.set(child.id, child);
+        uiChildrenMap.set(child.id.toString(), child); // Ensure key is string
       }
     });
 
     // 4. Identify children to delete (those in backend but no longer in UI with a name)
-    const existingChildrenFromBackend = currentParentInTree
+    let existingChildrenFromBackend = currentParentInTree
       ? currentParentInTree.children || []
       : [];
     const nodeIdsToDelete = existingChildrenFromBackend
-      .filter((backendChild) => !uiChildrenMap.has(backendChild.id))
+      .filter((backendChild) => !uiChildrenMap.has(backendChild.id.toString())) // Ensure comparison is string-based
       .map((child) => child.id);
 
     if (nodeIdsToDelete.length > 0) {
@@ -260,8 +262,9 @@ const DemaChat = () => {
 
     // Add/Update children from UI input
     uiChildrenMap.forEach((uiChild) => {
+      // Ensure backendChild.id is explicitly toString for consistent comparison
       const matchingBackendChild = existingChildrenFromBackend.find(
-        (backendChild) => backendChild.id === uiChild.id
+        (backendChild) => backendChild.id.toString() === uiChild.id.toString()
       );
 
       let childToAddToPayload;
@@ -270,12 +273,14 @@ const DemaChat = () => {
         childToAddToPayload = { ...matchingBackendChild }; // Start with backend data
         childToAddToPayload.name = uiChild.name.trim(); // Apply UI name
         childToAddToPayload.decompose = uiChild.decompose; // Apply UI decompose
-        processedBackendChildIds.add(matchingBackendChild.id);
+        processedBackendChildIds.add(matchingBackendChild.id.toString()); // Ensure added ID is string
       } else {
         // New child from UI
         maxSuffix += 1;
         childToAddToPayload = {
-          id: `${effectiveParentId}-${Date.now()}-${maxSuffix}`, // New unique ID
+          id: `${effectiveParentId}-${Date.now()}-${maxSuffix}-${Math.random()
+            .toString(36)
+            .substr(2, 9)}`, // New unique string ID with random suffix
           name: uiChild.name.trim() || `Child ${maxSuffix}`,
           nodeNumber: `${parentNodeNumber}${maxSuffix}`,
           decompose: uiChild.decompose,
@@ -290,26 +295,39 @@ const DemaChat = () => {
 
     // Add any backend children that were not present in UI (meaning they are to be preserved)
     existingChildrenFromBackend.forEach((backendChild) => {
-      if (!processedBackendChildIds.has(backendChild.id)) {
+      if (!processedBackendChildIds.has(backendChild.id.toString())) {
+        // Ensure comparison is string-based
         // This child existed in the backend and was not in the UI input (so not updated or deleted)
         finalChildrenPayload.push(backendChild);
       }
     });
 
-    // Now send finalChildrenPayload to the backend
-    if (finalChildrenPayload.length > 0) {
+    // Ensure finalChildrenPayload is truly unique by ID before sending to backend
+    const uniqueChildrenPayloadMap = new Map();
+    finalChildrenPayload.forEach((child) => {
+      if (child.id) {
+        uniqueChildrenPayloadMap.set(child.id.toString(), child); // Ensure key is string
+      }
+    });
+    const deduplicatedFinalChildrenPayload = Array.from(
+      uniqueChildrenPayloadMap.values()
+    );
+
+    // Now send deduplicatedFinalChildrenPayload to the backend
+    if (deduplicatedFinalChildrenPayload.length > 0) {
       try {
         const res = await axiosInstance.post(
           `/api/projects/${projectId}/nodes`,
           {
             parentId: effectiveParentId,
-            children: finalChildrenPayload, // Send the complete desired state
+            children: deduplicatedFinalChildrenPayload, // Send the complete desired state
             metadata: {
               decisionProcess: "LSPrec",
               objectName: "My Object",
             },
           }
         );
+
         const treeDataToSend = res.data; // This is the new full tree data
         const parentNode = findNodeById(treeDataToSend, effectiveParentId);
 
@@ -320,16 +338,29 @@ const DemaChat = () => {
             name: child.name,
             decompose: child.decompose,
           }));
-          const paddedChildren = [...backendChildren];
+          // Filter out any duplicate children by ID before padding
+          const uniqueBackendChildrenMap = new Map();
+          backendChildren.forEach((child) => {
+            if (child.id) {
+              uniqueBackendChildrenMap.set(child.id.toString(), child); // Ensure key is string
+            }
+          });
+          const uniqueBackendChildren = Array.from(
+            uniqueBackendChildrenMap.values()
+          );
+
+          const paddedChildren = [...uniqueBackendChildren]; // Use unique children
           while (paddedChildren.length < 5) {
             paddedChildren.push({
-              id: Date.now() + paddedChildren.length,
+              id: `${Date.now()}-${paddedChildren.length}-${Math.random()
+                .toString(36)
+                .substr(2, 9)}`, // Unique string ID for new empty rows
               name: "",
               decompose: null,
             });
           }
           setChildrenDetails(paddedChildren.slice(0, 5));
-          setOriginalChildren(backendChildren);
+          setOriginalChildren(uniqueBackendChildren); // Store original unique children
         } else {
           setChildrenDetails(getInitialChildren());
           setOriginalChildren([]);
@@ -355,11 +386,11 @@ const DemaChat = () => {
         sessionStorage.setItem("bfsQueue", JSON.stringify(updatedQueue));
         setBfsQueue(updatedQueue);
       } catch (error) {
-        console.error("Error saving children:", error);
+        // console.error("Error saving children:", error);
         throw error;
       }
     } else {
-      // If finalChildrenPayload is empty (all children cleared from UI)
+      // If deduplicatedFinalChildrenPayload is empty (all children cleared from UI)
       try {
         const res = await axiosInstance.post(
           `/api/projects/${projectId}/nodes`,
@@ -385,14 +416,14 @@ const DemaChat = () => {
         sessionStorage.setItem("bfsQueue", JSON.stringify(updatedQueue));
         setBfsQueue(updatedQueue);
       } catch (error) {
-        console.error("Error clearing children:", error);
+        // console.error("Error clearing children:", error);
         throw error;
       }
     }
 
     setProcessing(false);
     setProcessedParentIds((prev) => {
-      const newState = new Set(prev).add(parentId);
+      const newState = new Set(prev).add(parentId.toString()); // Ensure parentId is string
       sessionStorage.setItem(
         "processedParentIds",
         JSON.stringify(Array.from(newState))
@@ -414,10 +445,7 @@ const DemaChat = () => {
       await axiosInstance.delete(`/api/projects/${projectId}/nodes`, {
         data: { nodeIds: nodeIdsToDelete },
       });
-      console.log("Deleted nodes:", nodeIdsToDelete);
-    } catch (error) {
-      console.error("Error deleting children:", error);
-    }
+    } catch (error) {}
   };
 
   const handleProcessChildren = async (nonEmptyChildren) => {
@@ -429,7 +457,7 @@ const DemaChat = () => {
       setShowProjectTreeModal(true);
       window.dispatchEvent(new Event("refreshProjectTree"));
     } catch (error) {
-      console.error("Error processing Components:", error);
+      // console.error("Error processing Components:", error);
       alert("Failed to process Components nodes.");
     } finally {
       setProcessing(false);
@@ -470,19 +498,38 @@ const DemaChat = () => {
 
       setHistory((prev) => prev.slice(0, -1));
 
-      // Revert processedParentIds to the state *before* this parent was processed
+      // Revert processedParentIds to the state *before* this parent was processed,
+      // AND filter to ensure only IDs that exist in the current tree are included.
+      const res = await axiosInstance.get(`/api/projects/${projectId}`);
+      const treeData = res.data;
+
+      // Helper to get all node IDs from the current tree structure
+      const getAllNodeIds = (node, ids = new Set()) => {
+        if (node && node.id) {
+          ids.add(node.id.toString());
+        }
+        if (node && node.children) {
+          node.children.forEach((child) => getAllNodeIds(child, ids));
+        }
+        return ids;
+      };
+      const validNodeIdsInCurrentTree = getAllNodeIds(treeData);
+
+      // Revert processedParentIds to the state *before* this parent was processed,
+      // AND filter to ensure only IDs that exist in the current tree are included.
       const updatedProcessedParentIds = new Set(
         previousState.bfsQueue
           .filter((node) => node.processed)
           .map((node) => node.id)
+          .filter((id) => validNodeIdsInCurrentTree.has(id.toString()))
       );
       setProcessedParentIds(updatedProcessedParentIds);
 
-      try {
-        setParentId(previousState.parentId);
-        setParentName(previousState.parentName);
-        setParentNodeNumber(previousState.parentNodeNumber);
+      setParentId(previousState.parentId);
+      setParentName(previousState.parentName);
+      setParentNodeNumber(previousState.parentNodeNumber);
 
+      try {
         const res = await axiosInstance.get(`/api/projects/${projectId}`);
         const treeData = res.data;
         const node = findNodeById(treeData, previousState.parentId);
@@ -522,7 +569,7 @@ const DemaChat = () => {
 
         window.dispatchEvent(new Event("refreshProjectTree"));
       } catch (err) {
-        console.error("Error during back operation:", err);
+        // console.error("Error during back operation:", err);
         setParentId(previousState.parentId);
         setParentName(previousState.parentName);
         setParentNodeNumber(previousState.parentNodeNumber);
@@ -579,7 +626,7 @@ const DemaChat = () => {
           window.dispatchEvent(new Event("refreshProjectTree"));
         }
       } catch (err) {
-        console.error("Failed to fetch project root:", err);
+        // console.error("Failed to fetch project root:", err);
       }
     }
   };
@@ -618,7 +665,7 @@ const DemaChat = () => {
         }
       }
     } catch (error) {
-      console.error("Error during finalization process:", error);
+      // console.error("Error during finalization process:", error);
       setEvaluationStarted(true);
     }
     sessionStorage.removeItem("bfsQueue");
@@ -647,7 +694,7 @@ const DemaChat = () => {
       ) {
         const rootNode = findNodeById(treeData, treeData.id);
         if (rootNode) {
-          parentsToProcess.unshift(rootNode); // Add root to the beginning
+          parentsToProcess.unshift(rootNode);
         }
       }
 
@@ -662,7 +709,7 @@ const DemaChat = () => {
         setEvaluationStarted(true);
       }
     } catch (err) {
-      console.error("Error starting parent processing:", err);
+      // console.error("Error starting parent processing:", err);
     }
   };
 
@@ -701,6 +748,7 @@ const DemaChat = () => {
         // Combine processedParentIds and current parentId for the partial tree builder
         const idsToShow = new Set(allVisibleProcessedIds);
         const partial = buildPartialTree(treeData, idsToShow);
+
         setPartialTree(partial);
       } catch (err) {
         setPartialTree(null);
@@ -743,7 +791,6 @@ const DemaChat = () => {
                         .map((pid) => findNodeById(treeData, pid))
                         .filter(Boolean);
 
-                      // Failsafe for root node (similar to finalizeNode)
                       if (
                         treeData &&
                         treeData.id &&
@@ -757,31 +804,25 @@ const DemaChat = () => {
                       ) {
                         const rootNode = findNodeById(treeData, treeData.id);
                         if (rootNode) {
-                          parentsToProcessForConnection.unshift(rootNode); // Add root to the beginning
+                          parentsToProcessForConnection.unshift(rootNode);
                         }
                       }
-
-                      console.log(
-                        "onNextLeaf: parentsToProcessForConnection after leaves",
-                        parentsToProcessForConnection.map((p) => p.id)
-                      );
 
                       if (parentsToProcessForConnection.length > 0) {
                         setParentNodes(parentsToProcessForConnection);
                         setCurrentParentIndex(0);
                         setProcessingParents(true);
                       } else {
-                        // No parents need connection processing, proceed to final evaluation
                         alert(
                           "All parent nodes and leaves completed process. Tree finalization complete."
                         );
                         setEvaluationStarted(true);
                       }
                     } catch (error) {
-                      console.error(
-                        "Error fetching tree after leaf processing:",
-                        error
-                      );
+                      // console.error(
+                      //   "Error fetching tree after leaf processing:",
+                      //   error
+                      // );
                       setEvaluationStarted(true);
                     }
                   })();
@@ -820,12 +861,7 @@ const DemaChat = () => {
                 "completedConnectionParents",
                 JSON.stringify(Array.from(newState))
               );
-              console.log(
-                "onNextParent: Added to completedConnectionParents",
-                completedParentId,
-                ", New state:",
-                Array.from(newState)
-              );
+
               return newState;
             });
 

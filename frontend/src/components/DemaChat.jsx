@@ -186,6 +186,10 @@ const DemaChat = () => {
     if (field === "name" && value.trim() === "") {
       newDetails[index]["decompose"] = null;
     }
+    // If "Select" is chosen for decompose, clear the name field
+    if (field === "decompose" && value === "") {
+      newDetails[index]["name"] = "";
+    }
     setChildrenDetails(newDetails);
   };
 

@@ -215,22 +215,6 @@ const DemaChat = () => {
     const treeData = treeDataResponse.data;
     let currentParentInTree = findNodeById(treeData, effectiveParentId); // Use let because it might be reassigned after deletion
 
-    // Determine the highest existing suffix for children of the current parent
-    let maxSuffix = 0;
-    if (currentParentInTree && currentParentInTree.children) {
-      currentParentInTree.children.forEach((child) => {
-        if (child.nodeNumber) {
-          const parts = child.nodeNumber.split(parentNodeNumber);
-          if (parts.length > 1) {
-            const suffix = parseInt(parts[1], 10);
-            if (!isNaN(suffix) && suffix > maxSuffix) {
-              maxSuffix = suffix;
-            }
-          }
-        }
-      });
-    }
-
     // 3. Prepare a map of children from UI for easier lookup
     const uiChildrenMap = new Map();
     childrenToSave.forEach((child) => {
@@ -245,8 +229,8 @@ const DemaChat = () => {
       ? currentParentInTree.children || []
       : [];
     const nodeIdsToDelete = existingChildrenFromBackend
-      .filter((backendChild) => !uiChildrenMap.has(backendChild.id.toString())) // Ensure comparison is string-based
-      .map((child) => child.id);
+      .filter((backendChild) => !uiChildrenMap.has(backendChild.id.toString()))
+      .map((child) => child.id.toString()); // Ensure IDs in this array are strings
 
     if (nodeIdsToDelete.length > 0) {
       await deleteChildren(nodeIdsToDelete);
@@ -258,6 +242,56 @@ const DemaChat = () => {
       existingChildrenFromBackend = currentParentInTree
         ? currentParentInTree.children || []
         : [];
+    }
+
+    // Filter out children that are marked for deletion before calculating suffixes
+    const childrenAfterLocalDeletion = existingChildrenFromBackend.filter(
+      (backendChild) => !nodeIdsToDelete.includes(backendChild.id.toString()) // Ensure consistent string comparison
+    );
+
+    console.log("saveChildren - nodeIdsToDelete:", nodeIdsToDelete);
+    console.log(
+      "saveChildren - existingChildrenFromBackend (after re-fetch):",
+      existingChildrenFromBackend.map((c) => ({
+        id: c.id,
+        nodeNumber: c.nodeNumber,
+      }))
+    );
+    console.log(
+      "saveChildren - childrenAfterLocalDeletion:",
+      childrenAfterLocalDeletion.map((c) => ({
+        id: c.id,
+        nodeNumber: c.nodeNumber,
+      }))
+    );
+
+    // Determine existing suffixes and find the next available one from the locally filtered list
+    const existingSuffixes = new Set();
+    childrenAfterLocalDeletion.forEach((child) => {
+      if (
+        child.nodeNumber &&
+        parentNodeNumber &&
+        child.nodeNumber.startsWith(parentNodeNumber) &&
+        child.nodeNumber.length > parentNodeNumber.length
+      ) {
+        const suffix = parseInt(
+          child.nodeNumber.substring(parentNodeNumber.length),
+          10
+        );
+        if (!isNaN(suffix)) {
+          existingSuffixes.add(suffix);
+        }
+      }
+    });
+
+    console.log(
+      "saveChildren - existingSuffixes:",
+      Array.from(existingSuffixes)
+    );
+
+    let nextAvailableSuffix = 1;
+    while (existingSuffixes.has(nextAvailableSuffix)) {
+      nextAvailableSuffix++;
     }
 
     // 5. Build the final payload: combine existing (non-deleted) and new/updated children
@@ -280,13 +314,13 @@ const DemaChat = () => {
         processedBackendChildIds.add(matchingBackendChild.id.toString()); // Ensure added ID is string
       } else {
         // New child from UI
-        maxSuffix += 1;
+        const assignedSuffix = nextAvailableSuffix++; // Use and then increment for the next new node
         childToAddToPayload = {
-          id: `${effectiveParentId}-${Date.now()}-${maxSuffix}-${Math.random()
+          id: `${effectiveParentId}-${Date.now()}-${assignedSuffix}-${Math.random()
             .toString(36)
             .substr(2, 9)}`, // New unique string ID with random suffix
-          name: uiChild.name.trim() || `Child ${maxSuffix}`,
-          nodeNumber: `${parentNodeNumber}${maxSuffix}`,
+          name: uiChild.name.trim() || `Child ${assignedSuffix}`,
+          nodeNumber: `${parentNodeNumber}${assignedSuffix}`,
           decompose: uiChild.decompose,
           attributes: { created: Date.now() },
           children: [],

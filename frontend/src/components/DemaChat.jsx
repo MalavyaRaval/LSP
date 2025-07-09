@@ -524,6 +524,7 @@ const DemaChat = () => {
         parentName,
         parentNodeNumber,
         bfsQueue: currentBfsQueue,
+        processedParentIds: Array.from(processedParentIds), // Add this line
       },
     ]);
 
@@ -553,15 +554,13 @@ const DemaChat = () => {
       };
       const validNodeIdsInCurrentTree = getAllNodeIds(treeData);
 
-      // Revert processedParentIds to the state *before* this parent was processed,
-      // AND filter to ensure only IDs that exist in the current tree are included.
-      const updatedProcessedParentIds = new Set(
-        previousState.bfsQueue
-          .filter((node) => node.processed)
-          .map((node) => node.id)
-          .filter((id) => validNodeIdsInCurrentTree.has(id.toString()))
+      // Revert processedParentIds using the stored state from history
+      const restoredProcessedParentIds = new Set(
+        (previousState.processedParentIds || []).filter((id) =>
+          validNodeIdsInCurrentTree.has(id.toString())
+        )
       );
-      setProcessedParentIds(updatedProcessedParentIds);
+      setProcessedParentIds(restoredProcessedParentIds);
 
       setParentId(previousState.parentId);
       setParentName(previousState.parentName);
@@ -875,7 +874,9 @@ const DemaChat = () => {
             />
           </div>
           <div className="w-1/3 p-2 bg-white rounded-lg shadow-md mx-0">
-            <h2 className="text-xl font-semibold mb-2">Project Tree</h2>
+            <h2 className="text-xl font-semibold mb-2">
+              Components for Evaluation
+            </h2>
             <ProjectTree
               projectId={projectId}
               processedNodes={allVisibleProcessedIds}

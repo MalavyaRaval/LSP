@@ -994,19 +994,18 @@ const DemaChat = () => {
             </tbody>
           </table>
         </div>
-        <div className="flex items-center mt-4 space-x-4">
+        <div className="flex justify-between items-center mt-4 space-x-4">
           <button
             onClick={handleBack}
-            className="text-lg font-extrabold bg-gradient-to-r from-gray-500 to-gray-700 text-white px-6 py-2 rounded-lg hover:from-gray-600 hover:to-gray-800 transition-all duration-300 shadow-lg transform hover:scale-105 disabled:opacity-70 disabled:cursor-not-allowed min-w-[200px] flex items-center justify-center"
+            className="text-lg font-extrabold bg-gradient-to-r from-gray-500 to-gray-700 text-white px-6 py-3 rounded-lg hover:from-gray-600 hover:to-gray-800 transition-all duration-300 shadow-lg transform hover:scale-105"
           >
-            <span style={{ fontSize: "2rem" }}>Back</span>
+            <span style={{ fontSize: "1.5rem" }}>Back</span>
           </button>
-          <div className="flex-grow"></div>
+
           <button
             onClick={handleNextStep}
-            className="text-lg font-extrabold bg-gradient-to-r from-green-500 to-green-700 text-white px-6 py-2 rounded-lg hover:from-green-600 hover:to-green-800 transition-all duration-300 shadow-lg transform hover:scale-105 disabled:opacity-70 disabled:cursor-not-allowed min-w-[200px] flex items-center justify-center"
+            className="text-lg font-extrabold bg-gradient-to-r from-green-500 to-green-700 text-white px-6 py-3 rounded-lg hover:from-green-600 hover:to-green-800 transition-all duration-300 shadow-lg transform hover:scale-105"
             disabled={processing}
-            style={{ marginRight: "130px" }}
           >
             {processing ? (
               <span className="flex items-center">
@@ -1033,7 +1032,7 @@ const DemaChat = () => {
                 <span style={{ fontSize: "1.5rem" }}>Processing...</span>
               </span>
             ) : (
-              <span style={{ fontSize: "2rem" }}>Continue</span>
+              <span style={{ fontSize: "1.5rem" }}>Continue</span>
             )}
           </button>
         </div>
@@ -1055,30 +1054,15 @@ const DemaChat = () => {
                   treeData={partialTree}
                 />
               </div>
-              <div className="flex justify-end space-x-4 mt-auto">
+              <div className="flex justify-between space-x-4 mt-auto">
                 <button
                   onClick={() => {
                     setShowProjectTreeModal(false);
                   }}
-                  className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-700"
+                  className="text-lg font-extrabold bg-gradient-to-r from-gray-500 to-gray-700 text-white px-6 py-3 rounded-lg hover:from-gray-600 hover:to-gray-800 transition-all duration-300 shadow-lg transform hover:scale-105"
                 >
                   <span className="flex items-center">
-                    <svg
-                      className="w-5 h-5 mr-2"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M15 19l-7-7 7-7"
-                      />
-                    </svg>
-                    <span style={{ fontSize: "1.1rem", fontWeight: 600 }}>
-                      Back
-                    </span>
+                    <span style={{ fontSize: "1.5rem" }}>Back</span>
                   </span>
                 </button>
                 <button
@@ -1108,7 +1092,8 @@ const DemaChat = () => {
                       finalizeNode();
                     }
                   }}
-                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700"
+                  className="text-lg font-extrabold bg-gradient-to-r from-green-500 to-green-700 text-white px-6 py-3 rounded-lg hover:from-green-600 hover:to-green-800 transition-all duration-300 shadow-lg transform hover:scale-105"
+                  style={{ fontSize: "1.5rem" }}
                 >
                   Continue
                 </button>

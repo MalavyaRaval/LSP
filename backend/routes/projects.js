@@ -441,6 +441,14 @@ router.delete("/:projectId/nodes", async (req, res) => {
           }
         }
         node.children = newChildren;
+
+        // Re-index node numbers for the remaining children to ensure sequential order
+        // This logic applies only if the current node has a nodeNumber itself, which parents should.
+        if (node.nodeNumber) {
+          node.children.forEach((child, index) => {
+            child.nodeNumber = `${node.nodeNumber}${index + 1}`;
+          });
+        }
       }
 
       return node;

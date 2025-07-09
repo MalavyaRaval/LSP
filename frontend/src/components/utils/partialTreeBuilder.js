@@ -6,47 +6,56 @@
 // 5. No grandchildren or unrelated branches.
 export function buildPartialTree(node, idsToInclude) {
   if (!node) {
+    console.log("[buildPartialTree] Node is null/undefined");
     return null;
   }
 
+  // Ensure node ID is a string for consistent comparison
   const nodeId = node.id?.toString();
-  const isExplicitlyIncluded = idsToInclude.has(nodeId);
-  const isRoot = node.parent === undefined || node.parent === null;
+  if (!nodeId) {
+    console.log("[buildPartialTree] Node has no ID, skipping", node);
+    return null;
+  }
 
+  const isIncluded = idsToInclude.has(nodeId);
   let relevantDescendantPaths = []; // These are children that are themselves included, or lead to included nodes.
   let hasAnyRelevantDescendant = false;
+  const seenNodeIds = new Set(); // Track seen node IDs to prevent duplicates within this branch
 
   console.log(`[buildPartialTree] Processing node: ${node.name} (ID: ${nodeId})`);
-  console.log(`  isExplicitlyIncluded: ${isExplicitlyIncluded}`);
-  console.log(`  isRoot: ${isRoot}`);
-  console.log(`  idsToInclude:`, Array.from(idsToInclude));
 
-  // Step 1: Recursively build the partial tree for children.
-  // This identifies which children are themselves relevant or lead to relevant nodes.
-  if (node.children && node.children.length > 0) {
-    node.children.forEach(child => {
+  if (node.children && Array.isArray(node.children)) {
+    console.log(`[buildPartialTree] Node ${nodeId} has ${node.children.length} children`);
+    for (const child of node.children) {
       const recursivelyBuiltChild = buildPartialTree(child, idsToInclude);
       if (recursivelyBuiltChild) {
+        // Check if we already have a node with this ID
+        const childId = recursivelyBuiltChild.id?.toString();
+        if (childId && seenNodeIds.has(childId)) {
+          console.log(`    [Duplicate Check] Skipping duplicate child: ${recursivelyBuiltChild.name} (ID: ${childId})`);
+          continue; // Skip this duplicate
+        }
+        if (childId) {
+          seenNodeIds.add(childId);
+        }
         relevantDescendantPaths.push(recursivelyBuiltChild);
         hasAnyRelevantDescendant = true;
       }
-    });
+    }
   }
 
-  console.log(`  hasAnyRelevantDescendant (after children recursion): ${hasAnyRelevantDescendant}`);
-  console.log(`  relevantDescendantPaths (after children recursion):`, relevantDescendantPaths.map(n => n.name));
+  // If this node is included, or it's an ancestor to an included node, create a new node for the partial tree
+  if (isIncluded || hasAnyRelevantDescendant) {
+    console.log(`[buildPartialTree] Node ${nodeId} is included or has relevant descendants.`);
+    const newNode = { ...node, children: [] }; // Start with an empty children array
 
-  // Step 2: Determine if this current node should be part of the final partial tree.
-  // It's included if it's explicitly marked, it's the root, or if it's an ancestor to a relevant child.
-  if (isExplicitlyIncluded || isRoot || hasAnyRelevantDescendant) {
-    const newNode = { ...node };
-
-    if (isExplicitlyIncluded || isRoot) {
-      // If this node is explicitly included (or root), we want to show ALL its direct children.
-      // For each direct child:
-      //   - If it's *also* a relevant child found in recursion (meaning it's processed or leads to a processed node),
-      //     use its recursively built structure (which already has its children pruned if it's a direct processed node).
-      //   - Otherwise, just include the direct child but ensure its own children are empty (no grandchildren).
+    // If this node is explicitly included, and has children, ensure those children are also included
+    // by mapping them from the original `node.children` and applying the same logic.
+    if (isIncluded) {
+      console.log(`[buildPartialTree] Node ${nodeId} is explicitly included.`);
+      // If the node itself is included, its children should be either:
+      //   - Recursively built children (if they are also included or ancestors to included nodes)
+      //   - Or direct children with their own descendants pruned.
       newNode.children = (node.children || []).map(originalChild => {
         const matchedRelevantChild = relevantDescendantPaths.find(c => c.id === originalChild.id);
         if (matchedRelevantChild) {
@@ -60,20 +69,19 @@ export function buildPartialTree(node, idsToInclude) {
           console.log(`    [Child Logic] Including direct child (pruned): ${originalChild.name}`);
           return { ...originalChild, children: [] };
         }
-      });
+      }).filter(Boolean); // Filter out any nulls from duplicate checks
     } else {
       // This node is *not* explicitly included, and *not* the root.
-      // It's only included because it's an ancestor to a relevant node.
-      // So, its children should only be the `relevantDescendantPaths` (the relevant branches).
-      console.log(`  [Node Logic] Including as ancestor, children are:`, relevantDescendantPaths.map(n => n.name));
+      // It's an ancestor being included purely for structural integrity.
+      // Its children should only be the ones that are themselves included or lead to included nodes.
+      console.log(`[buildPartialTree] Node ${nodeId} is an ancestor, not explicitly included.`);
       newNode.children = relevantDescendantPaths;
     }
 
-    console.log(`[buildPartialTree] Returning node: ${node.name} with children:`, newNode.children.map(c => c.name));
+    console.log(`[buildPartialTree] Returning node ${nodeId} with ${newNode.children.length} children`);
     return newNode;
   }
 
-  // If none of the conditions met, this node is not relevant to the partial tree.
-  console.log(`[buildPartialTree] Pruning node: ${node.name}`);
+  console.log(`[buildPartialTree] Node ${nodeId} not included and has no relevant descendants, returning null.`);
   return null;
 } 

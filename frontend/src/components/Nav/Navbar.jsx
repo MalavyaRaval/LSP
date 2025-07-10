@@ -76,6 +76,7 @@ const Navbar = () => {
 
         <div className="flex justify-end items-center relative">
           <button
+            type="button"
             onClick={toggleHelpModal}
             className="text-white font-semibold text-2xl bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded-lg shadow-md transition-all duration-300 !-mt-16 relative z-30 transform scale-110 origin-center"
             aria-label="Help"

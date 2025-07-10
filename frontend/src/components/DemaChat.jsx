@@ -249,14 +249,8 @@ const DemaChat = () => {
       (backendChild) => !nodeIdsToDelete.includes(backendChild.id.toString()) // Ensure consistent string comparison
     );
 
-    console.log("saveChildren - nodeIdsToDelete:", nodeIdsToDelete);
-    console.log(
-      "saveChildren - existingChildrenFromBackend (after re-fetch):",
-      existingChildrenFromBackend.map((c) => ({
-        id: c.id,
-        nodeNumber: c.nodeNumber,
-      }))
-    );
+    // console.log("saveChildren - nodeIdsToDelete:", nodeIdsToDelete);
+
     console.log(
       "saveChildren - childrenAfterLocalDeletion:",
       childrenAfterLocalDeletion.map((c) => ({
@@ -283,11 +277,6 @@ const DemaChat = () => {
         }
       }
     });
-
-    console.log(
-      "saveChildren - existingSuffixes:",
-      Array.from(existingSuffixes)
-    );
 
     let nextAvailableSuffix = 1;
     while (existingSuffixes.has(nextAvailableSuffix)) {

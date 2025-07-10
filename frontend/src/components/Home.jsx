@@ -218,6 +218,7 @@ const Home = () => {
               <div className="p-4">
                 <div className="flex flex-wrap gap-2 mt-4">
                   <button
+                    type="button"
                     onClick={() =>
                       navigate(
                         `/project/${event.name
@@ -230,12 +231,14 @@ const Home = () => {
                     View Details
                   </button>
                   <button
+                    type="button"
                     onClick={() => handleDelete(event.projectId)}
                     className="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors text-sm"
                   >
                     Delete
                   </button>
                   <button
+                    type="button"
                     onClick={() =>
                       navigate(
                         `/project/${event.name

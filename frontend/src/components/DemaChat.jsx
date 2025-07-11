@@ -918,7 +918,7 @@ const DemaChat = () => {
       <div className="p-0 bg-white rounded-lg mx-4">
         <h2 className="text-xl font-semibold text-gray-800 mb-0">
           Analyzed item:
-          <span className="text-indigo-600">
+          <span className="text-indigo-700">
             {} {parentNodeNumber} {parentName}
           </span>
         </h2>

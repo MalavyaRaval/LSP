@@ -14,11 +14,17 @@ const TreeNode = ({ node, level = 0, highlightedNodeId }) => {
   return (
     <div>
       <div
-        className={`font-bold leading-none ${
-          isHighlighted ? "bg-yellow-200 p-1 rounded" : ""
-        }`}
+        className={`font-bold leading-none text-indigo-700`}
         style={{
           fontSize: "28px",
+          fontFamily: "Arial Narrow",
+          ...(isHighlighted
+            ? {
+                backgroundColor: "#FEF3C7",
+                padding: "0.25rem",
+                borderRadius: "0.25rem",
+              }
+            : {}),
         }}
       >{`${indentation}${node.nodeNumber || "1"} ${node.name}`}</div>
       {node.children && node.children.length > 0 && (
@@ -217,7 +223,11 @@ const ProjectTree = ({ projectId, treeData, highlightedNodeId }) => {
 
   // console.log("ProjectTree: Component is rendering");
   return (
-    <div className="tree-container" key={refreshKey}>
+    <div
+      className="tree-container"
+      key={refreshKey}
+      style={{ fontFamily: "Arial Narrow" }}
+    >
       <TreeNode node={tree} highlightedNodeId={highlightedNodeId} />
     </div>
   );

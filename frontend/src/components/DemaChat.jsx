@@ -251,13 +251,13 @@ const DemaChat = () => {
 
     // console.log("saveChildren - nodeIdsToDelete:", nodeIdsToDelete);
 
-    console.log(
-      "saveChildren - childrenAfterLocalDeletion:",
-      childrenAfterLocalDeletion.map((c) => ({
-        id: c.id,
-        nodeNumber: c.nodeNumber,
-      }))
-    );
+    // console.log(
+    //   "saveChildren - childrenAfterLocalDeletion:",
+    //   childrenAfterLocalDeletion.map((c) => ({
+    //     id: c.id,
+    //     nodeNumber: c.nodeNumber,
+    //   }))
+    // );
 
     // Determine existing suffixes and find the next available one from the locally filtered list
     const existingSuffixes = new Set();

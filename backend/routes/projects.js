@@ -129,13 +129,13 @@ router.post("/:projectId/nodes", async (req, res) => {
 
     const { parentId, children, metadata } = req.body;
 
-    console.log(`Backend: POST /${req.params.projectId}/nodes received. parentId: ${parentId}, children count: ${children.length}`);
-    console.log("Backend: Received children data:", JSON.stringify(children.map(c => ({ id: c.id, name: c.name, nodeNumber: c.nodeNumber }))));
+    // console.log(`Backend: POST /${req.params.projectId}/nodes received. parentId: ${parentId}, children count: ${children.length}`);
+    // console.log("Backend: Received children data:", JSON.stringify(children.map(c => ({ id: c.id, name: c.name, nodeNumber: c.nodeNumber }))));
 
     const addChildrenToParent = (node) => {
       if (node.id == parentId) {
-        console.log("Backend: Found parent node in tree. Parent ID:", node.id, "Existing children count:", node.children.length);
-        console.log("Backend: Existing children before update:", JSON.stringify(node.children.map(c => ({ id: c.id, name: c.name, nodeNumber: c.nodeNumber }))));
+        // console.log("Backend: Found parent node in tree. Parent ID:", node.id, "Existing children count:", node.children.length);
+        // console.log("Backend: Existing children before update:", JSON.stringify(node.children.map(c => ({ id: c.id, name: c.name, nodeNumber: c.nodeNumber }))));
 
         // Ensure parent node has a valid name
         if (!node.name || typeof node.name !== "string" || node.name.trim() === "") {
@@ -163,7 +163,7 @@ router.post("/:projectId/nodes", async (req, res) => {
           children: child.children || [], // Preserve existing children if any, or initialize as empty
         }));
 
-        console.log("Backend: Children after update and mapping:", JSON.stringify(node.children.map(c => ({ id: c.id, name: c.name, nodeNumber: c.nodeNumber }))));
+        // console.log("Backend: Children after update and mapping:", JSON.stringify(node.children.map(c => ({ id: c.id, name: c.name, nodeNumber: c.nodeNumber }))));
         return true;
       }
       // Recursively search in children if not found at current node

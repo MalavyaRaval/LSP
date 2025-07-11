@@ -278,6 +278,32 @@ const ConnectionProcessing = ({ onComplete, currentParent, projectId }) => {
           <h2 className="font-semibold leading-tight mb-1">
             Select the desired degree of simultaneous satisfaction:
           </h2>
+          {/* Show logic summary for selected connection type */}
+          {selectedLogic && selectedLogic.connectionType && (
+            <div className="mb-3 text-lg text-blue-800 font-semibold">
+              {selectedLogic.connectionType === "HC" && (
+                <span>All requirements must be satisfied.</span>
+              )}
+              {selectedLogic.connectionType === "SC" && (
+                <span>
+                  High satisfaction of requirements is desirable but not
+                  mandatory.
+                </span>
+              )}
+              {selectedLogic.connectionType === "SD" && (
+                <span>
+                  Components can substitute each other; high values can
+                  compensate for low values.
+                </span>
+              )}
+              {selectedLogic.connectionType === "HD" && (
+                <span>
+                  Any single component requirement is sufficient for complete
+                  satisfaction.
+                </span>
+              )}
+            </div>
+          )}
           <div className="flex flex-col items-center gap-3 w-full">
             {getConnectionOptions(selectedLogic.connectionType).map(
               (connection) => (

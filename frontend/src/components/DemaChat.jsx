@@ -790,7 +790,7 @@ const DemaChat = () => {
     if (processingLeaves) {
       return (
         <div className="flex flex-row gap-4 w-full">
-          <div className="w-2/3">
+          <div className="w-3/5">
             <LeafProcessing
               leafNodes={leafNodes}
               currentLeafIndex={currentLeafIndex}
@@ -862,7 +862,7 @@ const DemaChat = () => {
               onBackToParentProcess={handleBack}
             />
           </div>
-          <div className="w-1/3 p-2 bg-white rounded-lg shadow-md mx-0">
+          <div className="w-1/2 p-2 bg-white rounded-lg shadow-md mx-0">
             <h2 className="text-xl font-semibold mb-2">
               Components for Evaluation
             </h2>

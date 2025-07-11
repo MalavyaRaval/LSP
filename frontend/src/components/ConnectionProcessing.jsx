@@ -247,47 +247,52 @@ const ConnectionProcessing = ({ onComplete, currentParent, projectId }) => {
     }
   };
   return (
-    <div className="p-2 bg-white rounded shadow-md mx-2 text-2xl">
+    <>
       {step === 1 && (
-        <div>
-          <p className="leading-tight mb-1 text-red-700">
+        <>
+          <p className="leading-tight text-red-700 mt-0 text-2xl mb-0">
             Select the logic condition for combining components:
           </p>
-          <ul className="space-y-1">
-            {connectionLogicOptions.map((option) => (
-              <li key={option.value}>
-                <button
-                  className={
-                    option.value === "opt6"
-                      ? "w-full text-left p-2 border rounded bg-gray-800 hover:bg-black text-white transition"
-                      : "w-full text-left p-2 border rounded bg-gray-200 hover:bg-gray-300 transition"
-                  }
-                  onClick={() => handleLogicSelect(option)}
-                >
-                  {option.label}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
+          <div className="px-4">
+            <ul className="flex flex-col gap-3 pl-0 list-none ml-0">
+              {connectionLogicOptions.map((option) => (
+                <li key={option.value}>
+                  <button
+                    className={
+                      option.value === "opt6"
+                        ? "w-full text-left p-2 border rounded bg-gray-800 hover:bg-black text-white transition text-lg font-bold"
+                        : "w-full text-left p-2 border rounded bg-gray-200 hover:bg-gray-300 transition text-lg font-bold"
+                    }
+                    onClick={() => handleLogicSelect(option)}
+                  >
+                    {option.label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </>
       )}
       {step === 2 && selectedLogic && (
-        <div>
+        <>
           <h2 className="font-semibold leading-tight mb-1">
             Select the desired degree of simultaneous satisfaction:
           </h2>
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col items-center gap-3 w-full">
             {getConnectionOptions(selectedLogic.connectionType).map(
               (connection) => (
-                <div key={connection} className="flex items-center gap-2">
+                <div
+                  key={connection}
+                  className="flex items-center gap-2 w-11/12 justify-center"
+                >
                   <button
-                    className="flex-grow text-left p-1 border rounded bg-gray-200 hover:bg-gray-300 transition"
+                    className="w-full text-2xl font-bold text-center p-3 border rounded-lg bg-gray-200 hover:bg-gray-300 transition shadow-md"
                     onClick={() => handleConnectionSelect(connection)}
                   >
                     {getLabelForConnection(connection)}
                   </button>
                   <button
-                    className="p-2 border rounded bg-blue-700 hover:bg-blue-800 text-white w-10 h-10 flex items-center justify-center font-bold text-xl"
+                    className="p-2 border rounded bg-blue-700 hover:bg-blue-800 text-white w-10 h-10 flex items-center justify-center font-bold text-2xl shadow-md"
                     onClick={() =>
                       handleHelpClick(selectedLogic.connectionType, connection)
                     }
@@ -298,10 +303,10 @@ const ConnectionProcessing = ({ onComplete, currentParent, projectId }) => {
               )
             )}
           </div>
-        </div>
+        </>
       )}
       {step === 3 && selectedLogic && selectedLogic.value === "opt6" && (
-        <div>
+        <>
           <h2 className="font-semibold leading-tight mb-3 text-red-700">
             Select Mandatory or Optional for each component:
           </h2>
@@ -349,7 +354,7 @@ const ConnectionProcessing = ({ onComplete, currentParent, projectId }) => {
                 return (
                   <p>
                     This translates to: Penalty={values.penalty}, Reward=
-                    {values.reward} in the CPA formula
+                    {values.reward}
                   </p>
                 );
               })()}
@@ -396,7 +401,6 @@ const ConnectionProcessing = ({ onComplete, currentParent, projectId }) => {
                 <button
                   onClick={() => setStep(1)}
                   className="text-lg font-extrabold bg-gradient-to-r from-gray-500 to-gray-700 text-white px-6 py-3 rounded-lg hover:from-gray-600 hover:to-gray-800 transition-all duration-300 shadow-lg transform hover:scale-105"
-                  style={{ fontSize: "1.5rem" }}
                 >
                   Back
                 </button>
@@ -404,14 +408,13 @@ const ConnectionProcessing = ({ onComplete, currentParent, projectId }) => {
                 <button
                   onClick={handleSavePartialAbsorption}
                   className="text-lg font-extrabold bg-gradient-to-r from-green-500 to-green-700 text-white px-6 py-3 rounded-lg hover:from-green-600 hover:to-green-800 transition-all duration-300 shadow-lg transform hover:scale-105"
-                  style={{ fontSize: "1.5rem" }}
                 >
                   Continue
                 </button>
               </div>
             </div>
           )}
-        </div>
+        </>
       )}
       {isHelpModalOpen && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex justify-center items-center">
@@ -429,7 +432,7 @@ const ConnectionProcessing = ({ onComplete, currentParent, projectId }) => {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 

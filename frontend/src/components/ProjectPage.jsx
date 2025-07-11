@@ -61,7 +61,7 @@ const ProjectPage = () => {
       </header>
 
       <main className="flex-grow pt-0.5 px-4 pb-4 w-full flex flex-col">
-        <div className="border border-gray-200 rounded bg-white text-lg">
+        <div className="border border-gray-200 rounded bg-white text-lg h-full">
           <DemaChat />
         </div>
       </main>

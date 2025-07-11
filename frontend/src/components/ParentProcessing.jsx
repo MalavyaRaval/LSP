@@ -50,20 +50,20 @@ const ParentProcessing = ({
   };
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md mx-4">
-      <h2 className="text-xl font-semibold mb-4">
+    <div className="p-0 bg-white rounded-lg shadow-md h-full">
+      <h2 className="text-xl font-semibold mb-0 mt-0">
         For : <span className="text-indigo-700">{currentParent.name}</span>
       </h2>
       {step === 1 ? (
-        <div className="flex flex-row gap-4 w-full">
-          <div className="w-2/3">
+        <div className="flex flex-row gap-1 w-full h-full">
+          <div className="w-[55%] h-full">
             <ConnectionProcessing
               onComplete={handleSaveConnection}
               currentParent={currentParent}
               projectId={projectId}
             />
           </div>
-          <div className="w-1/3 p-2 bg-white rounded-lg shadow-md mx-0">
+          <div className="w-[45%] bg-white rounded-lg shadow-md">
             <h2 className="text-xl font-semibold mb-2">
               {" "}
               Components for Evaluation

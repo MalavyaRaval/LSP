@@ -9,38 +9,38 @@ const connectionLogicOptions = [
   {
     value: "opt1",
     label:
-      "All components are mandatory and must be simultaneously highly satisfied.",
+      "All requirements are mandatory and must be simultaneously highly satisfied",
     marker: "Q1",
     connectionType: "HC",
   },
   {
     value: "opt2",
-    label: "All components satisfied is desirable but not mandatory.",
+    label: "High satisafation of requirements is desireable but not mandatory",
     marker: "Q2",
     connectionType: "SC",
   },
   {
     value: "opt3",
-    label: "Good satisfaction of most component requirements is appreciated.",
+    label: "Desirable good satisfaction of most requirements",
     autoConnection: "A",
   },
   {
     value: "opt4",
     label:
-      "Components can substitute each other with high values outweighing negatives.",
+      "Components can substitute each other with high values outweighing low values",
     marker: "Q4",
     connectionType: "SD",
   },
   {
     value: "opt5",
     label:
-      "Any single fully satisfied component is sufficient for the compound requirement.",
+      "Any single component requirement is sufficient for the complete satisfaction of this criterion",
     marker: "Q5",
     connectionType: "HD",
   },
   {
     value: "opt6",
-    label: "Mandatory and Optional",
+    label: "Combinig mandatory and optional requirements",
     marker: "Q6",
     connectionType: "CPA",
   },
@@ -139,7 +139,7 @@ const ConnectionProcessing = ({ onComplete, currentParent, projectId }) => {
     } else if (connectionType === "HC") {
       if (connectionValue === "HC++") {
         content =
-          "Highest simultaneous satisfaction (HC++): For this option, all components are mandatory and must be simultaneously highly satisfied. The overall satisfaction is determined by the *minimum* satisfaction level among all components. This means even a single component with a low value will significantly penalize the overall satisfaction. It is suitable when all requirements are critical and must be met at the highest level.";
+          "Extreme simultaneous satisfaction (HC++): For this option, all components are mandatory and must be simultaneously highly satisfied. The overall satisfaction is determined by the *minimum* satisfaction level among all components. This means even a single component with a low value will significantly penalize the overall satisfaction. It is suitable when all requirements are critical and must be met at the highest level.";
       } else if (connectionValue === "HC+") {
         content =
           "High simultaneous satisfaction (HC+): All components are mandatory and must be simultaneously highly satisfied. The overall satisfaction heavily depends on all components performing well. While not as strict as HC++, low values in individual components will still lead to a substantial reduction in overall satisfaction.";
@@ -251,7 +251,7 @@ const ConnectionProcessing = ({ onComplete, currentParent, projectId }) => {
       {step === 1 && (
         <div>
           <p className="leading-tight mb-1 text-red-700">
-            Select the logic requirement for the components:
+            Select the logic condition for combining components:
           </p>
           <ul className="space-y-1">
             {connectionLogicOptions.map((option) => (

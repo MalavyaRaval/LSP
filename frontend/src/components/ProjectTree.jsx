@@ -20,7 +20,7 @@ const TreeNode = ({ node, level = 0, highlightedNodeId }) => {
         style={{
           fontSize: "28px",
         }}
-      >{`${indentation}[${node.nodeNumber || "1"}] ${node.name}`}</div>
+      >{`${indentation}${node.nodeNumber || "1"} ${node.name}`}</div>
       {node.children && node.children.length > 0 && (
         <div className="ml-4">
           {node.children.map((child) => (

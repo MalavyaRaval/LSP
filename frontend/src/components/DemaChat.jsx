@@ -919,7 +919,7 @@ const DemaChat = () => {
         <h2 className="text-xl font-semibold text-gray-800 mb-0">
           Analyzed item:
           <span className="text-indigo-600">
-            [{parentNodeNumber}] {parentName}
+            {} {parentNodeNumber} {parentName}
           </span>
         </h2>
         <p className="text-2xl text-red-700 mt-0 mb-3">

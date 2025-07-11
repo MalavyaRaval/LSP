@@ -188,7 +188,7 @@ const Home = () => {
                         className="px-6 py-2.5 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 text-lg font-medium shadow-sm transition-all"
                         onClick={() => setShowModal(false)}
                       >
-                        Cancel
+                        Show existing projects
                       </button>
                       <button
                         type="submit"
@@ -223,19 +223,20 @@ const Home = () => {
                       navigate(
                         `/project/${event.name
                           .toLowerCase()
-                          .replace(/\s+/g, "-")}/evaluate`
+                          .replace(/\s+/g, "-")}`
                       )
                     }
-                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm"
+                    className="px-4 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors text-sm"
                   >
-                    View Details
+                    Open Project
                   </button>
+
                   <button
                     type="button"
                     onClick={() => handleDelete(event.projectId)}
                     className="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors text-sm"
                   >
-                    Delete
+                    Delete Project
                   </button>
                   <button
                     type="button"
@@ -243,12 +244,12 @@ const Home = () => {
                       navigate(
                         `/project/${event.name
                           .toLowerCase()
-                          .replace(/\s+/g, "-")}`
+                          .replace(/\s+/g, "-")}/evaluate`
                       )
                     }
-                    className="px-4 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors text-sm"
+                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm"
                   >
-                    Open Project
+                    View Results
                   </button>
                 </div>
               </div>

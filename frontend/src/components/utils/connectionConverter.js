@@ -21,7 +21,7 @@ export const getLabelForConnection = (connection) => {
     "SD+": "High",
     SD: "Medium",
     "SD-": "Low",
-    "HD++": "Highest",
+    "HD++": "Extreme (Using only the largest value)",
     "HD+": "High",
     HD: "Medium",
     "HD-": "Low",

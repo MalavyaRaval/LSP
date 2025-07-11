@@ -257,7 +257,11 @@ const ConnectionProcessing = ({ onComplete, currentParent, projectId }) => {
             {connectionLogicOptions.map((option) => (
               <li key={option.value}>
                 <button
-                  className="w-full text-left p-2 border rounded bg-gray-200 hover:bg-gray-300 transition"
+                  className={
+                    option.value === "opt6"
+                      ? "w-full text-left p-2 border rounded bg-gray-800 hover:bg-black text-white transition"
+                      : "w-full text-left p-2 border rounded bg-gray-200 hover:bg-gray-300 transition"
+                  }
                   onClick={() => handleLogicSelect(option)}
                 >
                   {option.label}

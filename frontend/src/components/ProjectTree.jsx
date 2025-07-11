@@ -28,7 +28,7 @@ const TreeNode = ({ node, level = 0, highlightedNodeId }) => {
         }}
       >{`${indentation}${node.nodeNumber || "1"} ${node.name}`}</div>
       {node.children && node.children.length > 0 && (
-        <div className="ml-4">
+        <div className="ml-8">
           {node.children.map((child) => (
             <TreeNode
               key={child.id}

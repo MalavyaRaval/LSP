@@ -226,17 +226,21 @@ const Home = () => {
                           .replace(/\s+/g, "-")}`
                       )
                     }
-                    className="px-4 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors text-sm"
+                    className="px-2 py-2 bg-blue-100 text-blue-900 font-bold rounded-lg hover:bg-blue-200 transition-colors text-sm"
                   >
-                    Open Project
+                    <span className="font-bold text-blue-900">
+                      Open Project
+                    </span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => handleDelete(event.projectId)}
-                    className="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors text-sm"
+                    className="px-2 py-2 bg-red-100 text-red-900 font-bold rounded-lg hover:bg-red-200 transition-colors text-sm"
                   >
-                    Delete Project
+                    <span className="font-bold text-red-900">
+                      Delete Project
+                    </span>
                   </button>
                   <button
                     type="button"
@@ -247,9 +251,9 @@ const Home = () => {
                           .replace(/\s+/g, "-")}/evaluate`
                       )
                     }
-                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm"
+                    className="px-2 py-2 bg-gray-200 text-gray-900 font-bold rounded-lg hover:bg-gray-300 transition-colors text-sm"
                   >
-                    View Results
+                    Show Results
                   </button>
                 </div>
               </div>

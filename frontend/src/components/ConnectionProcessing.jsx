@@ -341,11 +341,11 @@ const ConnectionProcessing = ({ onComplete, currentParent, projectId }) => {
             can enhance the overall satisfaction.
           </p>
           {/* Impact Level Configuration */}
-          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="mb-2 p-2 bg-blue-50 border border-blue-200 rounded-lg">
             <h3 className="text-xl font-semibold text-blue-800 mb-3">
               Impact of Optional Components
             </h3>
-            <div className="w-full max-w-md">
+            <div className="w-full max-w-2xl">
               <label className="block text-lg font-medium text-gray-700 mb-2">
                 How much should optional components impact the overall
                 evaluation?
@@ -353,7 +353,7 @@ const ConnectionProcessing = ({ onComplete, currentParent, projectId }) => {
               <select
                 value={impactLevel}
                 onChange={(e) => setImpactLevel(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                className="block w-full border border-gray-300 rounded-lg text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white mb-2"
               >
                 <option value="low">
                   Low Impact - Optional components have minimal effect
@@ -367,35 +367,17 @@ const ConnectionProcessing = ({ onComplete, currentParent, projectId }) => {
                 </option>
               </select>
             </div>
-            <div className="mt-3 text-sm text-gray-600">
-              <p>
-                <strong>Current setting:</strong>
-                {}
-                {impactLevel.charAt(0).toUpperCase() + impactLevel.slice(1)}
-                {}
-                Impact
-              </p>
-              {(() => {
-                const values = getImpactValues(impactLevel);
-                return (
-                  <p>
-                    This translates to: Penalty={values.penalty}, Reward=
-                    {values.reward}
-                  </p>
-                );
-              })()}
-            </div>
           </div>
           {children.length === 0 ? (
             <div className="text-center text-lg text-gray-600 py-4">
               No child components found. Please add components first.
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-1">
               {children.map((child) => (
                 <div
                   key={child.id}
-                  className="border border-gray-200 rounded-lg p-3 bg-gray-50"
+                  className="border border-gray-200 rounded-lg p-2 bg-gray-50"
                 >
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex-1">
@@ -423,17 +405,17 @@ const ConnectionProcessing = ({ onComplete, currentParent, projectId }) => {
                 </div>
               ))}
 
-              <div className="flex justify-between items-center mt-6 pt-4 border-t border-gray-200">
+              <div className="flex justify-between items-center mt-3">
                 <button
                   onClick={() => setStep(1)}
-                  className="text-lg font-extrabold bg-gradient-to-r from-gray-500 to-gray-700 text-white px-6 py-3 rounded-lg hover:from-gray-600 hover:to-gray-800 transition-all duration-300 shadow-lg transform hover:scale-105"
+                  className="text-xl font-extrabold bg-gradient-to-r from-gray-500 to-gray-700 text-white px-6 py-3 rounded-xl hover:from-gray-600 hover:to-gray-800 transition-all duration-300 shadow-lg transform hover:scale-105"
                 >
                   Back
                 </button>
 
                 <button
                   onClick={handleSavePartialAbsorption}
-                  className="text-lg font-extrabold bg-gradient-to-r from-green-500 to-green-700 text-white px-6 py-3 rounded-lg hover:from-green-600 hover:to-green-800 transition-all duration-300 shadow-lg transform hover:scale-105"
+                  className="text-xl font-extrabold bg-gradient-to-r from-green-500 to-green-700 text-white px-6 py-3 rounded-xl hover:from-green-600 hover:to-green-800 transition-all duration-300 shadow-lg transform hover:scale-105"
                 >
                   Continue
                 </button>

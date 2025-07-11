@@ -42,7 +42,43 @@ const ParentProcessing = ({
           },
         }
       );
-      setStep(2);
+
+      // Fetch children to check if we should skip importance step
+      const response = await axiosInstance.get(`/api/projects/${projectId}`);
+      const treeData = response.data;
+
+      // Find the current parent in the tree and get its children
+      const findNodeById = (node, id) => {
+        if (node.id?.toString() === id.toString()) return node;
+        if (!node.children || node.children.length === 0) return null;
+        for (let child of node.children) {
+          const found = findNodeById(child, id);
+          if (found) return found;
+        }
+        return null;
+      };
+
+      const parentNode = findNodeById(treeData, currentParent.id);
+      const children = parentNode?.children || [];
+      const isCPA = connectionValue === "CPA";
+      if (isCPA && children.length === 2) {
+        // Set importance to 5 for both children
+        for (const child of children) {
+          await axiosInstance.put(
+            `/api/projects/${projectId}/nodes/${child.id}`,
+            {
+              attributes: {
+                ...child.attributes,
+                importance: 5,
+              },
+            }
+          );
+        }
+        // Skip importance step
+        onNextParent();
+      } else {
+        setStep(2);
+      }
     } catch (err) {
       console.error("Failed to update parent node:", err);
       setError("Failed to update node. Please try again.");

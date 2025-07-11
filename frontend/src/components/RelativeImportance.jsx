@@ -130,7 +130,7 @@ const RelativeImportance = ({
     return (
       <div className="p-4 bg-white rounded-lg shadow-md mx-4">
         <h2 className="text-3xl font-semibold mb-2">
-          Relative Importance for:
+          Relative Importance for: {}
           <span className="text-indigo-700">{currentParent.name}</span>
         </h2>
         <div className="text-center text-2xl text-gray-600">
@@ -159,7 +159,7 @@ const RelativeImportance = ({
   return (
     <div className="p-4 bg-white rounded-lg shadow-md mx-4">
       <h2 className="text-3xl font-semibold mb-2">
-        Relative Importance for:
+        Relative Importance for: {}
         <span className="text-indigo-700">{currentParent.name}</span>
       </h2>
 

@@ -103,7 +103,6 @@ const LeafProcessing = ({
           </div>
           <div className="flex justify-between mt-4">
             <button
-              className="bg-gray-300 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-400 transition-all duration-300"
               onClick={() => {
                 if (currentLeafIndex === 0) {
                   onBackToParentProcess();
@@ -111,8 +110,9 @@ const LeafProcessing = ({
                   onPrevLeaf();
                 }
               }}
+              className="text-lg font-extrabold bg-gradient-to-r from-gray-500 to-gray-700 text-white px-6 py-3 rounded-lg hover:from-gray-600 hover:to-gray-800 transition-all duration-300 shadow-lg transform hover:scale-105"
             >
-              Back
+              <span style={{ fontSize: "1.5rem" }}>Back</span>
             </button>
           </div>
           {showHelpPopup && (

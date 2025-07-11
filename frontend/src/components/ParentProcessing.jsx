@@ -64,7 +64,10 @@ const ParentProcessing = ({
             />
           </div>
           <div className="w-1/3 p-2 bg-white rounded-lg shadow-md mx-0">
-            <h2 className="text-xl font-semibold mb-2">Project Tree</h2>
+            <h2 className="text-xl font-semibold mb-2">
+              {" "}
+              Components for Evaluation
+            </h2>
             <ProjectTree
               projectId={projectId}
               highlightedNodeId={currentParent.id}

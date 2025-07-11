@@ -11,7 +11,7 @@ export const getConnectionOptions = (type) => {
 
 export const getLabelForConnection = (connection) => {
   const labels = {
-    "HC++": "Highest",
+    "HC++": "Extreme (Using only the smallest value)",
     "HC+": "High",
     HC: "Medium",
     "HC-": "Low",

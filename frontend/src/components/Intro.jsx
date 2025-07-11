@@ -50,7 +50,7 @@ const Intro = () => {
           <div className="mb-12 backdrop-blur-sm bg-white/30 p-8 rounded-2xl shadow-xl">
             <h1 className="text-6xl font-bold">Welcome to LSPrec</h1>
             <p className="text-4xl text-gray-800 mb-12">
-              Decision making and recommendation aid for everybody.
+              Decision making and recommendation aid for everybody
             </p>
             {/* Center Start button */}
             <div className="flex justify-center mt-8">
@@ -79,9 +79,9 @@ const Intro = () => {
                   className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-2 px-6 rounded transition-all duration-300"
                   onClick={handleContinue}
                 >
-                  {imageStep < images.length - 1
-                    ? "Continue"
-                    : "Continue to App"}
+                  <b>
+                    {imageStep < images.length - 1 ? "Continue" : "Continue"}
+                  </b>
                 </button>
               </div>
             </div>

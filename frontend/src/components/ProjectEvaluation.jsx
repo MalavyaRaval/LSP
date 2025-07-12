@@ -66,7 +66,7 @@ const ProjectEvaluation = () => {
       return;
     }
     const costNum = parseFloat(alternativeCost);
-    if (isNaN(costNum) || costNum <= 0) {
+    if (isNaN(costNum) || costNum < 0) {
       setError("Please enter a positive number for cost.");
       return;
     }
@@ -143,7 +143,7 @@ const ProjectEvaluation = () => {
 
   const renderStep2 = () => (
     <div className="p-6 bg-white rounded-lg shadow-md mx-4">
-      <h1 className="text-2xl font-bold mb-4">Project Evaluation</h1>
+      <h1 className="text-2xl font-bold mb-4">Evaluation</h1>
       <div className="mb-4 flex gap-4">
         <p className="m-0">
           <span className="font-medium">Alternative Name:</span>
@@ -155,7 +155,7 @@ const ProjectEvaluation = () => {
         </p>
       </div>
       <p className="text-red-700 m-0 leading-tight">
-        PLEASE ENTER THE VALUES OF ATTRIBUTES
+        Please enter the valuse of Attributes
       </p>
       {error && <p className="text-red-500">{error}</p>}
       {}
@@ -241,10 +241,12 @@ const ProjectEvaluation = () => {
   if (evaluationStep === 1) {
     return (
       <div className="p-4 leading-tight space-y-2 bg-white rounded-lg shadow-md mx-4">
-        <h1 className="text-2xl font-bold mb-2">Project Evaluation</h1>
-        <p>Please enter the alternative details.</p>
+        <h1 className="text-2xl font-bold mb-2">Evaluation</h1>
+        <p className="text-red-600 text-lg font-medium">
+          Please specify a competitor
+        </p>
         <div className="mt-4">
-          <label className="block mb-2">Alternative Name:</label>
+          <label className="block mb-2">Competitor Name:</label>
           <input
             type="text"
             value={alternativeName ?? ""}
@@ -254,7 +256,7 @@ const ProjectEvaluation = () => {
           />
         </div>
         <div className="mt-4">
-          <label className="block mb-2">Cost:</label>
+          <label className="block mb-2">Cost (Enter 0 if not used):</label>
           <input
             type="number"
             value={alternativeCost ?? ""}

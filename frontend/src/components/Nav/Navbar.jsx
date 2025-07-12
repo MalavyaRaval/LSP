@@ -13,18 +13,16 @@ const Navbar = () => {
   // Determine current page based on URL
   useEffect(() => {
     const path = location.pathname;
-    if (path.includes("/home")) {
+    if (path.includes("/evaluate")) {
+      setCurrentPage("Evaluation Results");
+    } else if (path.includes("/home")) {
       setCurrentPage("Existing Projects");
     } else if (path.includes("/project")) {
-      if (path.includes("/evaluate")) {
-        setCurrentPage("Evaluation Results");
+      // When on queries page, we'll display the project name in the center
+      if (projectname) {
+        setCurrentPage(""); // Clear current page name so only project name shows
       } else {
-        // When on queries page, we'll display the project name in the center
-        if (projectname) {
-          setCurrentPage(""); // Clear current page name so only project name shows
-        } else {
-          setCurrentPage("Queries");
-        }
+        setCurrentPage("Queries");
       }
     } else if (path === "/") {
       setCurrentPage("V-1.0 (Single User)");

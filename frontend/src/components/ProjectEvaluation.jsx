@@ -208,7 +208,7 @@ const ProjectEvaluation = () => {
                       onChange={(e) =>
                         handleValueChange(leaf.id, e.target.value)
                       }
-                      className="w-full border rounded px-2 py-1"
+                      className="w-full border-2 border-gray-800 rounded px-2 py-1 bg-white"
                       placeholder="Enter value"
                     />
                     {}
@@ -251,7 +251,7 @@ const ProjectEvaluation = () => {
             type="text"
             value={alternativeName ?? ""}
             onChange={(e) => setAlternativeName(e.target.value)}
-            className="border border-gray-300 rounded-lg p-2 w-full"
+            className="border-2 border-gray-800 rounded-lg p-2 w-full bg-white"
             placeholder="Enter alternative name"
           />
         </div>
@@ -261,7 +261,7 @@ const ProjectEvaluation = () => {
             type="number"
             value={alternativeCost ?? ""}
             onChange={(e) => setAlternativeCost(e.target.value)}
-            className="border border-gray-300 rounded-lg p-2 w-full"
+            className="border-2 border-gray-800 rounded-lg p-2 w-full bg-white"
             placeholder="Enter positive cost"
           />
         </div>

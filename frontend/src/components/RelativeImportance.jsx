@@ -202,7 +202,7 @@ const RelativeImportance = ({
                     }
                     className="w-full border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 text-base"
                   >
-                    <option value="">Select Level</option>
+                    <option value="">Select</option>
                     {levelsImportance.map((level) => (
                       <option key={level.value} value={level.value}>
                         {level.value} - {level.label}

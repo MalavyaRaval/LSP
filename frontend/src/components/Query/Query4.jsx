@@ -169,39 +169,39 @@ const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
               Description of requirements
             </th>
             <th className="text-xl border border-gray-700 p-1">
-              Your (numeric) values
+              Numeric values
             </th>
           </tr>
         </thead>
         <tbody>
           <tr className="hover:bg-gray-100">
-            <td className="text-xl border border-gray-700 p-1">
+            <td className="text-2xl border border-gray-700 p-1">
               It is unacceptable if the given value is less than or equal to
             </td>
-            <td className="border border-gray-700 p-1">
+            <td className="border border-gray-700 p-1 w-32">
               <input
                 type="number"
                 name="from"
                 value={values.from}
                 onChange={handleChange}
                 onBlur={handleChange}
-                className="w-full border rounded px-2 py-1"
+                className="w-full border-2 border-gray-800 rounded px-2 py-1 bg-white"
                 style={{ fontSize: "1.5rem" }}
               />
             </td>
           </tr>
           <tr className="hover:bg-gray-100">
-            <td className="text-xl border border-gray-700 p-1">
+            <td className="text-2xl border border-gray-700 p-1">
               I am fully satisfied if the value is greater than or equal to
             </td>
-            <td className="border border-gray-700 p-1">
+            <td className="border border-gray-700 p-1 w-32">
               <input
                 type="number"
                 name="to"
                 value={values.to}
                 onChange={handleChange}
                 onBlur={handleChange}
-                className="w-full border rounded px-2 py-1"
+                className="w-full border-2 border-gray-800 rounded px-2 py-1 bg-white"
                 style={{ fontSize: "1.5rem" }}
               />
             </td>
@@ -211,7 +211,7 @@ const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
             <td colSpan="2" className="border border-gray-700 p-1">
               <div className="flex justify-between items-center">
                 <button
-                  className="text-lg font-bold bg-blue-500 hover:bg-blue-600 text-white px-4 py-1 rounded transition-all w-full"
+                  className="text-lg font-bold bg-blue-500 hover:bg-blue-600 text-white px-1 py-1 rounded transition-all w-full text-center"
                   onClick={addSpecificValue}
                   disabled={!values.from || !values.to}
                   title={
@@ -223,8 +223,8 @@ const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
                   }
                 >
                   {showSpecificValue
-                    ? "Optional condition to increase precision (skip if not used)"
-                    : "Optional Condition to Increase precision"}
+                    ? "Optional condition to increase precision (press continue if not used)"
+                    : "Optional condition to increase precision (press continue if not used)"}
                 </button>
               </div>
             </td>
@@ -234,14 +234,14 @@ const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
             specificValues.map((item, index) => (
               <React.Fragment key={index}>
                 <tr className="bg-blue-50">
-                  <td className="text-xl border border-gray-700 p-1">
+                  <td className="text-2xl border border-gray-700 p-1">
                     <div className="flex justify-between items-center">
                       <div className="flex-grow">
                         If the analyzed item has this value:
                       </div>
                     </div>
                   </td>
-                  <td className="border border-gray-700 p-1">
+                  <td className="border border-gray-700 p-1 w-32">
                     <input
                       type="number"
                       value={item.value}
@@ -259,23 +259,21 @@ const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
                           e.target.value
                         );
                       }}
-                      className="w-full border rounded px-2 py-1"
+                      className="w-full border-2 border-gray-800 rounded px-2 py-1 bg-white"
                       style={{ fontSize: "1.5rem" }}
                       min={values.from ? parseFloat(values.from) + 0.01 : ""}
                       max={values.to ? parseFloat(values.to) - 0.01 : ""}
                       placeholder={
-                        values.from && values.to
-                          ? `Between ${values.from} and ${values.to}`
-                          : "Enter value"
+                        values.from && values.to ? `Enter value` : "Enter value"
                       }
                     />
                   </td>
                 </tr>
                 <tr className="bg-blue-50 border-t-0">
-                  <td className="text-xl border border-gray-700 p-1">
+                  <td className="text-2xl border border-gray-700 p-1">
                     ... then my satisfaction degree is (%):
                   </td>
-                  <td className="border border-gray-700 p-1">
+                  <td className="border border-gray-700 p-1 w-32">
                     <input
                       type="number"
                       value={item.satisfaction}
@@ -295,7 +293,7 @@ const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
                       }}
                       min="0"
                       max="100"
-                      className="w-full border rounded px-3 py-1"
+                      className="w-full border-2 border-gray-800 rounded px-3 py-1 bg-white"
                       style={{ fontSize: "1.5rem" }}
                     />
                   </td>

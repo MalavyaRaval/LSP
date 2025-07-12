@@ -66,6 +66,15 @@ const ConnectionProcessing = ({ onComplete, currentParent, projectId }) => {
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
   const [helpModalContent, setHelpModalContent] = useState("");
 
+  // Reset state when currentParent changes (new node being processed)
+  useEffect(() => {
+    setStep(1);
+    setSelectedLogic(null);
+    setChildren([]);
+    setPartialAbsorptionSelections({});
+    setImpactLevel("medium");
+  }, [currentParent]);
+
   // Fetch children when we need to show partial absorption selection
   useEffect(() => {
     if (step === 3 && currentParent && projectId) {

@@ -76,14 +76,22 @@ const DemaChat = () => {
 
   // Computed value for processedParentIds (now combines with the state variable)
   const allVisibleProcessedIds = useMemo(() => {
-    const ids = new Set(processedParentIds); // Start with the actual state
-    // Add current parentId if it exists
-    if (parentId) {
-      ids.add(parentId.toString()); // Ensure parentId is string
+    const ids = new Set(); // Start with empty set
+
+    // If we're at the root node (nodeNumber === "1"), only show current node and its children
+    // This prevents showing the entire tree when revisiting a project
+    if (parentId && parentNodeNumber === "1") {
+      ids.add(parentId.toString()); // Only include current root node
+    } else {
+      // For non-root nodes, include all processed parent IDs and current parentId
+      processedParentIds.forEach((id) => ids.add(id.toString()));
+      if (parentId) {
+        ids.add(parentId.toString()); // Ensure parentId is string
+      }
     }
-    // History is no longer directly iterated here, as processedParentIds state is maintained by explicit calls.
+
     return ids;
-  }, [parentId, processedParentIds]);
+  }, [parentId, processedParentIds, parentNodeNumber]);
 
   const getInitialChildren = () =>
     Array.from({ length: 5 }, (_, id) => ({
@@ -781,7 +789,7 @@ const DemaChat = () => {
       }
     };
     fetchPartialTree();
-  }, [showProjectTreeModal, processedParentIds, parentId, projectId]);
+  }, [showProjectTreeModal, allVisibleProcessedIds, projectId]);
 
   const renderStep = () => {
     if (evaluationStarted) {

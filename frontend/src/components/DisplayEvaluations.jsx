@@ -66,6 +66,10 @@ const DisplayEvaluations = () => {
   const [nodeDetails, setNodeDetails] = useState({});
   const [allNodes, setAllNodes] = useState([]);
   const [allSatisfactions, setAllSatisfactions] = useState({});
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showModifyModal, setShowModifyModal] = useState(false);
+  const [selectedEvaluation, setSelectedEvaluation] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   // Fetch evaluations.
   useEffect(() => {
@@ -179,6 +183,43 @@ const DisplayEvaluations = () => {
       setAllSatisfactions(satisfactionsMap);
     }
   }, [evaluations, projectTree, queryDetails, allNodes]);
+
+  // Handle delete evaluation
+  const handleDeleteEvaluation = async (evaluationId) => {
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this competitor? This action cannot be undone."
+      )
+    ) {
+      return;
+    }
+
+    setDeleteLoading(true);
+    try {
+      const res = await axiosInstance.delete(
+        `/api/evaluations/${evaluationId}`
+      );
+      // Remove from local state using the returned deletedEvaluation._id
+      setEvaluations((prev) =>
+        prev.filter((e) => e._id !== res.data.deletedEvaluation._id)
+      );
+      setShowDeleteModal(false);
+      setSelectedEvaluation(null);
+      alert("Competitor deleted successfully.");
+    } catch (err) {
+      console.error("Error deleting evaluation:", err);
+      setError("Failed to delete competitor.");
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
+  // Handle modify evaluation
+  const handleModifyEvaluation = (evaluation) => {
+    setSelectedEvaluation(evaluation);
+    setShowModifyModal(false);
+    navigate(`/project/${projectname}/evaluation/${evaluation._id}/modify`);
+  };
 
   // Format query values for display
   const getQueryValuesDisplay = (nodeId) => {
@@ -313,12 +354,26 @@ const DisplayEvaluations = () => {
           >
             <span style={{ fontSize: "1.5rem" }}>Back to Home</span>
           </button>
-          <button
-            onClick={() => navigate(`/project/${projectname}/evaluation/new`)}
-            className="text-lg font-extrabold bg-gradient-to-r from-green-500 to-green-700 text-white px-6 py-3 rounded-lg hover:from-green-600 hover:to-green-800 transition-all duration-300 shadow-lg transform hover:scale-105"
-          >
-            <span style={{ fontSize: "1.5rem" }}>Add Competitor</span>
-          </button>
+          <div className="flex gap-4">
+            <button
+              onClick={() => navigate(`/project/${projectname}/evaluation/new`)}
+              className="text-lg font-extrabold bg-gradient-to-r from-green-500 to-green-700 text-white px-6 py-3 rounded-lg hover:from-green-600 hover:to-green-800 transition-all duration-300 shadow-lg transform hover:scale-105"
+            >
+              <span style={{ fontSize: "1.5rem" }}>Add Competitor</span>
+            </button>
+            <button
+              onClick={() => setShowDeleteModal(true)}
+              className="text-lg font-extrabold bg-gradient-to-r from-red-500 to-red-700 text-white px-6 py-3 rounded-lg hover:from-red-600 hover:to-red-800 transition-all duration-300 shadow-lg transform hover:scale-105"
+            >
+              <span style={{ fontSize: "1.5rem" }}>Delete Competitor</span>
+            </button>
+            <button
+              onClick={() => setShowModifyModal(true)}
+              className="text-lg font-extrabold bg-gradient-to-r from-blue-500 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-600 hover:to-blue-800 transition-all duration-300 shadow-lg transform hover:scale-105"
+            >
+              <span style={{ fontSize: "1.5rem" }}>Modify Competitor</span>
+            </button>
+          </div>
         </div>
         {error && <p className="text-red-500">{error}</p>}
 
@@ -471,6 +526,87 @@ const DisplayEvaluations = () => {
           </table>
         </div>
       </div>
+
+      {/* Delete Competitor Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h2 className="text-xl font-bold mb-4">Delete Competitor</h2>
+            <p className="mb-4 text-gray-600">Select a competitor to delete:</p>
+            {evaluations.length === 0 ? (
+              <p className="text-gray-500 mb-4">No competitors found.</p>
+            ) : (
+              <div className="space-y-2 mb-4 max-h-60 overflow-y-auto">
+                {evaluations.map((evaluation) => (
+                  <div
+                    key={evaluation._id}
+                    className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50"
+                  >
+                    <span className="font-medium">
+                      {evaluation.alternativeName}
+                    </span>
+                    <button
+                      onClick={() => handleDeleteEvaluation(evaluation._id)}
+                      disabled={deleteLoading}
+                      className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 disabled:opacity-50"
+                    >
+                      {deleteLoading ? "Deleting..." : "Delete"}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="flex justify-end">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modify Competitor Modal */}
+      {showModifyModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h2 className="text-xl font-bold mb-4">Modify Competitor</h2>
+            <p className="mb-4 text-gray-600">Select a competitor to modify:</p>
+            {evaluations.length === 0 ? (
+              <p className="text-gray-500 mb-4">No competitors found.</p>
+            ) : (
+              <div className="space-y-2 mb-4 max-h-60 overflow-y-auto">
+                {evaluations.map((evaluation) => (
+                  <div
+                    key={evaluation._id}
+                    className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50"
+                  >
+                    <span className="font-medium">
+                      {evaluation.alternativeName}
+                    </span>
+                    <button
+                      onClick={() => handleModifyEvaluation(evaluation)}
+                      className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+                    >
+                      Modify
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="flex justify-end">
+              <button
+                onClick={() => setShowModifyModal(false)}
+                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };

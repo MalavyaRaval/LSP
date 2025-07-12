@@ -120,34 +120,34 @@ const RelativeImportance = ({
   };
   if (loading) {
     return (
-      <div className="p-4 bg-white rounded-lg shadow-md mx-4">
-        <div className="text-center text-2xl">Loading children...</div>
+      <div className="p-3 bg-white rounded-lg shadow-md mx-4">
+        <div className="text-center text-xl">Loading children...</div>
       </div>
     );
   }
 
   if (!children || children.length === 0) {
     return (
-      <div className="p-4 bg-white rounded-lg shadow-md mx-4">
-        <h2 className="text-3xl font-semibold mb-2">
+      <div className="p-3 bg-white rounded-lg shadow-md mx-4">
+        <h2 className="text-2xl font-semibold mb-1">
           Relative Importance for: {}
           <span className="text-indigo-700">{currentParent.name}</span>
         </h2>
-        <div className="text-center text-2xl text-gray-600">
+        <div className="text-center text-lg text-gray-600">
           This parent has no children to assign importance to.
         </div>
-        <div className="flex justify-between mt-4">
+        <div className="flex justify-between mt-3">
           <button
-            className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 text-xl"
+            className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 text-base"
             onClick={onBack}
           >
             Back
           </button>
           <div className="flex justify-end">
             <button
-              className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-all shadow-md min-w-[180px] text-2xl font-bold"
+              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all shadow-md min-w-[150px] text-xl font-bold"
               onClick={onComplete}
-              style={{ fontSize: "2rem" }}
+              style={{ fontSize: "1.5rem" }}
             >
               Continue
             </button>
@@ -157,73 +157,85 @@ const RelativeImportance = ({
     );
   }
   return (
-    <div className="p-4 bg-white rounded-lg shadow-md mx-4">
-      <h2 className="text-3xl font-semibold mb-2">
+    <div className="p-3 bg-white rounded-lg shadow-md mx-4">
+      <h2 className="text-2xl font-semibold mb-1">
         Relative Importance for: {}
         <span className="text-indigo-700">{currentParent.name}</span>
       </h2>
 
-      <p className="text-xl text-red-700 mb-3">
-        Please assign importance levels to each child component relative to
-        achieving the parent's objective.
+      <p className="text-lg text-red-700 mb-2">
+        Please assign importance levels to each listed component
       </p>
 
-      <div className="space-y-2">
-        {children.map((child, index) => (
-          <div key={child.id} className="border border-gray-200 rounded-lg p-2">
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex-1">
-                <h3 className="text-2xl font-medium text-gray-800 leading-tight">
-                  [
-                  {child.nodeNumber ||
-                    `${currentParent.nodeNumber || "1"}${index + 1}`}
-                  ] {child.name}
-                </h3>
-              </div>
-              <div className="flex-1 max-w-xs ml-2">
-                <label className="block text-lg font-medium text-gray-700 mb-0.5">
-                  Importance Level
-                </label>
-                <select
-                  value={childrenImportance[child.id] || ""}
-                  onChange={(e) =>
-                    handleImportanceChange(child.id, e.target.value)
-                  }
-                  className="w-full border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
-                >
-                  <option value="">Select Level</option>
-                  {levelsImportance.map((level) => (
-                    <option key={level.value} value={level.value}>
-                      {level.value} - {level.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+      <div className="border border-gray-200 rounded-lg overflow-hidden">
+        <div className="bg-gray-50 px-3 py-2 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold text-gray-800">
+                Component names
+              </h3>
+            </div>
+            <div className="flex-1 max-w-xs">
+              <h3 className="text-lg font-semibold text-gray-800">
+                Relative importance level
+              </h3>
             </div>
           </div>
-        ))}
+        </div>
+
+        <div className="divide-y divide-gray-200">
+          {children.map((child, index) => (
+            <div key={child.id} className="px-3 py-2 hover:bg-gray-50">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex-1">
+                  <h3 className="text-lg font-medium text-gray-800 leading-tight">
+                    {child.nodeNumber ||
+                      `${currentParent.nodeNumber || "1"}${index + 1}`}{" "}
+                    {child.name}
+                  </h3>
+                </div>
+                <div className="flex-1 max-w-xs">
+                  <select
+                    value={childrenImportance[child.id] || ""}
+                    onChange={(e) =>
+                      handleImportanceChange(child.id, e.target.value)
+                    }
+                    className="w-full border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 text-base"
+                  >
+                    <option value="">Select Level</option>
+                    {levelsImportance.map((level) => (
+                      <option key={level.value} value={level.value}>
+                        {level.value} - {level.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {error && (
-        <div className="mt-3 p-3 bg-red-100 border border-red-300 rounded text-red-700 text-lg">
+        <div className="mt-2 p-2 bg-red-100 border border-red-300 rounded text-red-700 text-base">
           {error}
         </div>
       )}
 
-      <div className="flex justify-between mt-4">
+      <div className="flex justify-between mt-3">
         <button
           onClick={onBack}
-          className="text-lg font-extrabold bg-gradient-to-r from-gray-500 to-gray-700 text-white px-6 py-2 rounded-lg hover:from-gray-600 hover:to-gray-800 transition-all duration-300 shadow-lg transform hover:scale-105 disabled:opacity-70 disabled:cursor-not-allowed min-w-[200px] flex items-center justify-center"
+          className="text-base font-bold bg-gradient-to-r from-gray-500 to-gray-700 text-white px-4 py-2 rounded-lg hover:from-gray-600 hover:to-gray-800 transition-all duration-300 shadow-lg transform hover:scale-105 disabled:opacity-70 disabled:cursor-not-allowed min-w-[150px] flex items-center justify-center"
           disabled={saving}
         >
-          <span style={{ fontSize: "2rem" }}>Back</span>
+          <span style={{ fontSize: "1.5rem" }}>Back</span>
         </button>
         <div className="flex justify-end">
           <button
-            className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-all shadow-md min-w-[180px] text-2xl font-bold"
+            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all shadow-md min-w-[150px] text-xl font-bold"
             onClick={handleSave}
             disabled={saving}
-            style={{ fontSize: "2rem" }}
+            style={{ fontSize: "1.5rem" }}
           >
             {saving ? "Saving..." : "Continue"}
           </button>

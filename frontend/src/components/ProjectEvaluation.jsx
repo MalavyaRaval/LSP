@@ -60,7 +60,7 @@ const ProjectEvaluation = () => {
     }
   }, [evaluationStep, projectname]);
 
-  const handleNextStep = () => {
+  const handleNextStep = async () => {
     if (!alternativeName.trim()) {
       setError("Please enter a valid name.");
       return;
@@ -70,6 +70,30 @@ const ProjectEvaluation = () => {
       setError("Please enter a positive number for cost.");
       return;
     }
+
+    // Check if alternative name already exists
+    try {
+      const res = await axiosInstance.get(
+        `/api/evaluations?project=${projectname}`
+      );
+      const existingEvaluations = res.data;
+      const nameExists = existingEvaluations.some(
+        (evaluation) =>
+          evaluation.alternativeName.toLowerCase() ===
+          alternativeName.trim().toLowerCase()
+      );
+
+      if (nameExists) {
+        setError(
+          "This alternative name already exists. Please choose a different name."
+        );
+        return;
+      }
+    } catch (err) {
+      console.error("Error checking existing evaluations:", err);
+      // Continue with the flow even if we can't check existing names
+    }
+
     setError("");
     setEvaluationStep(2);
   };
@@ -101,7 +125,13 @@ const ProjectEvaluation = () => {
       handleConfirmYes();
     } catch (err) {
       console.error("Error submitting evaluation:", err);
-      setError("Failed to submit evaluation.");
+      if (err.response && err.response.status === 409) {
+        setError(
+          "This alternative name already exists. Please choose a different name."
+        );
+      } else {
+        setError("Failed to submit evaluation.");
+      }
     }
   };
 
@@ -126,9 +156,16 @@ const ProjectEvaluation = () => {
       handleConfirmNo();
     } catch (err) {
       console.error("Error submitting evaluation:", err);
-      setError("Failed to submit evaluation.");
+      if (err.response && err.response.status === 409) {
+        setError(
+          "This alternative name already exists. Please choose a different name."
+        );
+      } else {
+        setError("Failed to submit evaluation.");
+      }
     }
   };
+
   const handleConfirmYes = () => {
     // Reset the form for a new alternative entry.
     setAlternativeName("");

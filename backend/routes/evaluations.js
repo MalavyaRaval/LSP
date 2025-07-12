@@ -9,10 +9,23 @@ router.post("/", async (req, res) => {
     if (!projectId || !user || !alternativeName || alternativeCost === undefined || !alternativeValues) {
       return res.status(400).json({ message: "Missing required fields." });
     }
+    
+    // Check if alternative name already exists for this project
+    const existingEvaluation = await Evaluation.findOne({ 
+      projectId, 
+      alternativeName: alternativeName.trim() 
+    });
+    
+    if (existingEvaluation) {
+      return res.status(409).json({ 
+        message: "Alternative name already exists for this project." 
+      });
+    }
+    
     const evaluation = new Evaluation({
       projectId,
       user,
-      alternativeName,
+      alternativeName: alternativeName.trim(),
       alternativeCost,
       alternativeValues,
     });

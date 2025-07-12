@@ -56,7 +56,12 @@ const getImpactValues = (impactLevel) => {
   return impactMappings[impactLevel] || impactMappings.medium;
 };
 
-const ConnectionProcessing = ({ onComplete, currentParent, projectId }) => {
+const ConnectionProcessing = ({
+  onComplete,
+  currentParent,
+  projectId,
+  onBack,
+}) => {
   const [step, setStep] = useState(1);
   const [selectedLogic, setSelectedLogic] = useState(null);
   const [children, setChildren] = useState([]);
@@ -65,6 +70,46 @@ const ConnectionProcessing = ({ onComplete, currentParent, projectId }) => {
   const [impactLevel, setImpactLevel] = useState("medium");
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
   const [helpModalContent, setHelpModalContent] = useState("");
+  const [hasExistingConnection, setHasExistingConnection] = useState(false);
+  const [continueError, setContinueError] = useState("");
+
+  // Check if current parent has existing connection
+  useEffect(() => {
+    const checkExistingConnection = async () => {
+      try {
+        const response = await axiosInstance.get(`/api/projects/${projectId}`);
+        const treeData = response.data;
+
+        // Find the current parent in the tree
+        const findNodeById = (node, id) => {
+          if (node.id?.toString() === id.toString()) return node;
+          if (!node.children || node.children.length === 0) return null;
+          for (let child of node.children) {
+            const found = findNodeById(child, id);
+            if (found) return found;
+          }
+          return null;
+        };
+
+        const parentNode = findNodeById(treeData, currentParent.id);
+        if (
+          parentNode &&
+          parentNode.attributes &&
+          parentNode.attributes.connection
+        ) {
+          setHasExistingConnection(true);
+        } else {
+          setHasExistingConnection(false);
+        }
+        setContinueError("");
+      } catch (err) {
+        console.error("Error checking existing connection:", err);
+        setHasExistingConnection(false);
+      }
+    };
+
+    checkExistingConnection();
+  }, [currentParent.id, projectId]);
 
   // Reset state when currentParent changes (new node being processed)
   useEffect(() => {
@@ -117,6 +162,7 @@ const ConnectionProcessing = ({ onComplete, currentParent, projectId }) => {
 
   const handleLogicSelect = (option) => {
     setSelectedLogic(option);
+    setContinueError(""); // Clear any previous errors
     if (option.autoConnection) {
       onComplete(option.autoConnection);
     } else if (option.value === "opt6") {
@@ -129,6 +175,23 @@ const ConnectionProcessing = ({ onComplete, currentParent, projectId }) => {
 
   const handleConnectionSelect = (connection) => {
     onComplete(connection);
+  };
+
+  const handleContinue = () => {
+    if (hasExistingConnection) {
+      // If there's an existing connection, we can proceed to the next step
+      // This would typically be handled by the parent component
+      // For now, we'll just call onComplete with the existing connection
+      const existingConnection = currentParent.attributes?.connection;
+      if (existingConnection) {
+        onComplete(existingConnection);
+      }
+      setContinueError("");
+    } else {
+      setContinueError(
+        "Please select one of the logic conditions before continuing."
+      );
+    }
   };
 
   const handleHelpClick = (connectionType, connectionValue) => {
@@ -162,13 +225,13 @@ const ConnectionProcessing = ({ onComplete, currentParent, projectId }) => {
     } else if (connectionType === "SD") {
       if (connectionValue === "SD+") {
         content =
-          "High substitutability (SD+): Components can significantly substitute each other. High values in some components can powerfully compensate for lower values in others. The focus is on achieving a high overall score even if individual components vary widely.";
+          "High substitutive satisfaction (SD+): Components can substitute each other with high values significantly outweighing low values. This option provides the most flexibility for compensation, allowing strong performance in some components to effectively compensate for weaker performance in others.";
       } else if (connectionValue === "SD") {
         content =
-          "Medium substitutability (SD): Components can substitute each other. High values in some areas can offset low values in others, leading to a balanced overall satisfaction. This option provides a moderate degree of compensation.";
+          "Medium substitutive satisfaction (SD): Components can substitute each other with high values outweighing low values. This provides a balanced approach to compensation, where good performance in some components can help offset poor performance in others.";
       } else if (connectionValue === "SD-") {
         content =
-          "Low substitutability (SD-): Components can substitute each other, but the ability of high values to compensate for low values is limited. While some substitution is allowed, persistent low values in multiple components will prevent a high overall satisfaction.";
+          "Low substitutive satisfaction (SD-): Components can substitute each other, but the compensation effect is more limited. High values have a reduced ability to compensate for low values, making this option more conservative in terms of substitution.";
       }
     } else if (connectionType === "HD") {
       if (connectionValue === "HD++") {
@@ -279,6 +342,27 @@ const ConnectionProcessing = ({ onComplete, currentParent, projectId }) => {
                 </li>
               ))}
             </ul>
+          </div>
+          {continueError && (
+            <p className="text-red-500 text-xl font-bold mt-2">
+              {continueError}
+            </p>
+          )}
+          <div className="flex justify-between mt-4">
+            <button
+              onClick={onBack}
+              className="text-lg font-extrabold bg-gradient-to-r from-gray-500 to-gray-700 text-white px-6 py-3 rounded-lg hover:from-gray-600 hover:to-gray-800 transition-all duration-300 shadow-lg transform hover:scale-105"
+            >
+              <span style={{ fontSize: "1.5rem" }}>Back</span>
+            </button>
+            <button
+              onClick={handleContinue}
+              className="text-lg font-extrabold bg-gradient-to-r from-green-500 to-green-700 text-white px-6 py-3 rounded-lg hover:from-green-600 hover:to-green-800 transition-all duration-300 shadow-lg transform hover:scale-105"
+            >
+              <span style={{ fontSize: "1.5rem" }}>
+                {hasExistingConnection ? "Continue" : "Continue"}
+              </span>
+            </button>
           </div>
         </>
       )}

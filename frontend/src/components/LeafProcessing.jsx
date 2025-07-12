@@ -144,6 +144,7 @@ const LeafProcessing = ({
         <>
           {composition === "q4" && (
             <Query4
+              key={`q4-${currentLeaf.name}`}
               onSave={handleSaveAndNext}
               nodeId={currentLeaf.id}
               projectId={projectname}
@@ -152,6 +153,7 @@ const LeafProcessing = ({
           )}
           {composition === "q5" && (
             <Query5
+              key={`q5-${currentLeaf.name}`}
               onSave={handleSaveAndNext}
               nodeId={currentLeaf.id}
               projectId={projectname}
@@ -161,6 +163,7 @@ const LeafProcessing = ({
           {}
           {composition === "q6" && (
             <Query6
+              key={`q6-${currentLeaf.name}`}
               onSave={handleSaveAndNext}
               nodeId={currentLeaf.id}
               projectId={projectname}

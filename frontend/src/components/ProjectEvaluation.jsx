@@ -194,7 +194,7 @@ const ProjectEvaluation = () => {
       <p className="text-red-700 m-0 leading-tight">
         Please enter the valuse of Attributes
       </p>
-      {error && <p className="text-red-500">{error}</p>}
+      {error && <p className="text-red-700 text-xl font-semibold">{error}</p>}
       {}
       <div className="overflow-x-auto mt-4">
         <table className="min-w-full border-collapse border border-gray-300">
@@ -302,7 +302,9 @@ const ProjectEvaluation = () => {
             placeholder="Enter positive cost"
           />
         </div>
-        {error && <p className="mt-2 text-red-500">{error}</p>}
+        {error && (
+          <p className="mt-2 text-red-700 text-xl font-semibold">{error}</p>
+        )}
         <button
           onClick={handleNextStep}
           className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"

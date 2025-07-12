@@ -14,21 +14,92 @@ const Query5 = ({ onSave, nodeId, projectId, nodeName }) => {
   const [queryResultId, setQueryResultId] = useState(null);
 
   useEffect(() => {
+    // Reset form state when nodeName changes
+    setValues({ from: "", to: "" });
+    setSpecificValues([]);
+    setShowSpecificValue(false);
+    setQueryResultId(null);
+    setError("");
+
+    // console.log(
+    //   "Query5: Fetching data for nodeName:",
+    //   nodeName,
+    //   "projectId:",
+    //   projectId
+    // );
+    // console.log("Query5: nodeName type:", typeof nodeName, "value:", nodeName);
+
     const fetchExistingQueryResult = async () => {
       try {
+        // console.log("Query5: Using nodeName for search:", nodeName);
+
         const response = await axiosInstance.get(
-          `/api/query-results?project=${projectId}&nodeId=${nodeId}`
+          `/api/queryResults?project=${projectId}&nodeName=${encodeURIComponent(
+            nodeName
+          )}`
         );
+        // console.log("Query5: Response data:", response.data);
         if (response.data && response.data.length > 0) {
-          const existingResult = response.data[0];
-          setQueryResultId(existingResult._id);
+          // Filter results by the specific nodeName
+          const existingResult = response.data.find(
+            (result) => result.nodeName === nodeName
+          );
+
+          if (existingResult) {
+            setQueryResultId(existingResult._id);
+            // console.log(
+            //   "Query5: Found existing result for nodeName:",
+            //   existingResult.nodeName
+            // );
+
+            // Populate form fields with existing values
+            if (existingResult.values) {
+              // Set main form values
+              if (existingResult.values.from && existingResult.values.to) {
+                setValues({
+                  from: existingResult.values.from.toString(),
+                  to: existingResult.values.to.toString(),
+                });
+                // console.log(
+                //   "Query5: Set values:",
+                //   existingResult.values.from,
+                //   existingResult.values.to
+                // );
+              }
+
+              // Set specific values if they exist
+              if (
+                existingResult.values.specificPoints &&
+                existingResult.values.specificPoints.length > 0
+              ) {
+                const processedSpecificValues =
+                  existingResult.values.specificPoints.map((point) => ({
+                    value: point.value.toString(),
+                    satisfaction: (point.satisfaction * 100).toString(), // Convert back to percentage
+                  }));
+                setSpecificValues(processedSpecificValues);
+                setShowSpecificValue(true);
+                // console.log(
+                //   "Query5: Set specific values:",
+                //   processedSpecificValues
+                // );
+              }
+            }
+          } else {
+            // console.log(
+            //   "Query5: No existing data found for nodeName:",
+            //   nodeName
+            // );
+          }
+        } else {
+          // console.log("Query5: No existing data found for nodeName:", nodeName);
         }
       } catch (err) {
         console.error("Error fetching existing query result:", err);
       }
     };
     fetchExistingQueryResult();
-  }, [nodeId, projectId]);
+  }, [nodeName, projectId]);
 
   const handleChange = (e) => {
     setValues({ ...values, [e.target.name]: e.target.value });
@@ -47,9 +118,8 @@ const Query5 = ({ onSave, nodeId, projectId, nodeName }) => {
       }
       setShowSpecificValue(true);
     } else {
-      // Hide the section and clear values when toggling off
-      setShowSpecificValue(false);
-      setSpecificValues([]);
+      // Add a new specific value row
+      setSpecificValues([...specificValues, { value: "", satisfaction: "" }]);
     }
   };
 
@@ -138,7 +208,7 @@ const Query5 = ({ onSave, nodeId, projectId, nodeName }) => {
 
       // Build payload including nodeName and specific values
       const payload = {
-        nodeId,
+        nodeId: nodeId.toString(), // Ensure nodeId is string
         nodeName,
         queryType: "q5",
         values: {
@@ -149,15 +219,17 @@ const Query5 = ({ onSave, nodeId, projectId, nodeName }) => {
         projectId,
       };
 
+      // console.log("Query5: Saving payload:", payload);
+
       if (queryResultId) {
         // If an existing result ID is found, use PUT to update
-        await axiosInstance.put("/api/query-results", {
+        await axiosInstance.put("/api/queryResults", {
           ...payload,
           _id: queryResultId,
         });
       } else {
         // Otherwise, use POST to create a new one
-        await axiosInstance.post("/api/query-results", payload);
+        await axiosInstance.post("/api/queryResults", payload);
       }
       onSave();
     } catch (err) {
@@ -227,13 +299,11 @@ const Query5 = ({ onSave, nodeId, projectId, nodeName }) => {
                   title={
                     !values.from || !values.to
                       ? "Please enter min and max values first"
-                      : showSpecificValue
-                      ? "Click to remove specific value"
                       : "Add specific values between min and max with their satisfaction levels"
                   }
                 >
                   {showSpecificValue
-                    ? "Optional condition to increase precision (press continue if not used)"
+                    ? "Add another specific value"
                     : "Optional condition to increase precision (press continue if not used)"}
                 </button>
               </div>
@@ -249,6 +319,14 @@ const Query5 = ({ onSave, nodeId, projectId, nodeName }) => {
                       <div className="flex-grow">
                         If the analyzed item has this value:
                       </div>
+                      <button
+                        type="button"
+                        onClick={() => removeSpecificValue(index)}
+                        className="ml-2 bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-sm"
+                        title="Remove this specific value"
+                      >
+                        ×
+                      </button>
                     </div>
                   </td>
                   <td className="border border-gray-700 p-1 w-32">

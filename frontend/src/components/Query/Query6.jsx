@@ -14,21 +14,81 @@ const Query6 = ({ onSave, nodeId, projectId, nodeName }) => {
   const [queryResultId, setQueryResultId] = useState(null);
 
   useEffect(() => {
+    // Reset form state when nodeName changes
+    setValues({ lower: "", middleLower: "", middleUpper: "", upper: "" });
+    setQueryResultId(null);
+    setError("");
+
+    // console.log(
+    //   "Query6: Fetching data for nodeName:",
+    //   nodeName,
+    //   "projectId:",
+    //   projectId
+    // );
+    // console.log("Query6: nodeName type:", typeof nodeName, "value:", nodeName);
+
     const fetchExistingQueryResult = async () => {
       try {
+        // console.log("Query6: Using nodeName for search:", nodeName);
+
         const response = await axiosInstance.get(
-          `/api/query-results?project=${projectId}&nodeId=${nodeId}`
+          `/api/queryResults?project=${projectId}&nodeName=${encodeURIComponent(
+            nodeName
+          )}`
         );
+        // console.log("Query6: Response data:", response.data);
         if (response.data && response.data.length > 0) {
-          const existingResult = response.data[0];
-          setQueryResultId(existingResult._id);
+          // Filter results by the specific nodeName
+          const existingResult = response.data.find(
+            (result) => result.nodeName === nodeName
+          );
+
+          if (existingResult) {
+            setQueryResultId(existingResult._id);
+            // console.log(
+            //   "Query6: Found existing result for nodeName:",
+            //   existingResult.nodeName
+            // );
+
+            // Populate form fields with existing values
+            if (existingResult.values) {
+              // For Query6, the values are stored as A, B, C, D
+              if (
+                existingResult.values.A &&
+                existingResult.values.B &&
+                existingResult.values.C &&
+                existingResult.values.D
+              ) {
+                setValues({
+                  lower: existingResult.values.A.toString(),
+                  middleLower: existingResult.values.B.toString(),
+                  middleUpper: existingResult.values.C.toString(),
+                  upper: existingResult.values.D.toString(),
+                });
+                // console.log(
+                //   "Query6: Set values:",
+                //   existingResult.values.A,
+                //   existingResult.values.B,
+                //   existingResult.values.C,
+                //   existingResult.values.D
+                // );
+              }
+            }
+          } else {
+            // console.log(
+            //   "Query6: No existing data found for nodeName:",
+            //   nodeName
+            // );
+          }
+        } else {
+          // console.log("Query6: No existing data found for nodeName:", nodeName);
         }
       } catch (err) {
         console.error("Error fetching existing query result:", err);
       }
     };
     fetchExistingQueryResult();
-  }, [nodeId, projectId]);
+  }, [nodeName, projectId]);
 
   const handleChange = (e) => {
     setValues({ ...values, [e.target.name]: e.target.value });
@@ -71,22 +131,24 @@ const Query6 = ({ onSave, nodeId, projectId, nodeName }) => {
       };
 
       const payload = {
-        nodeId,
+        nodeId: nodeId.toString(), // Ensure nodeId is string
         nodeName,
         queryType: "q6",
         values: mappedValues, // Send the mapped A,B,C,D values
         projectId,
       };
 
+      // console.log("Query6: Saving payload:", payload);
+
       if (queryResultId) {
         // If an existing result ID is found, use PUT to update
-        await axiosInstance.put("/api/query-results", {
+        await axiosInstance.put("/api/queryResults", {
           ...payload,
           _id: queryResultId,
         });
       } else {
         // Otherwise, use POST to create a new one
-        await axiosInstance.post("/api/query-results", payload);
+        await axiosInstance.post("/api/queryResults", payload);
       }
       onSave();
     } catch (err) {

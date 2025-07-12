@@ -303,7 +303,7 @@ const Query4 = ({ onSave, nodeId, projectId, nodeName }) => {
                   }
                 >
                   {showSpecificValue
-                    ? "Add another specific value"
+                    ? "Optional condition to increase precision (press continue if not used)"
                     : "Optional condition to increase precision (press continue if not used)"}
                 </button>
               </div>

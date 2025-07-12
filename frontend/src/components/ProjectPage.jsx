@@ -42,7 +42,7 @@ const ProjectPage = () => {
               className="px-3 py-1 border border-gray-300 text-gray-700 rounded bg-gray-200 hover:bg-gray-300 text-2xl font-bold"
               onClick={() => navigate(`/project/${projectSlug}/evaluation/new`)}
             >
-              New Alternative
+              New Competitor
             </button>
             <button
               className="px-3 py-1 border border-gray-300 text-gray-700 rounded bg-gray-200 hover:bg-gray-300 text-2xl font-bold"

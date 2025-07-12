@@ -40,7 +40,7 @@ const connectionLogicOptions = [
   },
   {
     value: "opt6",
-    label: "Combining one mandatory and one optional requirements",
+    label: "Combining mandatory and optional requirements",
     marker: "Q6",
     connectionType: "CPA",
   },
@@ -338,8 +338,8 @@ const ConnectionProcessing = ({ onComplete, currentParent, projectId }) => {
             <span className="underline">optional</span> for each component:
           </h2>
           <p className="text-lg text-gray-800 mb-2">
-            Mandatory components must be satisfied, while optional components
-            can be either satisfied or not
+            Mandatory components must be satisfied, optional components can be
+            either satisfied or not satisfied
           </p>
           {children.length === 0 ? (
             <div className="text-center text-lg text-gray-600 py-2">

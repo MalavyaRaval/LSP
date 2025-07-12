@@ -242,7 +242,7 @@ const ProjectEvaluation = () => {
     return (
       <div className="p-4 leading-tight space-y-2 bg-white rounded-lg shadow-md mx-4">
         <h1 className="text-2xl font-bold mb-2">Evaluation</h1>
-        <p className="text-red-600 text-lg font-medium">
+        <p className="text-red-600 text-2xl font-medium">
           Please specify a competitor
         </p>
         <div className="mt-4">

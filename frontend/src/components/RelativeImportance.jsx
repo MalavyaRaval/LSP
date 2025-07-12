@@ -163,7 +163,7 @@ const RelativeImportance = ({
         <span className="text-indigo-700">{currentParent.name}</span>
       </h2>
 
-      <p className="text-lg text-red-700 mb-2">
+      <p className="text-2xl text-red-700 mb-2">
         Please assign importance levels to each listed component
       </p>
 

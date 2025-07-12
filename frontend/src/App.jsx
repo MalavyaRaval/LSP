@@ -5,6 +5,7 @@ import Intro from "./components/Intro.jsx";
 import ProjectPage from "./components/ProjectPage.jsx";
 import DisplayEvaluations from "./components/DisplayEvaluations";
 import ProjectEvaluation from "./components/ProjectEvaluation.jsx";
+import ModifyEvaluation from "./components/ModifyEvaluation.jsx";
 import DemaChat from "./components/DemaChat.jsx";
 
 const App = () => {
@@ -20,6 +21,10 @@ const App = () => {
         <Route
           path="/project/:projectname/evaluation/new"
           element={<ProjectEvaluation />}
+        />
+        <Route
+          path="/project/:projectname/evaluation/:evaluationId/modify"
+          element={<ModifyEvaluation />}
         />
         <Route path="/projects/:projectname/demachat" element={<DemaChat />} />
         <Route path="/" element={<Intro />} />

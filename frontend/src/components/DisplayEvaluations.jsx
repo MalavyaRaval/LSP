@@ -306,12 +306,20 @@ const DisplayEvaluations = () => {
     <>
       <Navbar />
       <div className="p-6 bg-white rounded-lg shadow-md mx-4">
-        <button
-          onClick={() => navigate("/home")}
-          className="mb-4 text-lg font-extrabold bg-gradient-to-r from-gray-500 to-gray-700 text-white px-6 py-3 rounded-lg hover:from-gray-600 hover:to-gray-800 transition-all duration-300 shadow-lg transform hover:scale-105"
-        >
-          <span style={{ fontSize: "1.5rem" }}>Back to Home</span>
-        </button>
+        <div className="flex justify-between items-center mb-4">
+          <button
+            onClick={() => navigate("/home")}
+            className="text-lg font-extrabold bg-gradient-to-r from-gray-500 to-gray-700 text-white px-6 py-3 rounded-lg hover:from-gray-600 hover:to-gray-800 transition-all duration-300 shadow-lg transform hover:scale-105"
+          >
+            <span style={{ fontSize: "1.5rem" }}>Back to Home</span>
+          </button>
+          <button
+            onClick={() => navigate(`/project/${projectname}/evaluation/new`)}
+            className="text-lg font-extrabold bg-gradient-to-r from-green-500 to-green-700 text-white px-6 py-3 rounded-lg hover:from-green-600 hover:to-green-800 transition-all duration-300 shadow-lg transform hover:scale-105"
+          >
+            <span style={{ fontSize: "1.5rem" }}>Add Competitor</span>
+          </button>
+        </div>
         {error && <p className="text-red-500">{error}</p>}
 
         <div className="overflow-x-auto">

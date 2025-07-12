@@ -85,6 +85,10 @@ const ParentProcessing = ({
     }
   };
 
+  const handleBack = () => {
+    onPrevParent();
+  };
+
   return (
     <div className="p-0 bg-white rounded-lg shadow-md h-full">
       <h2 className="text-xl font-semibold mb-0 mt-0">
@@ -97,6 +101,7 @@ const ParentProcessing = ({
               onComplete={handleSaveConnection}
               currentParent={currentParent}
               projectId={projectId}
+              onBack={handleBack}
             />
           </div>
           <div className="w-[45%] bg-white rounded-lg shadow-md">

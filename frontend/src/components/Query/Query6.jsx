@@ -108,7 +108,7 @@ const Query6 = ({ onSave, nodeId, projectId, nodeName }) => {
               Description of requirements
             </th>
             <th className="text-xl border border-gray-700 p-2">
-              Your (numeric) values
+              Numeric values
             </th>
           </tr>
         </thead>
@@ -117,14 +117,14 @@ const Query6 = ({ onSave, nodeId, projectId, nodeName }) => {
             <td className="text-2xl border border-gray-700 p-2">
               It is unacceptable if the value is less than
             </td>
-            <td className="border border-gray-700 p-2">
+            <td className="border border-gray-700 p-2 w-32">
               <input
                 type="number"
                 name="lower"
                 value={values.lower}
                 onChange={handleChange}
                 onBlur={handleChange}
-                className="w-full border rounded px-2 py-0"
+                className="w-full border-2 border-gray-800 rounded px-2 py-1 bg-white"
                 style={{ fontSize: "1.5rem" }}
               />
             </td>
@@ -134,7 +134,7 @@ const Query6 = ({ onSave, nodeId, projectId, nodeName }) => {
               I am fully satisfied if the offered value is between the following
               two values
             </td>
-            <td className="border border-gray-700 p-2">
+            <td className="border border-gray-700 p-2 w-32">
               <div className="flex space-x-2">
                 <input
                   type="number"
@@ -143,7 +143,7 @@ const Query6 = ({ onSave, nodeId, projectId, nodeName }) => {
                   onChange={handleChange}
                   onBlur={handleChange}
                   placeholder="Lower bound"
-                  className="w-1/2 border rounded px-2 py-0"
+                  className="w-1/2 border-2 border-gray-800 rounded px-2 py-1 bg-white"
                   style={{ fontSize: "1.5rem" }}
                 />
                 <input
@@ -153,7 +153,7 @@ const Query6 = ({ onSave, nodeId, projectId, nodeName }) => {
                   onChange={handleChange}
                   onBlur={handleChange}
                   placeholder="Upper bound"
-                  className="w-1/2 border rounded px-2 py-0"
+                  className="w-1/2 border-2 border-gray-800 rounded px-2 py-1 bg-white"
                   style={{ fontSize: "1.5rem" }}
                 />
               </div>
@@ -163,14 +163,14 @@ const Query6 = ({ onSave, nodeId, projectId, nodeName }) => {
             <td className="text-2xl border border-gray-700 p-2">
               It is unacceptable if the value is greater than
             </td>
-            <td className="border border-gray-700 p-2">
+            <td className="border border-gray-700 p-2 w-32">
               <input
                 type="number"
                 name="upper"
                 value={values.upper}
                 onChange={handleChange}
                 onBlur={handleChange}
-                className="w-full border rounded px-2 py-0"
+                className="w-full border-2 border-gray-800 rounded px-2 py-1 bg-white"
                 style={{ fontSize: "1.5rem" }}
               />
             </td>

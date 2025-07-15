@@ -356,6 +356,12 @@ const DisplayEvaluations = () => {
           </button>
           <div className="flex gap-4">
             <button
+              onClick={() => navigate("/")}
+              className="text-lg font-extrabold bg-gradient-to-r from-black to-gray-800 text-white px-6 py-3 rounded-lg hover:from-gray-900 hover:to-gray-900 transition-all duration-300 shadow-lg transform hover:scale-105"
+            >
+              <span style={{ fontSize: "1.5rem" }}>Exit</span>
+            </button>
+            <button
               onClick={() => navigate(`/project/${projectname}/evaluation/new`)}
               className="text-lg font-extrabold bg-gradient-to-r from-green-500 to-green-700 text-white px-6 py-3 rounded-lg hover:from-green-600 hover:to-green-800 transition-all duration-300 shadow-lg transform hover:scale-105"
             >

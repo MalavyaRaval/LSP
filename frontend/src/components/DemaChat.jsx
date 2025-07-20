@@ -916,6 +916,26 @@ const DemaChat = () => {
           onPrevParent={() => {
             if (currentParentIndex > 0) {
               setCurrentParentIndex(currentParentIndex - 1);
+            } else {
+              // If we're on the root node (index 0), go back to leaf processing
+              setProcessingParents(false);
+              // Fetch leaf nodes again to ensure they're available
+              (async () => {
+                try {
+                  const res = await axiosInstance.get(
+                    `/api/projects/${projectId}`
+                  );
+                  const treeData = res.data;
+                  const leaves = getLeafNodes(treeData);
+                  if (leaves.length > 0) {
+                    setLeafNodes(leaves);
+                    setProcessingLeaves(true);
+                    setCurrentLeafIndex(leaves.length - 1); // Go to the last leaf
+                  }
+                } catch (error) {
+                  console.error("Error fetching leaf nodes:", error);
+                }
+              })();
             }
           }}
           projectId={projectId}

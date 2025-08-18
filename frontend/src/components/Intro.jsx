@@ -15,6 +15,10 @@ const Intro = () => {
   const [modalContent, setModalContent] = useState("");
   const [modalTitle, setModalTitle] = useState("");
   const [imageStep, setImageStep] = useState(0);
+  const [showUserChoiceModal, setShowUserChoiceModal] = useState(false);
+  const [userChoiceModalContent, setUserChoiceModalContent] = useState("");
+  const [userChoiceModalTitle, setUserChoiceModalTitle] = useState("");
+  const [userChoiceModalHelp, setUserChoiceModalHelp] = useState("");
 
   const handleShowInfo = (content, title) => {
     setModalContent(content);
@@ -37,8 +41,10 @@ const Intro = () => {
     if (imageStep < images.length - 1) {
       setImageStep((prev) => prev + 1);
     } else {
+      // All images displayed, now show the user choice modal
       setShowModal(false);
-      navigate("/home", { state: { showCreate: true } });
+      setShowUserChoiceModal(true);
+      setUserChoiceModalTitle("Choose Your Experience");
     }
   };
 
@@ -83,6 +89,57 @@ const Intro = () => {
                     {imageStep < images.length - 1 ? "Continue" : "Continue"}
                   </b>
                 </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Modal for user choice (Single Time User vs Registered User) */}
+        {showUserChoiceModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg shadow-xl max-w-lg w-full p-6">
+              <h2 className="text-2xl font-bold mb-4 text-center">
+                {userChoiceModalTitle}
+              </h2>
+              <div className="flex flex-col space-y-4">
+                <div className="flex items-center space-x-2">
+                  <button
+                    className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 px-6 rounded-lg shadow-md transition-all duration-300"
+                    onClick={() =>
+                      navigate("/home", { state: { showCreate: true } })
+                    }
+                  >
+                    Single Time User
+                  </button>
+                  <button
+                    className="bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-4 rounded-full text-md ml-4"
+                    onClick={() => {
+                      alert(
+                        "As a single time user, you can use the application without logging in. Your data will not be saved."
+                      );
+                    }}
+                  >
+                    ?
+                  </button>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <button
+                    className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 px-6 rounded-lg shadow-md transition-all duration-300"
+                    onClick={() => navigate("/register/login")}
+                  >
+                    Registered User
+                  </button>
+                  <button
+                    className="bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-4 rounded-full text-md ml-4"
+                    onClick={() => {
+                      alert(
+                        "As a registered user, you can create an account, log in, and save your progress and data for future use."
+                      );
+                    }}
+                  >
+                    ?
+                  </button>
+                </div>
               </div>
             </div>
           </div>

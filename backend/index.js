@@ -10,6 +10,7 @@ mongoose.connect(config.connectionString || process.env.MONGODB_URI, {});
 // Import models
 const queryResultsRouter = require("./routes/queryResults");
 const evaluationsRouter = require("./routes/evaluations");
+const authRouter = require("./routes/auth"); // Import auth routes
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use(
 );
 app.use("/api/query-results", queryResultsRouter);
 app.use("/api/evaluations", evaluationsRouter);
+app.use("/api/auth", authRouter); // Use auth routes
 
 app.use("/api/queryResults", require("./routes/queryResults"));
 app.use("/api/evaluations", require("./routes/evaluations"));

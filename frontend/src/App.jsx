@@ -7,6 +7,8 @@ import DisplayEvaluations from "./components/DisplayEvaluations";
 import ProjectEvaluation from "./components/ProjectEvaluation.jsx";
 import ModifyEvaluation from "./components/ModifyEvaluation.jsx";
 import DemaChat from "./components/DemaChat.jsx";
+import Login from "./components/register/Login.jsx";
+import Signup from "./components/register/Signup.jsx";
 
 const App = () => {
   return (
@@ -28,6 +30,8 @@ const App = () => {
         />
         <Route path="/projects/:projectname/demachat" element={<DemaChat />} />
         <Route path="/" element={<Intro />} />
+        <Route path="/register/login" element={<Login />} />
+        <Route path="/register/signup" element={<Signup />} />
       </Routes>
     </Router>
   );

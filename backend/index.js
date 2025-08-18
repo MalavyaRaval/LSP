@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const express = require("express");
 const cors = require("cors");
 
-// Connect MongoDB
+// Connect MongoDB 
 mongoose.connect(config.connectionString || process.env.MONGODB_URI, {});
 
 // Import models

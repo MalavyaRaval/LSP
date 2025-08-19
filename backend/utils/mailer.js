@@ -12,6 +12,18 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+// Optional: verify transporter configuration (will be called from server start)
+async function verifyTransporter() {
+  try {
+    await transporter.verify();
+    console.log('SMTP transporter verified');
+    return true;
+  } catch (err) {
+    console.error('Failed to verify SMTP transporter:', err);
+    return false;
+  }
+}
+
 async function sendVerificationEmail(to, token) {
   const baseUrl = process.env.FRONTEND_BASE_URL || process.env.VITE_APP_BASE_URL || 'https://lsp-frontend.onrender.com';
   const verifyUrl = `${baseUrl.replace(/\/$/, '')}/verify-email?token=${token}`;
@@ -31,4 +43,4 @@ async function sendVerificationEmail(to, token) {
   return transporter.sendMail(mailOptions);
 }
 
-module.exports = { sendVerificationEmail };
+module.exports = { sendVerificationEmail, verifyTransporter };

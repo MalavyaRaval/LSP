@@ -23,14 +23,18 @@ router.post('/register', async (req, res) => {
     const user = new User({ username, email, password, verificationToken, verificationExpires });
     await user.save();
 
-    // Send verification email (don't block on result)
+    // Send verification email and report status
+    let emailError = null;
     try {
       await sendVerificationEmail(email, verificationToken);
     } catch (emailErr) {
+      emailError = emailErr;
       console.error('Failed to send verification email:', emailErr);
     }
 
-    res.status(201).json({ message: 'User registered successfully! Please check your email to verify your account.' });
+    const responsePayload = { message: 'User registered successfully! Please check your email to verify your account.' };
+    if (emailError) responsePayload.emailError = (emailError && emailError.message) ? emailError.message : String(emailError);
+    res.status(201).json(responsePayload);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

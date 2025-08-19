@@ -10,7 +10,9 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:8000/api/auth/register", {
+      // Prefer VITE_APP_BASE_URL, otherwise default to production backend URL
+      const baseUrl = import.meta.env.VITE_APP_BASE_URL.replace(/\/$/, "");
+      const response = await fetch(`${baseUrl}/api/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

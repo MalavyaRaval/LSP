@@ -92,9 +92,9 @@ router.get('/verify', async (req, res) => {
       return res.json({ success: true, message: 'Email verified' });
     }
 
-    // Otherwise redirect to frontend verified page
-    const front = process.env.FRONTEND_BASE_URL || process.env.VITE_APP_BASE_URL || 'https://lsp-frontend.onrender.com';
-    return res.redirect(`${front.replace(/\/$/, '')}/verified`);
+  // Otherwise redirect to frontend login page
+  const front = process.env.FRONTEND_BASE_URL || process.env.VITE_APP_BASE_URL || 'https://lsp-frontend.onrender.com';
+  return res.redirect(`${front.replace(/\/$/, '')}/register/login`);
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }

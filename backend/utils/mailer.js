@@ -32,14 +32,15 @@ async function sendVerificationEmail(to, token) {
   const verifyUrl = `${baseUrl.replace(/\/$/, '')}/verify-email?token=${token}`;
 
   const mailOptions = {
-    from: process.env.EMAIL_FROM,
+    from: process.env.EMAIL_FROM || 'no-reply@lsp.com',
     to,
     subject: 'Please verify your email',
     html: `
-  <p>Thank you for registering. Please verify your email by clicking the link below:</p>
-  <p><a href="${verifyUrl}">Verify Email</a></p>
-  <p>If the link doesn't work, copy and paste this URL into your browser:</p>
-  <p>${verifyUrl}</p>
+      <p>Thank you for registering. Please verify your email by clicking the link below:</p>
+      <p><a href="${verifyUrl}">Verify Email</a></p>
+      <p>If the link doesn't work, open the verification page and paste this token there:</p>
+      <pre style="background:#f6f8fa;padding:8px;border-radius:6px;overflow:auto;">${token}</pre>
+      <p style="color:#666;font-size:12px;margin-top:8px;">Open the verification page: ${baseUrl.replace(/\/$/, '')}/verify-email</p>
     `,
   };
 

@@ -1,41 +1,26 @@
-import React, { useEffect, useState } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
-import axios from "../../utils/axiosInstance";
+import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 const VerifyEmail = () => {
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const [status, setStatus] = useState("Verifying...");
+  const [status, setStatus] = useState('Redirecting to verify...');
 
   useEffect(() => {
-    const token = searchParams.get("token");
+    const token = searchParams.get('token');
     if (!token) {
-      setStatus("No token provided.");
+      setStatus('No token provided.');
       return;
     }
 
-    async function verify() {
-      try {
-        // Call backend verify endpoint
-        const res = await axios.get(`/api/auth/verify?token=${token}`);
-        // backend redirects to frontend /verified; but if it returns JSON, handle it
-        if (res.status === 200 || res.status === 302) {
-          // redirect to verified page
-          navigate("/verified");
-        } else {
-          setStatus("Verification completed. Please try logging in.");
-        }
-      } catch (err) {
-        const msg =
-          err?.response?.data?.message ||
-          err?.message ||
-          "Verification failed.";
-        setStatus(msg);
-      }
-    }
+    // Build backend verify URL and perform a full same-tab navigation so the server
+    // verifies and then redirects to the login page. This avoids duplicate/XHR calls
+    // that can consume the token and show transient errors.
+    const backendBase = import.meta.env.VITE_APP_BASE_URL || window.location.origin;
+    const verifyUrl = `${backendBase.replace(/\/$/, '')}/api/auth/verify?token=${token}`;
 
-    verify();
-  }, [searchParams, navigate]);
+    // Use replace so history doesn't keep the intermediate URL
+    window.location.replace(verifyUrl);
+  }, [searchParams]);
 
   return (
     <div style={{ padding: 20 }}>

@@ -32,16 +32,23 @@ async function sendVerificationEmail(to, token) {
   const verifyUrl = `${baseUrl.replace(/\/$/, '')}/verify-email?token=${token}`;
 
   const mailOptions = {
-    from: process.env.EMAIL_FROM || 'no-reply@lsp.com',
-    to,
-    subject: 'Please verify your email',
-    html: `
-  <p>Thank you for registering. Please verify your email by clicking the link below:</p>
-  <p><a href="${verifyUrl}">Verify Email</a></p>
-  <p>If the link doesn't work, copy and paste this URL into your browser:</p>
-  <p>${verifyUrl}</p>
-    `,
-  };
+  from: process.env.EMAIL_FROM,
+  to,
+  subject: 'Please verify your email',
+  html: `
+    <p>Thank you for registering. Please verify your email by clicking the link below:</p>
+
+    <p>
+      <a href="${verifyUrl}" style="display:inline-block;padding:10px 20px;background-color:#007bff;color:#ffffff;text-decoration:none;border-radius:5px;">
+        Verify Email
+      </a>
+    </p>
+
+    <p>If the button doesn't work, copy and paste this URL into your browser:</p>
+
+    <p style="color:#444;word-break:break-word;"><code>${verifyUrl}</code></p>
+  `,
+};
 
   try {
     const info = await transporter.sendMail(mailOptions);

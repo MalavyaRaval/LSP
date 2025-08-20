@@ -2,14 +2,17 @@ const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 // Configure transporter using SMTP settings from env
+const defaultPort = process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT, 10) : (process.env.SMTP_SECURE === 'true' ? 465 : 587);
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
-  port: process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT, 10) : 587,
+  port: defaultPort,
   secure: process.env.SMTP_SECURE === 'true',
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
+  logger: true,
+  debug: true,
 });
 
 // Optional: verify transporter configuration (will be called from server start)
@@ -40,7 +43,14 @@ async function sendVerificationEmail(to, token) {
     `,
   };
 
-  return transporter.sendMail(mailOptions);
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Verification email sent:', info && info.messageId);
+    return info;
+  } catch (err) {
+    console.error('Error sending verification email:', err && err.message ? err.message : err);
+    throw err;
+  }
 }
 
 module.exports = { sendVerificationEmail, verifyTransporter };

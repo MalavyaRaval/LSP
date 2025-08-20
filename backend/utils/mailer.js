@@ -28,20 +28,18 @@ async function verifyTransporter() {
 }
 
 async function sendVerificationEmail(to, token) {
-  // Prefer an explicit backend URL so the link performs a full navigation to the server,
-  // which can verify and then redirect back to the frontend login page in the same tab.
-  const backendBase = process.env.BACKEND_BASE_URL || process.env.SERVER_BASE_URL || (`http://localhost:${process.env.PORT || 8000}`);
-  const verifyUrl = `${backendBase.replace(/\/$/, '')}/api/auth/verify?token=${token}`;
+  const baseUrl = process.env.FRONTEND_BASE_URL || process.env.VITE_APP_BASE_URL || 'https://lsp-frontend.onrender.com';
+  const verifyUrl = `${baseUrl.replace(/\/$/, '')}/verify-email?token=${token}`;
 
   const mailOptions = {
     from: process.env.EMAIL_FROM || 'no-reply@lsp.com',
     to,
     subject: 'Please verify your email',
     html: `
-    <p>Thank you for registering. Click the link below to verify your email — this will open in the same tab and then take you to the login page:</p>
-    <p><a href="${verifyUrl}">Verify Email</a></p>
-    <p>If the link doesn't work, copy and paste this URL into your browser:</p>
-    <p>${verifyUrl}</p>
+  <p>Thank you for registering. Please verify your email by clicking the link below:</p>
+  <p><a href="${verifyUrl}">Verify Email</a></p>
+  <p>If the link doesn't work, copy and paste this URL into your browser:</p>
+  <p>${verifyUrl}</p>
     `,
   };
 

@@ -86,7 +86,13 @@ router.get('/verify', async (req, res) => {
     user.verificationExpires = undefined;
     await user.save();
 
-    // Redirect to frontend verified page or respond with success
+    // If the request looks like an XHR/axios call, return JSON so the frontend can handle navigation.
+    const wantsJson = req.xhr || (req.headers['x-requested-with'] === 'XMLHttpRequest') || (req.headers.accept && req.headers.accept.indexOf('application/json') !== -1);
+    if (wantsJson) {
+      return res.json({ success: true, message: 'Email verified' });
+    }
+
+    // Otherwise redirect to frontend verified page
     const front = process.env.FRONTEND_BASE_URL || process.env.VITE_APP_BASE_URL || 'https://lsp-frontend.onrender.com';
     return res.redirect(`${front.replace(/\/$/, '')}/verified`);
   } catch (err) {

@@ -44,7 +44,7 @@ const Intro = () => {
       // All images displayed, now show the user choice modal
       setShowModal(false);
       setShowUserChoiceModal(true);
-      setUserChoiceModalTitle("Choose Your Experience");
+      setUserChoiceModalTitle("Choose Your Status");
     }
   };
 

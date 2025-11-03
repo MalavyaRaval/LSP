@@ -15,7 +15,7 @@ const connectionLogicOptions = [
   },
   {
     value: "opt2",
-    label: "High satisafation of requirements is desireable but not mandatory",
+    label: "High satisfaction  of requirements is desirable  but not mandatory",
     marker: "Q2",
     connectionType: "SC",
   },

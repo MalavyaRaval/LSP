@@ -92,7 +92,7 @@ const ParentProcessing = ({
   return (
     <div className="p-0 bg-white rounded-lg shadow-md h-full">
       <h2 className="text-xl font-semibold mb-0 mt-0">
-        For : <span className="text-indigo-700">{currentParent.name}</span>
+        For: <span className="text-indigo-700">{currentParent.name}</span>
       </h2>
       {step === 1 ? (
         <div className="flex flex-row gap-1 w-full h-full">

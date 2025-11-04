@@ -192,7 +192,7 @@ const ProjectEvaluation = () => {
         </p>
       </div>
       <p className="text-red-700 m-0 leading-tight">
-        Please enter the valuse of Attributes
+        Please enter the values of Attributes
       </p>
       {error && <p className="text-red-700 text-xl font-semibold">{error}</p>}
       {}

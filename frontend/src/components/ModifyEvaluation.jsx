@@ -17,7 +17,6 @@ const ModifyEvaluation = () => {
   const navigate = useNavigate();
   const [evaluationStep, setEvaluationStep] = useState(1);
   const [alternativeName, setAlternativeName] = useState("");
-  const [alternativeCost, setAlternativeCost] = useState("");
   const [error, setError] = useState("");
   const [leafNodes, setLeafNodes] = useState([]);
   const [alternativeValues, setAlternativeValues] = useState({});
@@ -43,7 +42,6 @@ const ModifyEvaluation = () => {
         }
 
         setAlternativeName(evaluation.alternativeName);
-        setAlternativeCost(evaluation.alternativeCost.toString());
         setAlternativeValues(evaluation.alternativeValues || {});
 
         // Fetch the project tree
@@ -72,11 +70,6 @@ const ModifyEvaluation = () => {
   const handleNextStep = async () => {
     if (!alternativeName.trim()) {
       setError("Please enter a valid name.");
-      return;
-    }
-    const costNum = parseFloat(alternativeCost);
-    if (isNaN(costNum) || costNum < 0) {
-      setError("Please enter a positive number for cost.");
       return;
     }
 
@@ -128,7 +121,6 @@ const ModifyEvaluation = () => {
       const payload = {
         projectId: projectname,
         alternativeName,
-        alternativeCost: parseFloat(alternativeCost),
         alternativeValues,
       };
 
@@ -176,20 +168,7 @@ const ModifyEvaluation = () => {
           placeholder="Enter alternative name"
         />
       </div>
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Cost:
-        </label>
-        <input
-          type="number"
-          value={alternativeCost}
-          onChange={(e) => setAlternativeCost(e.target.value)}
-          className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="Enter cost"
-          step="0.01"
-          min="0"
-        />
-      </div>
+
       {error && (
         <p className="text-red-700 text-xl font-semibold mb-4">{error}</p>
       )}
@@ -213,13 +192,10 @@ const ModifyEvaluation = () => {
   const renderStep2 = () => (
     <div className="p-6 bg-white rounded-lg shadow-md mx-4">
       <h1 className="text-2xl font-bold mb-4">Modify Evaluation</h1>
-      <div className="mb-4 flex gap-4">
+      <div className="mb-4">
         <p className="m-0">
           <span className="font-medium">Alternative Name:</span>{" "}
           {alternativeName}
-        </p>
-        <p className="m-0">
-          <span className="font-medium">Cost:</span> {alternativeCost}
         </p>
       </div>
       <p className="text-red-700 m-0 leading-tight">

@@ -17,7 +17,6 @@ const ProjectEvaluation = () => {
   const navigate = useNavigate();
   const [evaluationStep, setEvaluationStep] = useState(1);
   const [alternativeName, setAlternativeName] = useState("");
-  const [alternativeCost, setAlternativeCost] = useState("");
   const [error, setError] = useState("");
   const [leafNodes, setLeafNodes] = useState([]);
   const [alternativeValues, setAlternativeValues] = useState({});
@@ -63,11 +62,6 @@ const ProjectEvaluation = () => {
   const handleNextStep = async () => {
     if (!alternativeName.trim()) {
       setError("Please enter a valid name.");
-      return;
-    }
-    const costNum = parseFloat(alternativeCost);
-    if (isNaN(costNum) || costNum < 0) {
-      setError("Please enter a positive number for cost.");
       return;
     }
 
@@ -118,7 +112,7 @@ const ProjectEvaluation = () => {
         projectId: projectname, // using projectname as project id
         user: "testing", // Use a fixed user
         alternativeName,
-        alternativeCost: parseFloat(alternativeCost),
+        alternativeCost: 1, // Default cost value
         alternativeValues, // object mapping each leaf id to a number
       };
       await axiosInstance.post("/api/evaluations", payload);
@@ -149,7 +143,7 @@ const ProjectEvaluation = () => {
         projectId: projectname, // using projectname as project id
         user: "testing", // Use a fixed user
         alternativeName,
-        alternativeCost: parseFloat(alternativeCost),
+        alternativeCost: 1, // Default cost value
         alternativeValues, // object mapping each leaf id to a number
       };
       await axiosInstance.post("/api/evaluations", payload);
@@ -169,7 +163,6 @@ const ProjectEvaluation = () => {
   const handleConfirmYes = () => {
     // Reset the form for a new alternative entry.
     setAlternativeName("");
-    setAlternativeCost("");
     setAlternativeValues({});
     setEvaluationStep(1);
   };
@@ -181,14 +174,11 @@ const ProjectEvaluation = () => {
   const renderStep2 = () => (
     <div className="p-6 bg-white rounded-lg shadow-md mx-4">
       <h1 className="text-2xl font-bold mb-4">Evaluation</h1>
-      <div className="mb-4 flex gap-4">
+      <div className="mb-4">
         <p className="m-0">
           <span className="font-medium">Alternative Name:</span>
           {}
           {alternativeName}
-        </p>
-        <p className="m-0">
-          <span className="font-medium">Cost:</span> {alternativeCost}
         </p>
       </div>
       <p className="text-red-700 m-0 leading-tight">
@@ -292,16 +282,7 @@ const ProjectEvaluation = () => {
             placeholder="Enter alternative name"
           />
         </div>
-        <div className="mt-4">
-          <label className="block mb-2">Cost (Enter 0 if not used):</label>
-          <input
-            type="number"
-            value={alternativeCost ?? ""}
-            onChange={(e) => setAlternativeCost(e.target.value)}
-            className="border-2 border-gray-800 rounded-lg p-2 w-full bg-white"
-            placeholder="Enter positive cost"
-          />
-        </div>
+
         {error && (
           <p className="mt-2 text-red-700 text-xl font-semibold">{error}</p>
         )}

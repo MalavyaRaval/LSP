@@ -118,9 +118,23 @@ const ModifyEvaluation = () => {
     setError("");
 
     try {
+      // Get the current evaluation to get its cost
+      const evalRes = await axiosInstance.get(
+        `/api/evaluations?project=${projectname}`
+      );
+      const currentEval = evalRes.data.find(
+        (evaluation) => evaluation._id === evaluationId
+      );
+
+      if (!currentEval) {
+        setError("Could not find the current evaluation");
+        return;
+      }
+
       const payload = {
         projectId: projectname,
         alternativeName,
+        alternativeCost: currentEval.alternativeCost, // Maintain the original cost
         alternativeValues,
       };
 

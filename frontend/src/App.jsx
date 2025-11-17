@@ -9,8 +9,6 @@ import ModifyEvaluation from "./components/ModifyEvaluation.jsx";
 import DemaChat from "./components/DemaChat.jsx";
 import Login from "./components/register/Login.jsx";
 import Signup from "./components/register/Signup.jsx";
-import VerifyEmail from "./components/register/VerifyEmail.jsx";
-import Verified from "./components/register/Verified.jsx";
 
 const App = () => {
   return (
@@ -34,8 +32,6 @@ const App = () => {
         <Route path="/" element={<Intro />} />
         <Route path="/register/login" element={<Login />} />
         <Route path="/register/signup" element={<Signup />} />
-        <Route path="/verify-email" element={<VerifyEmail />} />
-        <Route path="/verified" element={<Verified />} />
       </Routes>
     </Router>
   );

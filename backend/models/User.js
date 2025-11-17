@@ -19,17 +19,6 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  // Email verification fields
-  isVerified: {
-    type: Boolean,
-    default: false,
-  },
-  verificationToken: {
-    type: String,
-  },
-  verificationExpires: {
-    type: Date,
-  },
 });
 
 // Hash password before saving

@@ -11,7 +11,6 @@ mongoose.connect(config.connectionString || process.env.MONGODB_URI, {});
 const queryResultsRouter = require("./routes/queryResults");
 const evaluationsRouter = require("./routes/evaluations");
 const authRouter = require("./routes/auth"); // Import auth routes
-const { verifyTransporter } = require('./utils/mailer');
 
 const app = express();
 
@@ -46,13 +45,4 @@ app.get("/", (req, res) => {
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
-  // Verify SMTP transporter configuration
-  try {
-    const ok = await verifyTransporter();
-    if (!ok) {
-      console.warn('SMTP transporter verification failed — emails may not be sent. Check SMTP_* env variables.');
-    }
-  } catch (err) {
-    console.warn('Error while verifying SMTP transporter:', err.message || err);
-  }
 });

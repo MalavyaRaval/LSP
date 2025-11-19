@@ -25,7 +25,7 @@ const Navbar = () => {
         setCurrentPage("Queries");
       }
     } else if (path === "/") {
-      setCurrentPage("V-2.0");
+      setCurrentPage("V-2");
     }
   }, [location, projectname]);
   useEffect(() => {

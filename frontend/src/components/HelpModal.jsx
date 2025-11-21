@@ -20,7 +20,7 @@ const HelpModal = ({ isOpen, onClose, currentPage }) => {
 
         <div className="flex-1 overflow-hidden">
           <iframe
-            src="/LSPrecHELP.pdf"
+            src="/LSPrec_User_Manual.pdf"
             className="w-full h-full border-0"
             title="Help Documentation"
             style={{ minHeight: "600px" }}

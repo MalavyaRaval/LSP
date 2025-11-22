@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Navbar from "./Nav/Navbar";
 import axiosInstance from "./utils/axiosInstance";
+import { Folder, Trash2, BarChart3, ArrowRight } from "lucide-react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
@@ -133,7 +134,7 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-200">
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <Navbar />
       <button
         type="button"
@@ -203,20 +204,37 @@ const Home = () => {
             </div>
           </div>
         )}
+
+        {/* Page Header */}
+        <div className="mb-8 mt-4">
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">
+            Existing Projects
+          </h1>
+          <p className="text-gray-600">Manage and evaluate existing projects</p>
+        </div>
+
         {/* Projects Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {events.map((event, index) => (
             <div
               key={index}
-              className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow overflow-hidden"
+              className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100"
             >
-              <div className="w-full h-64 flex items-center justify-center bg-gray-100">
-                <h2 className="text-2xl font-bold text-gray-700">
-                  {event.name}
-                </h2>
+              {/* Project Header */}
+              <div className="relative w-full h-48 flex flex-col items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600 overflow-hidden">
+                <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity duration-300" />
+                <Folder className="w-16 h-16 text-white mb-2 transform group-hover:scale-110 transition-transform duration-300" />
+                <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/30 to-transparent">
+                  <h2 className="text-2xl font-bold text-white drop-shadow-lg">
+                    {event.name}
+                  </h2>
+                </div>
               </div>
-              <div className="p-4">
-                <div className="flex flex-wrap gap-2 mt-4">
+
+              {/* Project Actions */}
+              <div className="p-6">
+                <div className="space-y-3">
+                  {/* Open Project Button */}
                   <button
                     type="button"
                     onClick={() =>
@@ -226,22 +244,16 @@ const Home = () => {
                           .replace(/\s+/g, "-")}`
                       )
                     }
-                    className="px-2 py-2 bg-blue-100 text-blue-900 font-bold rounded-lg hover:bg-blue-200 transition-colors text-sm"
+                    className="w-full flex items-center justify-between px-4 py-3 bg-blue-300 text-black font-semibold rounded-xl hover:bg-blue-600 transition-all duration-200 shadow-sm hover:shadow-md group/btn"
                   >
-                    <span className="font-bold text-blue-900">
+                    <span className="flex items-center gap-2">
+                      <Folder className="w-4 h-4" />
                       Open Project
                     </span>
+                    <ArrowRight className="w-4 h-4 transform group-hover/btn:translate-x-1 transition-transform" />
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={() => handleDelete(event.projectId)}
-                    className="px-2 py-2 bg-red-100 text-red-900 font-bold rounded-lg hover:bg-red-200 transition-colors text-sm"
-                  >
-                    <span className="font-bold text-red-900">
-                      Delete Project
-                    </span>
-                  </button>
+                  {/* Show Results Button */}
                   <button
                     type="button"
                     onClick={() =>
@@ -251,9 +263,20 @@ const Home = () => {
                           .replace(/\s+/g, "-")}/evaluate`
                       )
                     }
-                    className="px-2 py-2 bg-gray-200 text-gray-900 font-bold rounded-lg hover:bg-gray-300 transition-colors text-sm"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-300 text-black-900 font-semibold rounded-xl hover:bg-gray-500 transition-all duration-200"
                   >
+                    <BarChart3 className="w-4 h-4" />
                     Show Results
+                  </button>
+
+                  {/* Delete Button */}
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(event.projectId)}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-100 text-red-600 font-semibold rounded-xl hover:bg-red-300 transition-all duration-200 border border-red-200"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    Delete Project
                   </button>
                 </div>
               </div>

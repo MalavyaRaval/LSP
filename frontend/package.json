@@ -17,6 +17,7 @@
     "axios": "^1.7.7",
     "bootstrap": "^5.2.3",
     "date-fns": "^4.1.0",
+    "lucide-react": "^0.554.0",
     "multer": "^1.4.5-lts.1",
     "re-resizable": "^6.11.2",
     "react": "^19.0.0",

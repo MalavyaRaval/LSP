@@ -19,7 +19,7 @@ async function verifyTransporter() {
 }
 
 async function sendVerificationEmail(to, token) {
-  const baseUrl = process.env.FRONTEND_BASE_URL || process.env.VITE_APP_BASE_URL || 'https://lsp-frontend.onrender.com';
+  const baseUrl = process.env.FRONTEND_BASE_URL || process.env.VITE_APP_BASE_URL;
   const verifyUrl = `${baseUrl.replace(/\/$/, '')}/verify-email?token=${token}`;
 
   const msg = {

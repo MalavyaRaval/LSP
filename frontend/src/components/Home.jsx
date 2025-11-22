@@ -206,12 +206,6 @@ const Home = () => {
         )}
 
         {/* Page Header */}
-        <div className="mb-8 mt-4">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">
-            Existing Projects
-          </h1>
-          <p className="text-gray-600">Manage and evaluate existing projects</p>
-        </div>
 
         {/* Projects Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -221,7 +215,7 @@ const Home = () => {
               className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100"
             >
               {/* Project Header */}
-              <div className="relative w-full h-48 flex flex-col items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600 overflow-hidden">
+              <div className="relative w-full h-48 flex flex-col items-center justify-center bg-gradient-to-br from-gray-500 to-blue-600 overflow-hidden">
                 <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity duration-300" />
                 <Folder className="w-16 h-16 text-white mb-2 transform group-hover:scale-110 transition-transform duration-300" />
                 <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/30 to-transparent">

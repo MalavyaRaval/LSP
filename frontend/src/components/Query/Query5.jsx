@@ -110,16 +110,17 @@ const Query5 = ({ onSave, nodeId, projectId, nodeName }) => {
     newSpecificValues[index][field] = value;
     setSpecificValues(newSpecificValues);
   };
-  const addSpecificValue = () => {
+  const toggleSpecificValue = () => {
     if (!showSpecificValue) {
-      // Only add a new value if there are no existing specific values
+      // Opening the section - add one empty row if none exist
       if (specificValues.length === 0) {
         setSpecificValues([{ value: "", satisfaction: "" }]);
       }
       setShowSpecificValue(true);
     } else {
-      // Add a new specific value row
-      setSpecificValues([...specificValues, { value: "", satisfaction: "" }]);
+      // Closing the section - clear all specific values
+      setSpecificValues([]);
+      setShowSpecificValue(false);
     }
   };
 
@@ -293,17 +294,23 @@ const Query5 = ({ onSave, nodeId, projectId, nodeName }) => {
             <td colSpan="2" className="border border-gray-700 p-1">
               <div className="flex justify-between items-center">
                 <button
-                  className="text-lg font-bold bg-blue-500 hover:bg-blue-600 text-white px-1 py-1 rounded transition-all w-full text-center"
-                  onClick={addSpecificValue}
+                  className={`text-lg font-bold text-white px-1 py-1 rounded transition-all w-full text-center ${
+                    showSpecificValue
+                      ? "bg-red-500 hover:bg-red-600"
+                      : "bg-blue-500 hover:bg-blue-600"
+                  }`}
+                  onClick={toggleSpecificValue}
                   disabled={!values.from || !values.to}
                   title={
                     !values.from || !values.to
                       ? "Please enter min and max values first"
-                      : "Add specific values between min and max with their satisfaction levels"
+                      : showSpecificValue
+                      ? "Click to close and clear optional conditions"
+                      : "Click to add optional conditions to increase precision"
                   }
                 >
                   {showSpecificValue
-                    ? "Optional condition to increase precision (press continue if not used)"
+                    ? "Close optional condition"
                     : "Optional condition to increase precision (press continue if not used)"}
                 </button>
               </div>

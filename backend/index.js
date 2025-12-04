@@ -1,11 +1,10 @@
 require("dotenv").config();
-const config = require("./config.json");
 const mongoose = require("mongoose");
 const express = require("express");
 const cors = require("cors");
 
 // Connect MongoDB 
-mongoose.connect(config.connectionString || process.env.MONGODB_URI, {});
+mongoose.connect(process.env.MONGODB_URI, {});
 
 // Import models
 const queryResultsRouter = require("./routes/queryResults");

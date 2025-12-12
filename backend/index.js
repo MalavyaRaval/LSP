@@ -3,6 +3,10 @@ const mongoose = require("mongoose");
 const express = require("express");
 const cors = require("cors");
 
+// Import Prometheus monitoring
+const prometheusMiddleware = require("./utils/metricsMiddleware");
+const { register } = require("./utils/prometheus");
+
 // Connect MongoDB 
 mongoose.connect(process.env.MONGODB_URI, {});
 
@@ -15,6 +19,9 @@ const app = express();
 
 // Middleware
 app.use(express.json());
+
+// Prometheus metrics middleware - must be before routes
+app.use(prometheusMiddleware);
 
 // CORS configuration
 app.use(
@@ -36,6 +43,12 @@ app.use("/api/evaluations", require("./routes/evaluations"));
 
 const projectsRouter = require("./routes/projects");
 app.use("/api/projects", projectsRouter);
+
+// Prometheus metrics endpoint
+app.get("/metrics", async (req, res) => {
+  res.set("Content-Type", register.contentType);
+  res.end(await register.metrics());
+});
 
 app.get("/", (req, res) => {
   res.json({ data: "hello" });

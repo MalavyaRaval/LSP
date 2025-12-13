@@ -1,0 +1,58 @@
+# Prometheus configuration for LSP Backend monitoring
+
+# Global settings
+global:
+  scrape_interval: 15s # Default scrape interval for all jobs
+  evaluation_interval: 15s # How often to evaluate rules
+  scrape_timeout: 10s # Timeout for scrape requests
+
+# Alerting configuration (optional, for future use)
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+# Rule files (optional, for future use)
+# rule_files:
+#   - "alert_rules.yml"
+
+# Scrape configurations
+scrape_configs:
+  # Job for monitoring the Node.js LSP Backend
+  - job_name: "lsp-backend"
+
+    # Override global settings for this job
+    scrape_interval: 15s # How often to scrape this target
+    scrape_timeout: 10s # Timeout for individual scrape requests
+
+    # Metrics path and scheme
+    metrics_path: "/metrics" # Path where metrics are exposed
+    scheme: "https" # Use HTTPS for Render backend
+
+    # Static configuration for targets
+    static_configs:
+      - targets: ["lsp-backend.onrender.com"]
+        labels:
+          instance: "lsp-backend-render"
+          environment: "production"
+
+    # TLS Configuration
+    tls_config:
+      insecure_skip_verify: false # Verify SSL certificates
+
+  # Optional: Local development configuration (uncomment when testing locally)
+  # - job_name: 'lsp-backend-local'
+  #   scrape_interval: 10s
+  #   scrape_timeout: 5s
+  #   metrics_path: '/metrics'
+  #   scheme: 'http'
+  #   static_configs:
+  #     - targets: ['localhost:8000']
+  #       labels:
+  #         instance: 'lsp-backend-local'
+  #         environment: 'development'
+
+  # Optional: Prometheus self-monitoring
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]

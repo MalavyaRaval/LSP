@@ -40,6 +40,7 @@ scrape_configs:
     tls_config:
       insecure_skip_verify: false # Verify SSL certificates
 
+
   # Optional: Local development configuration (uncomment when testing locally)
   # - job_name: 'lsp-backend-local'
   #   scrape_interval: 10s
@@ -51,8 +52,3 @@ scrape_configs:
   #       labels:
   #         instance: 'lsp-backend-local'
   #         environment: 'development'
-
-  # Optional: Prometheus self-monitoring
-  - job_name: "prometheus"
-    static_configs:
-      - targets: ["localhost:9090"]

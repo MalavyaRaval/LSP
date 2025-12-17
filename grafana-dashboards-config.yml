@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: "LSP Dashboards"
+    orgId: 1
+    folder: "LSP Backend"
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /etc/grafana/provisioning/dashboards

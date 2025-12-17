@@ -42,13 +42,13 @@ scrape_configs:
 
 
   # Optional: Local development configuration (uncomment when testing locally)
-  # - job_name: 'lsp-backend-local'
+  # - job_name: "lsp-backend-local"
   #   scrape_interval: 10s
   #   scrape_timeout: 5s
-  #   metrics_path: '/metrics'
-  #   scheme: 'http'
+  #   metrics_path: "/metrics"
+  #   scheme: "http"
   #   static_configs:
-  #     - targets: ['localhost:8000']
+  #     - targets: ["localhost:8000"]
   #       labels:
-  #         instance: 'lsp-backend-local'
-  #         environment: 'development'
+  #         instance: "lsp-backend-local"
+  #         environment: "development"

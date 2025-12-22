@@ -50,7 +50,9 @@ Run this command to start monitoring your application:
 
 Then open **http://localhost:3000** in your browser.
 
-**Login:** admin / admin
+### Login
+UserName: admin   
+Password: admin
 
 View three auto-provisioned dashboards:
 
